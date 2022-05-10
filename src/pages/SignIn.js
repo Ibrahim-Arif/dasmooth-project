@@ -73,7 +73,7 @@ export default function SignIn() {
           <Form.Item
             name="password"
             rules={[
-              { min: 8, message: "Password length should not be less than 6" },
+              { min: 6, message: "Password length should not be less than 6" },
               {
                 required: true,
                 message: "Please input your Password!",
