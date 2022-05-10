@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import {
+  BrowserRouter,
+  Navigate,
+  useLocation,
+  Route,
+  Routes,
+} from "react-router-dom";
+import { StateProvider } from "./hooks/useContext";
+import { Dashboard, SignIn } from "./pages";
 
-function App() {
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap";
+import "antd/dist/antd.min.css";
+
+const App = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setLoading] = useState(false);
+  const userContextValues = {
+    isLogin,
+    setIsLogin,
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <StateProvider values={userContextValues}>
+      <BrowserRouter>
+        {isLoading === false ? (
+          <>
+            <Routes>
+              <Route
+                path="/"
+                // element={isLogin !== false ? <Navigate to="/" /> : <SignIn />}
+                element={<SignIn />}
+              />
+              <Route path="/dashboard" element={<Dashboard />} />
+              {/*  <Route path="*" element={<NotFound />} /> */}
+            </Routes>
+          </>
+        ) : // <Loading />
+        null}
+      </BrowserRouter>
+    </StateProvider>
   );
-}
+};
 
 export default App;
