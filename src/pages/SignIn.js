@@ -11,6 +11,7 @@ export default function SignIn() {
   const [mode, setMode] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+
   useEffect(() => {
     document.getElementById("root").style.backgroundColor = colors.cg100;
   }, []);
@@ -33,11 +34,11 @@ export default function SignIn() {
   const { Title } = Typography;
 
   return (
-    <Container className="d-flex flex-row " style={{ height: "100vh" }}>
-      <Container className="d-md-flex d-none justify-content-center align-items-center">
+    <Container className="d-flex flex-column" style={{ height: "100vh" }}>
+      <Container className="d-flex mt-5 justify-content-center align-items-center">
         <h1>Logo</h1>
       </Container>
-      <Container className="d-flex flex-column justify-content-center align-items-center">
+      <Container className="d-flex flex-column col-12 col-lg-7 mt-5 justify-content-center align-items-center">
         <Title level={1} className="mb-5">
           <ColoredTitle color="white">
             {/* {!mode ? "Sign In" : "Sign Up"} */}
@@ -46,13 +47,14 @@ export default function SignIn() {
         </Title>
         <Form
           name="normal_login"
-          className="login-form d-flex flex-column align-items-center"
+          className="login-form d-flex col-12 flex-column align-items-center"
           initialValues={{
             remember: true,
           }}
           onFinish={onFinish}
         >
           <Form.Item
+            className="col-12"
             name="email"
             rules={[
               {
@@ -71,6 +73,7 @@ export default function SignIn() {
             />
           </Form.Item>
           <Form.Item
+            className="col-12"
             name="password"
             rules={[
               { min: 6, message: "Password length should not be less than 6" },
@@ -137,20 +140,20 @@ const LoginButton = styledComponents(Button)`
         width: 300px;
         height: 40px;
         color: ${(props) => (props.color ? props.color : "white")};
-        border-color:${(props) => props.bgColor};
-        background-color:${(props) => props.bgColor};
+        border-color:${({ bgColor, ...props }) => bgColor};
+        background-color:${({ bgColor, ...props }) => bgColor};
         :hover{
-          color: ${(props) => props.bgColor};
-          border-color:${(props) => props.bgColor};
+          color: ${({ bgColor, ...props }) => bgColor};
+          border-color:${({ bgColor, ...props }) => bgColor};
         }
 `;
 
 const FormInput = styledComponents(Input, Input.Password)`
-    width: 300px;
+    width: 100%;
     height: 40px;
 `;
 const FormPassword = styledComponents(Input.Password)`
-    width: 300px;
+    width: 100%;
     height: 40px;
 `;
 

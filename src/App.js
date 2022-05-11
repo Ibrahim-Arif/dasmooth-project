@@ -32,7 +32,7 @@ const App = () => {
                 // element={isLogin !== false ? <Navigate to="/" /> : <SignIn />}
                 element={<SignIn />}
               />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/*" element={<Dashboard />} />
               {/*  <Route path="*" element={<NotFound />} /> */}
             </Routes>
           </>

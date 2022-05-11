@@ -1,115 +1,166 @@
-import React, { useState } from "react";
-import { Layout, Menu, Breadcrumb } from "antd";
+import React, { useEffect, useState } from "react";
+import { Layout, Menu, Input, Button } from "antd";
 import {
   DesktopOutlined,
   PieChartOutlined,
   FileOutlined,
   TeamOutlined,
+  TeamFilled,
   UserOutlined,
   LoginOutlined,
+  SearchOutlined,
+  RightOutlined,
+  DeleteFilled,
+  DeleteOutlined,
+  SettingOutlined,
+  BellOutlined,
 } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+
+import { Container } from "react-bootstrap";
+import { BrowserRouter, useNavigate, Routes, Route } from "react-router-dom";
 import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
+import styledComponents from "styled-components";
 
 import "./dashboard.css";
+import DeleteBaton from "./DeleteBaton";
 
+const { Header, Content, Footer, Sider } = Layout;
 export default function Dashboard() {
   const [collapsed, setCollapsed] = useState(false);
-
+  const [renderSearchBar, setRenderSearchBar] = useState(false);
   const { setIsLogin } = useUser();
-  const onCollapse = (collapsed) => {
-    console.log(collapsed);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.getElementById("root").style.backgroundColor = "white";
+  }, []);
+
+  const onCollapse = (collapsed, type) => {
+    console.log(collapsed, type);
     setCollapsed(collapsed);
   };
-  const { Header, Content, Footer, Sider } = Layout;
-  function getItem(label, key, icon, children) {
+
+  const handleSearchBarShow = () => {
+    if (window.innerWidth <= 768) {
+      setRenderSearchBar(!renderSearchBar);
+    }
+  };
+
+  const getItem = (label, key, icon, children) => {
     return {
       key,
       icon,
       children,
       label,
     };
-  }
+  };
+  const handleItemClick = ({ item, key, keyPath, domEvent }) => {
+    console.log(key);
+    switch (key) {
+      case "logout":
+        setIsLogin(false);
+        navigate("/");
+        break;
+      case "delete":
+        navigate("deleteBaton");
+        break;
+      case "dashboard":
+        navigate("/dashboard");
+        break;
+    }
+  };
   const items = [
-    getItem("Dashboard", "1", <PieChartOutlined />),
-    getItem("Notifications", "2", <DesktopOutlined />),
-    getItem("Profile Settings", "sub1", <UserOutlined />),
+    getItem("Dashboard", "dashboard", <PieChartOutlined />),
+    getItem("Notifications", "notifications", <BellOutlined />),
+    getItem("Profile Settings", "profile", <SettingOutlined />),
     getItem("Team Members", "team", <TeamOutlined />),
-    getItem("Deleted Batons", "del", <FileOutlined />),
+    getItem("Deleted Batons", "delete", <DeleteOutlined />),
     getItem(
       "Logout",
       "logout",
 
       <LoginOutlined />
-      // [<Link to="/" onClick={() => setIsLogin(false)}></Link>]
     ),
   ];
 
   return (
-    <Layout
+    <div
       style={{
         minHeight: "100vh",
       }}
     >
-      <Sider
-        collapsible
-        collapsed={collapsed}
-        onCollapse={onCollapse}
-        style={{ backgroundColor: colors.tealLight80 }}
+      <DashboardHeader
+        bgColor={colors.teal100}
+        className="d-flex flex-row align-items-center"
       >
-        <div className="logo" />
-        <Menu
-          theme="light"
-          style={{
-            color: colors.teal100,
-            backgroundColor: colors.tealLight80,
-            fontWeight: "bold",
-          }}
-          defaultSelectedKeys={["1"]}
-          mode="inline"
-          items={items}
-        ></Menu>
-      </Sider>
-      <Layout className="site-layout">
-        <Header
-          className="site-layout-background"
-          style={{
-            padding: 0,
-          }}
-        />
-        {/* <Content
-          style={{
-            margin: "0 16px",
-          }}
-        >
-          <Breadcrumb
-            style={{
-              margin: "16px 0",
-            }}
-          >
-            <Breadcrumb.Item>User</Breadcrumb.Item>
-            <Breadcrumb.Item>Bill</Breadcrumb.Item>
-          </Breadcrumb>
-          <div
-            className="site-layout-background"
-            style={{
-              padding: 24,
-              minHeight: 360,
-            }}
-          >
-            Bill is a cat.
-          </div>
-        </Content> */}
+        <Container className="col-8 col-lg-3 align-self-center">
+          {!renderSearchBar && <h2>Logo</h2>}
+          {renderSearchBar && (
+            <SearchBar
+              size="large"
+              placeholder="Search by name, email or team member"
+              prefix={<SearchOutlined />}
+            />
+          )}
+        </Container>
+        <Container className="col-2 col-md-1 col-lg-8 ">
+          <Button
+            shape="circle"
+            className="d-inline-block d-lg-none"
+            icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
+            size="large"
+            color={colors.teal100}
+            onClick={handleSearchBarShow}
+          />
 
-        {/* <Footer
-          style={{
-            textAlign: "center",
+          <SearchBar
+            className="d-none d-lg-flex w-50"
+            size="large"
+            placeholder="Search by name, email or team member"
+            prefix={<SearchOutlined />}
+          />
+        </Container>
+      </DashboardHeader>
+      <Layout style={{ minHeight: "100vh" }}>
+        <Sider
+          className="col-3"
+          collapsible
+          collapsed={collapsed}
+          // collapsedWidth="0"
+          onCollapse={onCollapse}
+          style={{ backgroundColor: colors.tealLight80 }}
+          // trigger={null}
+          onBreakpoint={(broken) => {
+            console.log(broken);
           }}
         >
-          Ant Design ©2018 Created by Ant UED
-        </Footer> */}
+          <Menu
+            theme="light"
+            style={{
+              color: colors.teal100,
+              backgroundColor: colors.tealLight80,
+              fontWeight: "bold",
+            }}
+            defaultSelectedKeys={["1"]}
+            mode="inline"
+            items={items}
+            onClick={handleItemClick}
+          ></Menu>
+        </Sider>
+        <Routes>
+          <Route path="/deleteBaton" element={<DeleteBaton />} />
+        </Routes>
       </Layout>
-    </Layout>
+    </div>
   );
 }
+
+const DashboardHeader = styledComponents(Header)`
+  padding: 0px;
+  background-color:${({ bgColor, ...props }) => bgColor};
+`;
+
+const SearchBar = styledComponents(Input)`
+    border-radius: 50px;
+`;
