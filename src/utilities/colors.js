@@ -20,4 +20,5 @@ export const colors = {
   tealLight90: "#E6F4F3",
   cgLight95: "#F4F5F6",
   tealLight95: "#F2F9F8",
+  htmlColor: "#161c1f",
 };

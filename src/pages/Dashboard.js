@@ -7,6 +7,7 @@ import { colors } from "../utilities/colors";
 
 export default function Dashboard() {
   const [mode, setMode] = useState(1);
+
   return (
     <>
       <Container className="row mt-4">

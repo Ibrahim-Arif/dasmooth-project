@@ -13,7 +13,7 @@ export default function SignIn() {
   const location = useLocation();
 
   useEffect(() => {
-    document.getElementById("root").style.backgroundColor = colors.cg100;
+    document.getElementById("root").style.backgroundColor = colors.htmlColor;
   }, []);
 
   const [form] = Form.useForm();

@@ -1,31 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Input, Button } from "antd";
-import {
-  DesktopOutlined,
-  PieChartOutlined,
-  FileOutlined,
-  TeamOutlined,
-  TeamFilled,
-  UserOutlined,
-  LoginOutlined,
-  SearchOutlined,
-  RightOutlined,
-  DeleteFilled,
-  DeleteOutlined,
-  SettingOutlined,
-  BellOutlined,
-  BarsOutlined,
-} from "@ant-design/icons";
+import { SearchOutlined, RightOutlined, BarsOutlined } from "@ant-design/icons";
 
 import { Container } from "react-bootstrap";
 import { useNavigate, Routes, Route } from "react-router-dom";
-import { useUser } from "../hooks/useContext";
-import { colors } from "../utilities/colors";
 import styledComponents from "styled-components";
 
-import "./dashboard.css";
 import DeleteBaton from "./DeleteBaton";
 import Dashboard from "./Dashboard";
+import { useUser } from "../hooks/useContext";
+import { colors } from "../utilities/colors";
+import { menuItems } from "../utilities/MenuItems";
+
+import "./dashboard.css";
 
 const { Header, Sider } = Layout;
 
@@ -37,11 +24,8 @@ export default function DashboardMenu() {
 
   useEffect(() => {
     document.getElementById("root").style.backgroundColor = "white";
+    navigate("main");
   }, []);
-  // useEffect(
-  //   () => (window.innerWidth < 768 ? setCollapsed(true) : setCollapsed(false)),
-  //   [window.innerWidth]
-  // );
 
   const onCollapse = (collapsed, type) => {
     console.log(collapsed, type);
@@ -54,14 +38,6 @@ export default function DashboardMenu() {
     }
   };
 
-  const getItem = (label, key, icon, children) => {
-    return {
-      key,
-      icon,
-      children,
-      label,
-    };
-  };
   const handleItemClick = ({ item, key, keyPath, domEvent }) => {
     console.log(key);
     switch (key) {
@@ -77,20 +53,6 @@ export default function DashboardMenu() {
         break;
     }
   };
-
-  const items = [
-    getItem("Dashboard", "dashboard", <PieChartOutlined />),
-    getItem("Notifications", "notifications", <BellOutlined />),
-    getItem("Profile Settings", "profile", <SettingOutlined />),
-    getItem("Team Members", "team", <TeamOutlined />),
-    getItem("Deleted Batons", "delete", <DeleteOutlined />),
-    getItem(
-      "Logout",
-      "logout",
-
-      <LoginOutlined />
-    ),
-  ];
 
   return (
     <div
@@ -127,6 +89,8 @@ export default function DashboardMenu() {
             />
           )}
         </Container>
+
+        {/* Search Bar */}
         <Container className="col-2 col-md-1 col-lg-8 ">
           <Button
             shape="circle"
@@ -145,6 +109,8 @@ export default function DashboardMenu() {
           />
         </Container>
       </DashboardHeader>
+
+      {/* Layout Grid */}
       <Layout style={{ minHeight: "100vh" }}>
         <Sider
           className="col-3"
@@ -165,10 +131,12 @@ export default function DashboardMenu() {
             }}
             defaultSelectedKeys={["1"]}
             mode="inline"
-            items={items}
+            items={menuItems}
             onClick={handleItemClick}
           ></Menu>
         </Sider>
+
+        {/* Nested Routing */}
         <Routes>
           <Route path="/main" element={<Dashboard />} />
           <Route path="/deleteBaton" element={<DeleteBaton />} />
