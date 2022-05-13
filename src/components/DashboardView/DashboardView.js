@@ -15,7 +15,7 @@ export default function DashboardView(props) {
           style={{ backgroundColor: colors.teal100, color: "white" }}
           size="large"
           icon={<PlusOutlined />}
-          // className="row align-items-center"
+          className="d-flex flex-row align-items-center"
           onClick={() => props.setMode(1)}
         >
           CREATE NEW

@@ -10,6 +10,7 @@ export default function FormItemSelect({
   image = null,
   onItemPress = () => null,
   isItemActive,
+  customColor = null,
 }) {
   const passive = { color: colors.teal100, bgColor: colors.tealLight90 };
   const active = { color: "white", bgColor: colors.teal100 };
@@ -18,12 +19,17 @@ export default function FormItemSelect({
 
   useEffect(() => setIsActive(isItemActive), [isItemActive]);
   useEffect(
-    () => (isActive ? setActiveColor(active) : setActiveColor(passive)),
-    [isActive]
+    () =>
+      customColor
+        ? setActiveColor(customColor)
+        : isItemActive
+        ? setActiveColor(active)
+        : setActiveColor(passive),
+    [isItemActive]
   );
   return (
     <CustomButton
-      className="row d-flex flex-row justify-content-center justify-content-md-start align-items-center py-2 mt-3"
+      className={`row d-flex flex-row justify-content-center justify-content-md-start align-items-center py-2 mt-3`}
       color={activeColor.color}
       bgcolor={activeColor.bgColor}
       onClick={() => {
@@ -31,9 +37,11 @@ export default function FormItemSelect({
         onItemPress();
       }}
     >
-      <Container className="col-1 d-flex align-items-center">
-        {image ? image : icon}
-      </Container>
+      {customColor == null && (
+        <Container className="col-1 d-flex align-items-center">
+          {image ? image : icon}
+        </Container>
+      )}
       <Container className="col-11 ">{text}</Container>
     </CustomButton>
   );

@@ -3,10 +3,13 @@ import { Upload, message } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 
 const { Dragger } = Upload;
+// https://prismasoft.medium.com/multiple-files-upload-to-firebase-in-react-using-ant-design-65ba671d9af5
+// use above link to for firebase file uploads
+
 const props = {
   name: "file",
   multiple: true,
-  action: "https://www.mocky.io/v2/5cc8019d300000980a055e76",
+  action: "https://api.imgur.com/3/image",
   onChange(info) {
     const { status } = info.file;
     if (status !== "uploading") {
@@ -25,7 +28,11 @@ const props = {
 
 export default function ImageUpload({ boxColor }) {
   return (
-    <Dragger {...props}>
+    <Dragger
+      {...props}
+      //   onChange={({ file, fileList, event }) => console.log(file)}
+      //   customRequest={httpRequest}
+    >
       <p className="ant-upload-drag-icon">
         <InboxOutlined style={{ color: boxColor }} />
       </p>
