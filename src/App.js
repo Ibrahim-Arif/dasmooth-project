@@ -1,15 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { StateProvider } from "./hooks/useContext";
-import {  DashboardMenu, SignIn } from "./pages";
+import { DashboardMenu, SignIn } from "./pages";
 
-import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap";
 import "antd/dist/antd.min.css";
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setLoading] = useState(false);
+
   const userContextValues = {
     isLogin,
     setIsLogin,

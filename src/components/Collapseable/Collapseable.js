@@ -41,8 +41,11 @@ export default function Collapseable({
           className="row mx-2 align-items-center justify-content-between"
           bordercolor={borderColor}
         >
-          <Container className="col-8  col-md-10 pt-2">
-            <h5>Test</h5>
+          <Container
+            className="col-8  col-md-10 pt-2"
+            style={{ wordWrap: "break-word" }}
+          >
+            <h5>{title}</h5>
           </Container>
           <Container className="col-4 col-md-2">
             <RightOutlined style={{ fontWeight: "bold", fontSize: 24 }} />
@@ -63,7 +66,7 @@ const PanelItem = styledComponents.div`
     border-left: 5px solid ${({ bordercolor }) => bordercolor};
     background-color: white;
     border-radius: 5px;
-    height: 50px;
+    min-height: 50px;
     font-weight: bold;
     transition: 0.4s;
     box-shadow: 0px 4px 0px 0px rgba(122,122,122,0.86);

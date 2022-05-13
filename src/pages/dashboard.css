@@ -15,3 +15,14 @@
 .ant-menu > .ant-menu-vertical .ant-menu-item:after {
   border-right: 3px solid #009688;
 }
+
+@media screen and (max-width: 360px) {
+  h4,
+  h5 {
+    font-size: calc(13px + 1vw) !important;
+  }
+}
+h5 {
+  /* word-wrap: break-word !important; */
+  /* font-size: calc(8px + 1vw) !important; */
+}

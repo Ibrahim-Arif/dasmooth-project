@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Menu, Input, Button } from "antd";
+import { Layout, Menu, Input, Button, Avatar } from "antd";
 import { SearchOutlined, RightOutlined, BarsOutlined } from "@ant-design/icons";
 
 import { Container } from "react-bootstrap";
 import { useNavigate, Routes, Route } from "react-router-dom";
 import styledComponents from "styled-components";
 
+import Notification from "./Notification";
+import TeamMembers from "./TeamMembers";
 import DeleteBaton from "./DeleteBaton";
 import Dashboard from "./Dashboard";
+import Profile from "./Profile";
+
 import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
 import { menuItems } from "../utilities/MenuItems";
@@ -17,7 +21,7 @@ import "./dashboard.css";
 const { Header, Sider } = Layout;
 
 export default function DashboardMenu() {
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
   const { setIsLogin } = useUser();
   const navigate = useNavigate();
@@ -28,7 +32,7 @@ export default function DashboardMenu() {
   }, []);
 
   const onCollapse = (collapsed, type) => {
-    console.log(collapsed, type);
+    // console.log(collapsed, type);
     setCollapsed(collapsed);
   };
 
@@ -38,8 +42,8 @@ export default function DashboardMenu() {
     }
   };
 
-  const handleItemClick = ({ item, key, keyPath, domEvent }) => {
-    console.log(key);
+  const handleItemClick = ({ key }) => {
+    // console.log(key);
     switch (key) {
       case "logout":
         setIsLogin(false);
@@ -51,6 +55,15 @@ export default function DashboardMenu() {
       case "dashboard":
         navigate("main");
         break;
+      case "notifications":
+        navigate("notifications");
+        break;
+      case "profile":
+        navigate("profileSettings");
+        break;
+      case "team":
+        navigate("teamMembers");
+        break;
     }
   };
 
@@ -61,7 +74,7 @@ export default function DashboardMenu() {
       }}
     >
       <DashboardHeader
-        bgColor={colors.teal100}
+        bgcolor={colors.teal100}
         className="d-flex flex-row align-items-center"
       >
         <Container className="col-8 col-lg-3 align-self-center">
@@ -111,7 +124,7 @@ export default function DashboardMenu() {
       </DashboardHeader>
 
       {/* Layout Grid */}
-      <Layout style={{ minHeight: "100vh" }}>
+      <Layout style={{ minHeight: "100vh", overflow: "hidden" }}>
         <Sider
           className="col-3"
           collapsible
@@ -122,6 +135,11 @@ export default function DashboardMenu() {
           onCollapse={onCollapse}
           style={{ backgroundColor: colors.tealLight80 }}
         >
+          <Container className="d-flex flex-column justify-content-center align-items-center p-4">
+            <Avatar src="https://joeschmoe.io/api/v1/random" size={70} />
+            <h5 className="mt-3">UserName</h5>
+          </Container>
+
           <Menu
             theme="light"
             style={{
@@ -129,7 +147,7 @@ export default function DashboardMenu() {
               backgroundColor: colors.tealLight80,
               fontWeight: "bold",
             }}
-            defaultSelectedKeys={["1"]}
+            defaultSelectedKeys={["dashboard"]}
             mode="inline"
             items={menuItems}
             onClick={handleItemClick}
@@ -140,6 +158,9 @@ export default function DashboardMenu() {
         <Routes>
           <Route path="/main" element={<Dashboard />} />
           <Route path="/deleteBaton" element={<DeleteBaton />} />
+          <Route path="/notifications" element={<Notification />} />
+          <Route path="/teamMembers" element={<TeamMembers />} />
+          <Route path="/profileSettings" element={<Profile />} />
         </Routes>
       </Layout>
     </div>
@@ -148,7 +169,7 @@ export default function DashboardMenu() {
 
 const DashboardHeader = styledComponents(Header)`
   padding: 0px;
-  background-color:${({ bgColor, ...props }) => bgColor};
+  background-color:${({ bgcolor, ...props }) => bgcolor};
 `;
 
 const SearchBar = styledComponents(Input)`
