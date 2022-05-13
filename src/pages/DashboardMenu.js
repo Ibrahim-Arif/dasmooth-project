@@ -24,6 +24,7 @@ export default function DashboardMenu() {
   const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
   const { setIsLogin } = useUser();
+  const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function DashboardMenu() {
 
   const handleItemClick = ({ key }) => {
     // console.log(key);
+
     switch (key) {
       case "logout":
         setIsLogin(false);
@@ -65,8 +67,12 @@ export default function DashboardMenu() {
         navigate("teamMembers");
         break;
     }
+    window.innerWidth < 768 && setCollapsed(true);
   };
-
+  useEffect(
+    () => (window.innerWidth < 768 ? setSiderW("100vw") : setSiderW("200px")),
+    [window.innerWidth]
+  );
   return (
     <div
       style={{
@@ -134,6 +140,7 @@ export default function DashboardMenu() {
           trigger={null}
           onCollapse={onCollapse}
           style={{ backgroundColor: colors.tealLight80 }}
+          width={siderW}
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
             <Avatar src="https://joeschmoe.io/api/v1/random" size={70} />
