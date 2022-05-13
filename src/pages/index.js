@@ -1,5 +1,5 @@
-import Dashboard from "./Dashboard";
+import DashboardMenu from "./DashboardMenu";
 import DeleteBaton from "./DeleteBaton";
 import SignIn from "./SignIn";
 
-export { Dashboard, SignIn, DeleteBaton };
+export { DashboardMenu, SignIn, DeleteBaton };

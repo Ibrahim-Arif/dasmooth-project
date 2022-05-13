@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter,
-  Navigate,
-  useLocation,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { StateProvider } from "./hooks/useContext";
-import { Dashboard, SignIn } from "./pages";
+import {  DashboardMenu, SignIn } from "./pages";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap";
@@ -32,7 +26,7 @@ const App = () => {
                 // element={isLogin !== false ? <Navigate to="/" /> : <SignIn />}
                 element={<SignIn />}
               />
-              <Route path="/dashboard/*" element={<Dashboard />} />
+              <Route path="/dashboard/*" element={<DashboardMenu />} />
               {/*  <Route path="*" element={<NotFound />} /> */}
             </Routes>
           </>
