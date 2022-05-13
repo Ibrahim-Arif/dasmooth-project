@@ -1,10 +1,6 @@
 import React from "react";
 import { Collapse } from "antd";
-import {
-  ArrowRightOutlined,
-  CaretRightOutlined,
-  RightOutlined,
-} from "@ant-design/icons";
+import { CaretRightOutlined, RightOutlined } from "@ant-design/icons";
 import styledComponents from "styled-components";
 import { Container } from "react-bootstrap";
 

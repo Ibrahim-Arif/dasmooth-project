@@ -9,11 +9,14 @@ export default function FormItemSelect({
   text,
   image = null,
   onItemPress = () => null,
+  isItemActive,
 }) {
   const passive = { color: colors.teal100, bgColor: colors.tealLight90 };
   const active = { color: "white", bgColor: colors.teal100 };
   const [activeColor, setActiveColor] = useState(passive);
   const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => setIsActive(isItemActive), [isItemActive]);
   useEffect(
     () => (isActive ? setActiveColor(active) : setActiveColor(passive)),
     [isActive]
