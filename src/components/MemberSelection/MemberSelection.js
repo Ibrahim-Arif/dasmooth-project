@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Input, Avatar } from "antd";
 import { colors } from "../../utilities/colors";
 import { PlusOutlined, UserOutlined } from "@ant-design/icons";
-import FormItemSelect from "../FormItemSelect";
 import { TealButton } from "../FormButton/FormButton";
+import Selectable from "../Selectable/Selectable";
 
 export default function MemberSelection({
   itemSelected,
@@ -23,13 +23,13 @@ export default function MemberSelection({
         style={{ borderRadius: 5, width: "100%" }}
       />
       <div className="px-3">
-        <FormItemSelect
+        <Selectable
           icon={<PlusOutlined />}
           text="Invite team member by email or text message"
           isItemActive={false}
           customColor={{ color: colors.teal100, bgColor: colors.cgLight95 }}
         />
-        <FormItemSelect
+        <Selectable
           onItemPress={() => {
             setCurrentItem({
               text: "Oswaldo Mondenza",
@@ -40,7 +40,7 @@ export default function MemberSelection({
           text="Oswaldo Mondenza"
           isItemActive={currentItem.text === "Oswaldo Mondenza" ? true : false}
         />
-        <FormItemSelect
+        <Selectable
           image={
             <Avatar style={{ backgroundColor: colors.teal100 }}>LW</Avatar>
           }

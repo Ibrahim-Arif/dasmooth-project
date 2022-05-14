@@ -10,12 +10,13 @@ import {
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 
-import { Modal, Input } from "antd";
+import { Modal } from "antd";
+
 import {
   BudgetForm,
   DashboardView,
   DateTimeSelection,
-  FormItemSelect,
+  Selectable,
   ImageUpload,
   MemberSelection,
   PostUpdateForm,
@@ -85,11 +86,13 @@ export default function Dashboard() {
       showModal();
     }
   };
+
   useEffect(() => {
     if (mode == 1) {
       flushData();
     }
   }, [mode]);
+
   return (
     <>
       <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
@@ -115,13 +118,14 @@ export default function Dashboard() {
                 />
                 <h4 className="mt-4">Get new city permit</h4>
                 {/* FormItems */}
-                <FormItemSelect
+                <Selectable
                   icon={null}
                   text="We need to get a permit for the Bilal and Ibrahim location"
                   isItemActive={false}
                   customColor={{ color: "black", bgColor: "white" }}
                 />
-                <FormItemSelect
+
+                <Selectable
                   icon={teamMemberData.icon}
                   image={teamMemberData.image}
                   text={teamMemberData.text}
@@ -143,7 +147,7 @@ export default function Dashboard() {
                       : false
                   }
                 />
-                <FormItemSelect
+                <Selectable
                   icon={<CalendarOutlined />}
                   text={dateData}
                   isItemActive={
@@ -163,7 +167,7 @@ export default function Dashboard() {
                     )
                   }
                 />
-                <FormItemSelect
+                <Selectable
                   icon={<DollarOutlined />}
                   text={budgetData}
                   isItemActive={
@@ -183,7 +187,7 @@ export default function Dashboard() {
                     )
                   }
                 />
-                <FormItemSelect
+                <Selectable
                   icon={<FileAddOutlined />}
                   text={filesList.text}
                   isItemActive={
@@ -204,7 +208,7 @@ export default function Dashboard() {
                     )
                   }
                 />
-                <FormItemSelect
+                <Selectable
                   icon={<FileTextOutlined />}
                   text="Post an Update"
                   isItemActive={

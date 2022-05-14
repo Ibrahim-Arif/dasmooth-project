@@ -2,9 +2,9 @@ import { Button } from "antd";
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import styledComponents from "styled-components";
-import { colors } from "../utilities/colors";
+import { colors } from "../../utilities/colors";
 
-export default function FormItemSelect({
+export default function Selectable({
   icon,
   text,
   image = null,
