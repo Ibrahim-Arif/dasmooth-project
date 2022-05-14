@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Input, Button, Avatar } from "antd";
+import { Input, Avatar } from "antd";
 import { colors } from "../../utilities/colors";
 import { PlusOutlined, UserOutlined } from "@ant-design/icons";
 import FormItemSelect from "../FormItemSelect";
+import { TealButton } from "../FormButton/FormButton";
 
 export default function MemberSelection({
   itemSelected,
@@ -58,7 +59,7 @@ export default function MemberSelection({
           isItemActive={false}
         /> */}
       </div>
-      <Button
+      <TealButton
         onClick={() => {
           setItemSelected({
             text: currentItem.text,
@@ -67,17 +68,10 @@ export default function MemberSelection({
           });
           clickOk();
         }}
-        style={{
-          marginTop: 16,
-          backgroundColor: colors.teal100,
-          color: "white",
-          fontWeight: "bold",
-          height: 50,
-        }}
         className="col-12"
       >
         SELECT TEAM MEMBER
-      </Button>
+      </TealButton>
     </>
   );
 }

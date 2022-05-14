@@ -9,17 +9,23 @@ import {
   FileTextOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
-import { Modal, Button } from "antd";
+
+import { Modal, Input } from "antd";
 import {
+  BudgetForm,
   DashboardView,
   DateTimeSelection,
   FormItemSelect,
   ImageUpload,
   MemberSelection,
+  PostUpdateForm,
 } from "../components";
 import { colors } from "../utilities/colors";
 
 import "./dashboard.css";
+import { TealButton } from "../components/FormButton/FormButton";
+import { flushSync } from "react-dom";
+
 export default function Dashboard() {
   const [mode, setMode] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -29,12 +35,40 @@ export default function Dashboard() {
   const showModal = () => {
     setIsModalVisible(true);
   };
-  const [teamMemeberData, setTeamMemberData] = useState({
+  const [teamMemberData, setTeamMemberData] = useState({
     text: "Select a team member",
     icon: <UserOutlined />,
     image: null,
   });
+  const [dateData, setDateData] = useState("Set a deadline");
+  const [budgetData, setBudgetData] = useState("Set a budget");
+  const [postUpdateData, setPostUpdateData] = useState("");
 
+  const [filesList, setFilesList] = useState({
+    text: "Attach a file",
+    filesList: [],
+  });
+
+  const flushData = () => {
+    setActiveComponent(null);
+    setActiveItemIndex(-1);
+    setActiveTitle("");
+    setTeamMemberData({
+      text: "Select a team member",
+      icon: <UserOutlined />,
+      image: null,
+    });
+    setDateData("Set a deadline");
+    setBudgetData("Set a budget");
+    setPostUpdateData("");
+    setFilesList({
+      text: "Attach a file",
+      filesList: [],
+    });
+  };
+  const handlePass = () => {
+    console.log(dateData, budgetData, postUpdateData, filesList.filesList);
+  };
   const handleOk = () => {
     setIsModalVisible(false);
   };
@@ -53,14 +87,7 @@ export default function Dashboard() {
   };
   useEffect(() => {
     if (mode == 1) {
-      setActiveComponent(null);
-      setActiveItemIndex(-1);
-      setActiveTitle("");
-      setTeamMemberData({
-        text: "Select a team member",
-        icon: <UserOutlined />,
-        image: null,
-      });
+      flushData();
     }
   }, [mode]);
   return (
@@ -95,14 +122,14 @@ export default function Dashboard() {
                   customColor={{ color: "black", bgColor: "white" }}
                 />
                 <FormItemSelect
-                  icon={teamMemeberData.icon}
-                  image={teamMemeberData.image}
-                  text={teamMemeberData.text}
+                  icon={teamMemberData.icon}
+                  image={teamMemberData.image}
+                  text={teamMemberData.text}
                   onItemPress={() =>
                     handleFormItemRender(
-                      teamMemeberData.text,
+                      "Select a member",
                       <MemberSelection
-                        itemSelected={teamMemeberData}
+                        itemSelected={teamMemberData}
                         setItemSelected={setTeamMemberData}
                         clickOk={handleOk}
                       />,
@@ -111,52 +138,94 @@ export default function Dashboard() {
                   }
                   isItemActive={
                     activeItemIndex == 1 ||
-                    teamMemeberData.text != "Select a team member"
+                    teamMemberData.text != "Select a team member"
                       ? true
                       : false
                   }
                 />
                 <FormItemSelect
                   icon={<CalendarOutlined />}
-                  text=" Set a deadline"
-                  isItemActive={activeItemIndex == 2 ? true : false}
+                  text={dateData}
+                  isItemActive={
+                    activeItemIndex == 2 || dateData != "Set a deadline"
+                      ? true
+                      : false
+                  }
                   onItemPress={() =>
                     handleFormItemRender(
                       "Set a deadline",
-                      <DateTimeSelection />,
+                      <DateTimeSelection
+                        itemSelected={dateData}
+                        setItemSelected={setDateData}
+                        clickOk={handleOk}
+                      />,
                       2
                     )
                   }
                 />
                 <FormItemSelect
                   icon={<DollarOutlined />}
-                  text=" Set a budget"
-                  isItemActive={activeItemIndex == 3 ? true : false}
+                  text={budgetData}
+                  isItemActive={
+                    activeItemIndex == 3 || budgetData != "Set a budget"
+                      ? true
+                      : false
+                  }
                   onItemPress={() =>
-                    handleFormItemRender("Set a budget", null, 3)
+                    handleFormItemRender(
+                      "Set a budget",
+                      <BudgetForm
+                        itemSelected={budgetData}
+                        setItemSelected={setBudgetData}
+                        clickOk={handleOk}
+                      />,
+                      3
+                    )
                   }
                 />
                 <FormItemSelect
                   icon={<FileAddOutlined />}
-                  text=" Attach a file"
-                  isItemActive={activeItemIndex == 4 ? true : false}
+                  text={filesList.text}
+                  isItemActive={
+                    activeItemIndex == 4 || filesList.text != "Attach a file"
+                      ? true
+                      : false
+                  }
                   onItemPress={() =>
                     handleFormItemRender(
                       "Attach a file",
-                      <ImageUpload boxColor={colors.teal100} />,
+                      <ImageUpload
+                        boxColor={colors.teal100}
+                        itemSelected={filesList}
+                        setItemSelected={setFilesList}
+                        clickOk={handleOk}
+                      />,
                       4
                     )
                   }
                 />
                 <FormItemSelect
                   icon={<FileTextOutlined />}
-                  text=" Post an Update"
-                  isItemActive={activeItemIndex == 5 ? true : false}
+                  text="Post an Update"
+                  isItemActive={
+                    activeItemIndex == 5 || postUpdateData != "" ? true : false
+                  }
                   onItemPress={() =>
-                    handleFormItemRender("Post an Update", null, 5)
+                    handleFormItemRender(
+                      "Post an Update",
+                      <PostUpdateForm
+                        itemSelected={postUpdateData}
+                        setItemSelected={setPostUpdateData}
+                        clickOk={handleOk}
+                      />,
+                      5
+                    )
                   }
                 />
               </Container>
+              <TealButton className="col-12" onClick={handlePass}>
+                PASS
+              </TealButton>
             </>
           )}
         </Container>

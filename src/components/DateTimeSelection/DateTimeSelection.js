@@ -1,16 +1,23 @@
 import React, { useState } from "react";
-import { Calendar, Alert } from "antd";
+import { Calendar, TimePicker } from "antd";
 import moment from "moment";
 import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
+import { TealButton } from "../FormButton/FormButton";
 
-export default function DateTimeSelection() {
-  const [dateTime, setDataTime] = useState("");
+export default function DateTimeSelection({
+  itemSelected,
+  setItemSelected,
+  clickOk,
+}) {
   const [calendar, setCalendar] = useState({
     value: moment(),
     selectedValue: moment(),
   });
-
+  const [time, setTime] = useState("");
+  function onChange(time, timeString) {
+    setTime(timeString);
+  }
   const onSelect = (value) => {
     setCalendar({
       value,
@@ -43,7 +50,32 @@ export default function DateTimeSelection() {
         onSelect={onSelect}
         onPanelChange={onPanelChange}
       />
-      <div></div>
+      <div className="col-12 mt-3">
+        <TimePicker
+          status={time == "" && "error"}
+          use12Hours
+          format="h:mm a"
+          onChange={onChange}
+          size="large"
+          className="col-12"
+        />
+      </div>
+
+      <TealButton
+        onClick={() => {
+          if (time == "") return;
+          else
+            setItemSelected(
+              `${calendar.selectedValue.format(
+                "dddd, MMMM Do, YYYY"
+              )} at ${time}`
+            );
+          clickOk();
+        }}
+        className="col-12"
+      >
+        SET DEADLINE
+      </TealButton>
     </Container>
   );
 }
