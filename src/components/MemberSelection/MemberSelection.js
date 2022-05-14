@@ -4,7 +4,11 @@ import { colors } from "../../utilities/colors";
 import { PlusOutlined, UserOutlined } from "@ant-design/icons";
 import FormItemSelect from "../FormItemSelect";
 
-export default function MemberSelection({ itemSelected, setItemSelected }) {
+export default function MemberSelection({
+  itemSelected,
+  setItemSelected,
+  clickOk,
+}) {
   const [currentItem, setCurrentItem] = useState({
     text: "Select a team member",
     icon: <UserOutlined />,
@@ -61,6 +65,7 @@ export default function MemberSelection({ itemSelected, setItemSelected }) {
             image: currentItem.image,
             icon: currentItem.icon,
           });
+          clickOk();
         }}
         style={{
           marginTop: 16,

@@ -56,11 +56,16 @@ export default function Dashboard() {
       setActiveComponent(null);
       setActiveItemIndex(-1);
       setActiveTitle("");
+      setTeamMemberData({
+        text: "Select a team member",
+        icon: <UserOutlined />,
+        image: null,
+      });
     }
   }, [mode]);
   return (
     <>
-      <Container className="row mt-4">
+      <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
         <Container className="col">
           {mode === 0 ? (
             <DashboardView setMode={setMode} />
@@ -70,8 +75,8 @@ export default function Dashboard() {
                 <Modal
                   title={activeTitle}
                   visible={isModalVisible}
-                  onOk={handleOk}
                   onCancel={handleCancel}
+                  footer={null}
                 >
                   {activeComponent}
                 </Modal>
@@ -98,6 +103,7 @@ export default function Dashboard() {
                       <MemberSelection
                         itemSelected={teamMemeberData}
                         setItemSelected={setTeamMemberData}
+                        clickOk={handleOk}
                       />,
                       1
                     )

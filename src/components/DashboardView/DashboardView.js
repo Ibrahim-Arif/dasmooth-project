@@ -9,7 +9,7 @@ import Collapseable from "../Collapseable/Collapseable";
 export default function DashboardView(props) {
   return (
     <>
-      <Container>
+      <Container className="col-12">
         <h4>Dashboard</h4>
         <Button
           style={{ backgroundColor: colors.teal100, color: "white" }}
