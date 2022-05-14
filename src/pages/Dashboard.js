@@ -10,7 +10,13 @@ import {
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { Modal, Button } from "antd";
-import { DashboardView, FormItemSelect, ImageUpload } from "../components";
+import {
+  DashboardView,
+  DateTimeSelection,
+  FormItemSelect,
+  ImageUpload,
+  MemberSelection,
+} from "../components";
 import { colors } from "../utilities/colors";
 
 import "./dashboard.css";
@@ -23,6 +29,11 @@ export default function Dashboard() {
   const showModal = () => {
     setIsModalVisible(true);
   };
+  const [teamMemeberData, setTeamMemberData] = useState({
+    text: "Select a team member",
+    icon: <UserOutlined />,
+    image: null,
+  });
 
   const handleOk = () => {
     setIsModalVisible(false);
@@ -78,19 +89,36 @@ export default function Dashboard() {
                   customColor={{ color: "black", bgColor: "white" }}
                 />
                 <FormItemSelect
-                  icon={<UserOutlined />}
-                  text=" Select a team member"
+                  icon={teamMemeberData.icon}
+                  image={teamMemeberData.image}
+                  text={teamMemeberData.text}
                   onItemPress={() =>
-                    handleFormItemRender("Select a team member", null, 1)
+                    handleFormItemRender(
+                      teamMemeberData.text,
+                      <MemberSelection
+                        itemSelected={teamMemeberData}
+                        setItemSelected={setTeamMemberData}
+                      />,
+                      1
+                    )
                   }
-                  isItemActive={activeItemIndex == 1 ? true : false}
+                  isItemActive={
+                    activeItemIndex == 1 ||
+                    teamMemeberData.text != "Select a team member"
+                      ? true
+                      : false
+                  }
                 />
                 <FormItemSelect
                   icon={<CalendarOutlined />}
                   text=" Set a deadline"
                   isItemActive={activeItemIndex == 2 ? true : false}
                   onItemPress={() =>
-                    handleFormItemRender("Set a deadline", null, 2)
+                    handleFormItemRender(
+                      "Set a deadline",
+                      <DateTimeSelection />,
+                      2
+                    )
                   }
                 />
                 <FormItemSelect
@@ -127,10 +155,13 @@ export default function Dashboard() {
         </Container>
 
         {/*  */}
-        <Container className="col flex-column d-none d-lg-flex">
+        <Container
+          className="col flex-column d-none d-lg-flex"
+          style={{ borderLeft: "1px solid grey" }}
+        >
           {mode != 0 && (
             <>
-              <h5>{activeTitle}</h5>
+              <h4>{activeTitle}</h4>
               {activeComponent}
             </>
           )}

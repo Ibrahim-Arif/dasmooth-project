@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { StateProvider } from "./hooks/useContext";
-import { DashboardMenu, SignIn } from "./pages";
+import { DashboardMenu, SignIn, Welcome } from "./pages";
 
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap";
@@ -24,6 +24,16 @@ const App = () => {
             <Routes>
               <Route
                 path="/"
+                // element={isLogin !== false ? <Navigate to="/" /> : <SignIn />}
+                element={<Welcome />}
+              />
+              <Route
+                path="signIn/"
+                // element={isLogin !== false ? <Navigate to="/" /> : <SignIn />}
+                element={<SignIn />}
+              />
+              <Route
+                path="signIn/:id"
                 // element={isLogin !== false ? <Navigate to="/" /> : <SignIn />}
                 element={<SignIn />}
               />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useLocation, useParams } from "react-router";
 
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
@@ -10,9 +10,9 @@ import { colors } from "../utilities/colors";
 export default function SignIn() {
   const [mode, setMode] = useState(0);
   const navigate = useNavigate();
-  const location = useLocation();
-
+  const { id } = useParams();
   useEffect(() => {
+    if (id == 1) setMode(1);
     document.getElementById("root").style.backgroundColor = colors.htmlColor;
   }, []);
 

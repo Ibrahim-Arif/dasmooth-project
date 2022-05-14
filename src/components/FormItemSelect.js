@@ -37,12 +37,10 @@ export default function FormItemSelect({
         onItemPress();
       }}
     >
-      {customColor == null && (
-        <Container className="col-1 d-flex align-items-center">
-          {image ? image : icon}
-        </Container>
-      )}
-      <Container className="col-11 ">{text}</Container>
+      <Container className="col-12 d-flex flex-row ">
+        <div className="me-3">{image ? image : icon}</div>
+        {text}
+      </Container>
     </CustomButton>
   );
 }

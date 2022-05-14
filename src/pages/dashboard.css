@@ -22,7 +22,13 @@
     font-size: calc(13px + 1vw) !important;
   }
 }
-h5 {
-  /* word-wrap: break-word !important; */
-  /* font-size: calc(8px + 1vw) !important; */
+
+.ant-upload.ant-upload-drag {
+  height: 200px !important;
+}
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+  color: #fff;
+  background: #009688 !important;
 }
