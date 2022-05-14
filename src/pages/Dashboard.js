@@ -77,6 +77,7 @@ export default function Dashboard() {
                   visible={isModalVisible}
                   onCancel={handleCancel}
                   footer={null}
+                  mask={false}
                 >
                   {activeComponent}
                 </Modal>
