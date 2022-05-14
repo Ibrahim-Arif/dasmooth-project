@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-
 import { Container } from "react-bootstrap";
+import { Modal } from "antd";
 import {
   UserOutlined,
   CalendarOutlined,
@@ -10,8 +10,7 @@ import {
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 
-import { Modal } from "antd";
-
+import { colors } from "../utilities/colors";
 import {
   BudgetForm,
   DashboardView,
@@ -20,12 +19,10 @@ import {
   ImageUpload,
   MemberSelection,
   PostUpdateForm,
+  TealButton,
 } from "../components";
-import { colors } from "../utilities/colors";
 
 import "./dashboard.css";
-import { TealButton } from "../components/FormButton/FormButton";
-import { flushSync } from "react-dom";
 
 export default function Dashboard() {
   const [mode, setMode] = useState(0);

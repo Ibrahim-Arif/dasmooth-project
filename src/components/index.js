@@ -6,8 +6,9 @@ import Selectable from "./Selectable/Selectable";
 import ImageUpload from "./ImageUpload/ImageUpload";
 import MemberSelection from "./MemberSelection/MemberSelection";
 import PostUpdateForm from "./PostUpdateForm/PostUpdateForm";
-
+import { TealButton } from "./FormButton/FormButton";
 export {
+  TealButton,
   Selectable,
   PostUpdateForm,
   BudgetForm,

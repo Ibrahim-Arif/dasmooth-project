@@ -1,8 +1,8 @@
 import React from "react";
 import { Collapse } from "antd";
+import { Container } from "react-bootstrap";
 import { CaretRightOutlined, RightOutlined } from "@ant-design/icons";
 import styledComponents from "styled-components";
-import { Container } from "react-bootstrap";
 
 const { Panel } = Collapse;
 

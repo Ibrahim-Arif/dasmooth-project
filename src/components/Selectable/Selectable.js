@@ -1,8 +1,7 @@
-import { Button } from "antd";
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
-import styledComponents from "styled-components";
 import { colors } from "../../utilities/colors";
+import styledComponents from "styled-components";
 
 export default function Selectable({
   icon,
