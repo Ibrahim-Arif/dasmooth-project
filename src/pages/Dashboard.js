@@ -27,12 +27,12 @@ import "./dashboard.css";
 export default function Dashboard() {
   const [mode, setMode] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [activeTitle, setActiveTitle] = useState("");
-  const [activeComponent, setActiveComponent] = useState(null);
-  const [activeItemIndex, setActiveItemIndex] = useState(-1);
   const showModal = () => {
     setIsModalVisible(true);
   };
+  const [activeTitle, setActiveTitle] = useState("");
+  const [activeComponent, setActiveComponent] = useState(null);
+  const [activeItemIndex, setActiveItemIndex] = useState(-1);
   const [teamMemberData, setTeamMemberData] = useState({
     text: "Select a team member",
     icon: <UserOutlined />,

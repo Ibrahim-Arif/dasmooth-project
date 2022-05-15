@@ -1,7 +1,11 @@
 import React from "react";
 import { Collapse } from "antd";
 import { Container } from "react-bootstrap";
-import { CaretRightOutlined, RightOutlined } from "@ant-design/icons";
+import {
+  CaretRightOutlined,
+  RightOutlined,
+  BarsOutlined,
+} from "@ant-design/icons";
 import styledComponents from "styled-components";
 
 const { Panel } = Collapse;
@@ -22,6 +26,8 @@ export default function Collapseable({
       className="site-collapse-custom-collapse"
       bgcolor={bgColor}
       bordercolor={borderColor}
+
+      // expandIconPosition="right"
     >
       <Panel
         header={
@@ -31,6 +37,16 @@ export default function Collapseable({
         }
         key="1"
         className="site-collapse-custom-panel"
+        extra={
+          <BarsOutlined
+            color="black"
+            size={24}
+            onClick={(event) => {
+              // If you don't want click extra trigger collapse, you can prevent this:
+              event.stopPropagation();
+            }}
+          />
+        }
       >
         {/* Panel Items */}
         <PanelItem
@@ -57,6 +73,7 @@ export default function Collapseable({
 const CustomCollapse = styledComponents(Collapse)`
     background-color: ${({ bgcolor }) => bgcolor};
     border-top: 5px solid ${({ bordercolor }) => bordercolor};
+    position: relative;
 `;
 const PanelItem = styledComponents.div`
     border-left: 5px solid ${({ bordercolor }) => bordercolor};

@@ -59,6 +59,7 @@ export default function DateTimeSelection({
           onChange={onChange}
           size="large"
           className="col-12"
+          inputReadOnly
         />
       </div>
 
