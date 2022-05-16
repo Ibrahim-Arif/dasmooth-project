@@ -12,13 +12,19 @@ export default function DashboardView(props) {
       <Container className="col-12">
         <h4>Dashboard</h4>
         <Button
-          style={{ backgroundColor: colors.teal100, color: "white" }}
+          style={{
+            backgroundColor: colors.tealDark30,
+            color: "white",
+            width: 220,
+            height: 50,
+            borderRadius: 5,
+          }}
           size="large"
           icon={<PlusOutlined />}
           className="d-flex flex-row align-items-center"
           onClick={() => props.setMode(1)}
         >
-          CREATE NEW
+          CREATE A NEW BATON
         </Button>
       </Container>
       {/* Batons Container */}

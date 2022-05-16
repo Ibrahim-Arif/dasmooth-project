@@ -138,7 +138,6 @@ export default function DashboardMenu() {
         style={{
           minHeight: "100vh",
           overflow: "hidden",
-          backgroundColor: colors.tealDark30,
         }}
       >
         <Sider
@@ -149,7 +148,7 @@ export default function DashboardMenu() {
           collapsedWidth="0"
           trigger={null}
           onCollapse={onCollapse}
-          style={{ backgroundColor: colors.tealLight80 }}
+          style={{ backgroundColor: colors.tealLight90 }}
           width={siderW}
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
@@ -161,7 +160,7 @@ export default function DashboardMenu() {
             theme="light"
             style={{
               color: colors.teal100,
-              backgroundColor: colors.tealLight80,
+              backgroundColor: colors.tealLight90,
               fontWeight: "bold",
             }}
             defaultSelectedKeys={["dashboard"]}
