@@ -17,7 +17,6 @@ import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
 import { menuItems } from "../utilities/MenuItems";
 
-import "./dashboard.css";
 import { placeHolder } from "../assets";
 
 const { Header, Sider } = Layout;

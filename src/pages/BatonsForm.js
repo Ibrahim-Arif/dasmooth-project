@@ -69,6 +69,7 @@ export default function BatonsForm() {
       filesList: [],
     });
   };
+
   const handlePass = () => {
     console.log(
       dateData,
@@ -143,6 +144,10 @@ export default function BatonsForm() {
     }
   }, [params]);
 
+  useEffect(() => {
+    setActiveTitle("");
+    setActiveComponent(null);
+  }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
       <Container className="col">

@@ -26,7 +26,6 @@ import {
 import { useUser } from "../hooks/useContext";
 import { Navigate, useLocation, useNavigate, useParams } from "react-router";
 
-import "./dashboard.css";
 export default function Dashboard() {
   return (
     <>
