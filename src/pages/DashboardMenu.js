@@ -11,6 +11,7 @@ import TeamMembers from "./TeamMembers";
 import DeleteBaton from "./DeleteBaton";
 import Dashboard from "./Dashboard";
 import Profile from "./Profile";
+import BatonsForm from "./BatonsForm";
 
 import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
@@ -173,6 +174,8 @@ export default function DashboardMenu() {
         {/* Nested Routing */}
         <Routes>
           <Route path="/main" element={<Dashboard />} />
+          <Route path="/batonsForm" element={<BatonsForm />} />
+          <Route path="/batonsForm/:id" element={<BatonsForm />} />
           <Route path="/deleteBaton" element={<DeleteBaton />} />
           <Route path="/notifications" element={<Notification />} />
           <Route path="/teamMembers" element={<TeamMembers />} />

@@ -39,7 +39,7 @@ h5 {
 .ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
 .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
   color: #fff;
-  background: #ffffff !important;
+  background: #009688 !important;
 }
 
 .ant-tooltip {

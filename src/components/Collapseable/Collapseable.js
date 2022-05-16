@@ -8,6 +8,7 @@ import {
 } from "@ant-design/icons";
 import styledComponents from "styled-components";
 import { colors } from "../../utilities/colors";
+import { useNavigate } from "react-router";
 
 const { Panel } = Collapse;
 
@@ -17,7 +18,9 @@ export default function Collapseable({
   bgColor = "#F4F5F6",
   borderColor = "#5F6B72",
   textColor = colors.dashboardText,
+  batonsData = [],
 }) {
+  const navigate = useNavigate();
   return (
     <CustomCollapse
       bordered={false}
@@ -37,7 +40,7 @@ export default function Collapseable({
       <Panel
         header={
           <h4 style={{ color: textColor }}>
-            {title} ({count})
+            {title} ({batonsData.length})
           </h4>
         }
         key="1"
@@ -54,20 +57,24 @@ export default function Collapseable({
         }
       >
         {/* Panel Items */}
-        <PanelItem
-          className="row mx-2 align-items-center justify-content-between"
-          bordercolor={borderColor}
-        >
-          <Container
-            className="col-8  col-md-10 pt-2"
-            style={{ wordWrap: "break-word" }}
+        {batonsData.map((e, index) => (
+          <PanelItem
+            key={e.id}
+            className="row mx-2 align-items-center justify-content-between my-3"
+            bordercolor={borderColor}
+            onClick={() => navigate(`/dashboard/batonsForm/${e.id}`)}
           >
-            <h5 style={{ color: textColor }}>{title}</h5>
-          </Container>
-          <Container className="col-4 col-md-2">
-            <RightOutlined style={{ fontWeight: "bold", fontSize: 24 }} />
-          </Container>
-        </PanelItem>
+            <Container
+              className="col-8  col-md-10 pt-2"
+              style={{ wordWrap: "break-word" }}
+            >
+              <h5 style={{ color: textColor }}>{e.title}</h5>
+            </Container>
+            <Container className="col-4 col-md-2">
+              <RightOutlined style={{ fontWeight: "bold", fontSize: 24 }} />
+            </Container>
+          </PanelItem>
+        ))}
 
         {/* ------------------- */}
       </Panel>

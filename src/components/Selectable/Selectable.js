@@ -36,8 +36,9 @@ export default function Selectable({
         onItemPress();
       }}
     >
-      <Container className="col-12 d-flex flex-row ">
-        <div className="me-3">{image ? image : icon}</div>
+      <Container className="col-12 d-flex flex-row align-items-center">
+        {image ? image : icon}
+        <div className="me-3"></div>
         {text}
       </Container>
     </CustomButton>

@@ -1,12 +1,21 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
 import Collapseable from "../Collapseable/Collapseable";
+import { useUser } from "../../hooks/useContext";
+import { useNavigate } from "react-router";
 
 export default function DashboardView(props) {
+  const { batonsData } = useUser();
+  const [pendingBatons, setPendingBatons] = useState();
+  const navigate = useNavigate();
+  useEffect(() => {
+    // console.log(batonsData);
+    setPendingBatons(batonsData);
+  }, [batonsData]);
   return (
     <>
       <Container className="col-12">
@@ -22,7 +31,7 @@ export default function DashboardView(props) {
           size="large"
           icon={<PlusOutlined />}
           className="d-flex flex-row align-items-center"
-          onClick={() => props.setMode(1)}
+          onClick={() => navigate("/dashboard/batonsForm")}
         >
           CREATE A NEW BATON
         </Button>
@@ -30,7 +39,7 @@ export default function DashboardView(props) {
       {/* Batons Container */}
       <Container>
         <div className="mt-5">
-          <Collapseable title="Pending Batons" count={1} />
+          <Collapseable title="Pending Batons" batonsData={pendingBatons} />
         </div>
         <div className="mt-5">
           <Collapseable

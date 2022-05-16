@@ -10,10 +10,13 @@ import "antd/dist/antd.min.css";
 const App = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setLoading] = useState(false);
+  const [batonsData, setBatonsData] = useState([]);
 
   const userContextValues = {
     isLogin,
     setIsLogin,
+    batonsData,
+    setBatonsData,
   };
 
   return (
