@@ -30,8 +30,8 @@ export default function DashboardView(props) {
           <Collapseable
             title="Passed Batons"
             count={4}
-            borderColor="gold"
-            bgColor="#faffb8"
+            borderColor="#EFB029"
+            bgColor="#FDF7E6"
           />
         </div>
       </Container>

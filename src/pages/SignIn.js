@@ -2,18 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
-import { useNavigate, useLocation, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
 
 export default function SignIn() {
   const [mode, setMode] = useState(0);
+  const [focusedEmail, setFocusedEmail] = useState(false);
+  const [focusedPassword, setFocusedPassword] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   useEffect(() => {
     if (id == 1) setMode(1);
-    document.getElementById("root").style.backgroundColor = colors.htmlColor;
+
+    document.getElementById("body").style.backgroundColor = colors.htmlColor;
   }, []);
 
   const [form] = Form.useForm();
@@ -68,8 +71,15 @@ export default function SignIn() {
             ]}
           >
             <FormInput
+              type="email"
               prefix={<UserOutlined className="site-form-item-icon" />}
               placeholder="Email"
+              style={{
+                backgroundColor: focusedEmail ? "white" : "transparent",
+                color: focusedEmail ? "black" : "white",
+              }}
+              onFocus={() => setFocusedEmail(true)}
+              onBlur={() => setFocusedEmail(false)}
             />
           </Form.Item>
           <Form.Item
@@ -85,8 +95,14 @@ export default function SignIn() {
           >
             <FormPassword
               prefix={<LockOutlined className="site-form-item-icon" />}
+              style={{
+                backgroundColor: focusedPassword ? "white" : "transparent",
+                color: focusedPassword ? "black" : "white",
+              }}
               type="password"
               placeholder="Password"
+              onFocus={() => setFocusedPassword(true)}
+              onBlur={() => setFocusedPassword(false)}
             />
           </Form.Item>
 
@@ -138,7 +154,8 @@ export default function SignIn() {
 // Componenets
 const LoginButton = styledComponents(Button)`
         width: 300px;
-        height: 40px;
+        height: 50px;
+        border-radius: 5px;
         color: ${(props) => (props.color ? props.color : "white")};
         border-color:${({ bgColor, ...props }) => bgColor};
         background-color:${({ bgColor, ...props }) => bgColor};
@@ -148,13 +165,30 @@ const LoginButton = styledComponents(Button)`
         }
 `;
 
-const FormInput = styledComponents(Input, Input.Password)`
+const FormInput = styledComponents(Input)`
     width: 100%;
     height: 40px;
+    input[type=email] {
+      background-color: transparent;
+      color: white;
+    }
+    input[type=email]:focus {
+      background-color: white;
+      color: black;
+    }
 `;
 const FormPassword = styledComponents(Input.Password)`
     width: 100%;
     height: 40px;
+    input[type=password] {
+      background-color: transparent;
+      color: white;
+    }
+    input[type=password]:focus {
+      background-color: white;
+      color: black;
+    }
+    
 `;
 
 const ColoredTitle = styledComponents.label`

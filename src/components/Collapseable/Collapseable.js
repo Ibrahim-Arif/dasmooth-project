@@ -4,24 +4,29 @@ import { Container } from "react-bootstrap";
 import {
   CaretRightOutlined,
   RightOutlined,
-  BarsOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import styledComponents from "styled-components";
+import { colors } from "../../utilities/colors";
 
 const { Panel } = Collapse;
 
 export default function Collapseable({
   title = "Dummy",
   count = 0,
-  bgColor = "#e6e6e6",
-  borderColor = "tomato",
+  bgColor = "#F4F5F6",
+  borderColor = "#5F6B72",
+  textColor = colors.dashboardText,
 }) {
   return (
     <CustomCollapse
       bordered={false}
       defaultActiveKey={["1"]}
       expandIcon={({ isActive }) => (
-        <CaretRightOutlined rotate={isActive ? 90 : 0} size="large" />
+        <CaretRightOutlined
+          rotate={isActive ? 90 : 0}
+          style={{ fontSize: 24, marginTop: 5 }}
+        />
       )}
       className="site-collapse-custom-collapse"
       bgcolor={bgColor}
@@ -31,20 +36,20 @@ export default function Collapseable({
     >
       <Panel
         header={
-          <h4>
+          <h4 style={{ color: textColor }}>
             {title} ({count})
           </h4>
         }
         key="1"
         className="site-collapse-custom-panel"
         extra={
-          <BarsOutlined
+          <MenuOutlined
             color="black"
-            size={24}
             onClick={(event) => {
               // If you don't want click extra trigger collapse, you can prevent this:
               event.stopPropagation();
             }}
+            style={{ fontSize: 24, marginTop: 5 }}
           />
         }
       >
@@ -57,7 +62,7 @@ export default function Collapseable({
             className="col-8  col-md-10 pt-2"
             style={{ wordWrap: "break-word" }}
           >
-            <h5>{title}</h5>
+            <h5 style={{ color: textColor }}>{title}</h5>
           </Container>
           <Container className="col-4 col-md-2">
             <RightOutlined style={{ fontWeight: "bold", fontSize: 24 }} />
@@ -72,7 +77,7 @@ export default function Collapseable({
 
 const CustomCollapse = styledComponents(Collapse)`
     background-color: ${({ bgcolor }) => bgcolor};
-    border-top: 5px solid ${({ bordercolor }) => bordercolor};
+    border-top: 3px solid ${({ bordercolor }) => bordercolor};
     position: relative;
 `;
 const PanelItem = styledComponents.div`

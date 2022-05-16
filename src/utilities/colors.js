@@ -7,6 +7,7 @@ export const colors = {
   alert: "#00685E",
   cg100: "#374747",
   teal100: "#009688",
+  dashboardText: "#37474F",
   success: "#66C0B7",
   cgLight20: " #5F6B72",
   tealLight20: "#33AB9F",

@@ -17,6 +17,7 @@ import { colors } from "../utilities/colors";
 import { menuItems } from "../utilities/MenuItems";
 
 import "./dashboard.css";
+import { placeHolder } from "../assets";
 
 const { Header, Sider } = Layout;
 
@@ -28,7 +29,7 @@ export default function DashboardMenu() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.getElementById("root").style.backgroundColor = "white";
+    document.getElementById("body").style.backgroundColor = "white";
     navigate("main");
   }, []);
 
@@ -83,7 +84,10 @@ export default function DashboardMenu() {
         bgcolor={colors.teal100}
         className="d-flex flex-row align-items-center"
       >
-        <Container className="col-8 col-lg-3 align-self-center">
+        <Container
+          className="align-self-center justify-content-center justify-content-lg-start mx-0"
+          style={{ width: 250 }}
+        >
           {!renderSearchBar && (
             <div className="d-flex flex-row align-items-center">
               <Button
@@ -96,7 +100,7 @@ export default function DashboardMenu() {
               ></Button>
 
               <div className="ms-3">
-                <h3>Logo</h3>
+                <img src={placeHolder} height="40px" />
               </div>
             </div>
           )}
@@ -110,7 +114,7 @@ export default function DashboardMenu() {
         </Container>
 
         {/* Search Bar */}
-        <Container className="col-2 col-md-1 col-lg-8 ">
+        <Container className="d-flex justify-content-end justify-content-lg-start mx-0">
           <Button
             shape="circle"
             className="d-inline-block d-lg-none"
@@ -130,7 +134,13 @@ export default function DashboardMenu() {
       </DashboardHeader>
 
       {/* Layout Grid */}
-      <Layout style={{ minHeight: "100vh", overflow: "hidden" }}>
+      <Layout
+        style={{
+          minHeight: "100vh",
+          overflow: "hidden",
+          backgroundColor: colors.tealDark30,
+        }}
+      >
         <Sider
           className="col-3"
           collapsible
