@@ -11,6 +11,7 @@ export default function ImageUpload({
   boxColor,
   itemSelected,
   setItemSelected,
+  clickOk,
 }) {
   const [imageData, setImageData] = useState({
     fileList: itemSelected.filesList,
@@ -87,7 +88,7 @@ export default function ImageUpload({
         <h6>{imageData.fileList.length} files attached</h6>
       </div>
       <TealButton
-        // onClick={this.handleUpload}
+        onClick={clickOk}
         disabled={imageData.fileList.length === 0}
         loading={imageData.uploading}
         style={{ marginTop: 16 }}
