@@ -16,12 +16,14 @@ export default function Welcome() {
   }, []);
 
   return (
-    <Container className="d-flex flex-column">
+    <Container className="d-flex flex-column mb-5">
       <Container className="d-flex mt-5 justify-content-center align-items-center">
         <h1 style={{ color: "white" }}>Logo</h1>
       </Container>
       <Container className="d-flex flex-column col-12 col-lg-7 mt-5 justify-content-center align-items-center">
-        <img src={placeHolder} style={{ width: window.innerWidth * 0.9 }} />
+        <div className="col-12 col-md-6">
+          <img src={placeHolder} style={{ width: "100%" }} />
+        </div>
 
         <div
           className="d-flex justify-content-center align-items-center"

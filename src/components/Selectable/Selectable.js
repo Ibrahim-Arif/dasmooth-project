@@ -12,7 +12,7 @@ export default function Selectable({
   customColor = null,
 }) {
   const passive = { color: colors.teal100, bgColor: colors.tealLight90 };
-  const active = { color: "white", bgColor: colors.teal100 };
+  const active = { color: "white", bgColor: colors.tealDark30 };
   const [activeColor, setActiveColor] = useState(passive);
   const [isActive, setIsActive] = useState(false);
 

@@ -74,6 +74,7 @@ export default function SignIn() {
               type="email"
               prefix={<UserOutlined className="site-form-item-icon" />}
               placeholder="Email"
+              autoComplete="off"
               style={{
                 backgroundColor: focusedEmail ? "white" : "transparent",
                 color: focusedEmail ? "black" : "white",
@@ -109,7 +110,7 @@ export default function SignIn() {
           <Form.Item className="mt-4">
             <LoginButton
               htmlType="submit"
-              bgColor={colors.teal100}
+              bgcolor={colors.teal100}
               className="login-form-button px-5"
             >
               {!mode ? "Log in" : "Sign up"}
@@ -157,11 +158,11 @@ const LoginButton = styledComponents(Button)`
         height: 50px;
         border-radius: 5px;
         color: ${(props) => (props.color ? props.color : "white")};
-        border-color:${({ bgColor, ...props }) => bgColor};
-        background-color:${({ bgColor, ...props }) => bgColor};
+        border-color:${({ bgcolor, ...props }) => bgcolor};
+        background-color:${({ bgcolor, ...props }) => bgcolor};
         :hover{
-          color: ${({ bgColor, ...props }) => bgColor};
-          border-color:${({ bgColor, ...props }) => bgColor};
+          color: ${({ bgcolor, ...props }) => bgcolor};
+          border-color:${({ bgcolor, ...props }) => bgcolor};
         }
 `;
 
@@ -176,6 +177,7 @@ const FormInput = styledComponents(Input)`
       background-color: white;
       color: black;
     }
+   
 `;
 const FormPassword = styledComponents(Input.Password)`
     width: 100%;

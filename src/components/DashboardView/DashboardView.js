@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { Button } from "antd";
+import { Button, List } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
@@ -8,14 +8,43 @@ import Collapseable from "../Collapseable/Collapseable";
 import { useUser } from "../../hooks/useContext";
 import { useNavigate } from "react-router";
 
+import ReactDragListView from "react-drag-listview";
+
 export default function DashboardView(props) {
-  const { batonsData } = useUser();
-  const [pendingBatons, setPendingBatons] = useState();
+  const { batonsData, batons, setBatons } = useUser();
+  const [PendingBatons, setPendingBatons] = useState([]);
+  const [PassedBatons, setPassedBatons] = useState([]);
+  const [ReceivedBatons, setReceivedBatons] = useState([]);
+  const [DeclinedBatons, setDeclinedBatons] = useState([]);
+  const [AcceptedBatons, setAcceptedBatons] = useState([]);
+  const [CompleteBatons, setCompleteBatons] = useState([]);
+
   const navigate = useNavigate();
   useEffect(() => {
-    // console.log(batonsData);
-    setPendingBatons(batonsData);
+    console.log("DashBoardView");
+    batonsData.forEach((e) => console.log(e.title, "|", e.id));
+    let pending = batonsData.filter((e) => e.status == "pending");
+    setPendingBatons(pending);
   }, [batonsData]);
+
+  const getBaton = {
+    PendingBatons,
+    PassedBatons,
+    ReceivedBatons,
+    DeclinedBatons,
+    AcceptedBatons,
+    CompleteBatons,
+  };
+
+  const onDragEnd = (fromIndex, toIndex) => {
+    if (toIndex < 0) return; // Ignores if outside designated area
+
+    const items = [...batons];
+    const item = items.splice(fromIndex, 1)[0];
+    items.splice(toIndex, 0, item);
+    setBatons(items);
+  };
+
   return (
     <>
       <Container className="col-12">
@@ -38,17 +67,26 @@ export default function DashboardView(props) {
       </Container>
       {/* Batons Container */}
       <Container>
-        <div className="mt-5">
-          <Collapseable title="Pending Batons" batonsData={pendingBatons} />
-        </div>
-        <div className="mt-5">
-          <Collapseable
-            title="Passed Batons"
-            count={4}
-            borderColor="#EFB029"
-            bgColor="#FDF7E6"
+        <ReactDragListView
+          nodeSelector=".ant-list-item.draggble"
+          handleSelector=".bars-icon"
+          onDragEnd={onDragEnd}
+        >
+          <List
+            dataSource={batons}
+            renderItem={(e) => (
+              <List.Item className="col-12 mt-5 draggble">
+                <Collapseable
+                  title={e.title}
+                  batonsData={getBaton[e.title.replace(/\s+/g, "")]}
+                  bgColor={e.bgColor}
+                  borderColor={e.borderColor}
+                  className="col-12"
+                />
+              </List.Item>
+            )}
           />
-        </div>
+        </ReactDragListView>
       </Container>
     </>
   );

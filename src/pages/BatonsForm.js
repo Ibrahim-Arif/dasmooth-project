@@ -54,6 +54,7 @@ export default function BatonsForm() {
   const flushData = () => {
     setActiveComponent(null);
     setActiveItemIndex(-1);
+    setID(null);
     setTitle("");
     setActiveTitle("");
     setTeamMemberData({
@@ -71,29 +72,33 @@ export default function BatonsForm() {
   };
 
   const handlePass = () => {
-    console.log(
-      dateData,
-      budgetData,
-      postUpdateData,
-      filesList.filesList,
-      title
-    );
-
+    // console.log(
+    //   dateData,
+    //   budgetData,
+    //   postUpdateData,
+    //   filesList.filesList,
+    //   title
+    // );
     let temp = batonsData;
-    if (id == null) {
+
+    if (params.id == null) {
+      console.log("New");
+      let id = uuidv4();
+      console.log(id);
       temp.push({
         dateData,
         budgetData,
         postUpdateData,
         filesList,
         title,
-        id: uuidv4(),
+        id,
+        status: "pending",
       });
       setBatonsData(temp);
-      setMode(0);
     } else {
+      console.log("Edit");
       temp = temp.map((e) => {
-        if (e.id == id)
+        if (e.id == params.id)
           return {
             ...e,
             dateData,
@@ -130,27 +135,32 @@ export default function BatonsForm() {
   useEffect(() => {
     console.log(params);
     if (params.id) {
-      let filter = batonsData.filter((e) => (e.id = params.id));
+      let filter = batonsData.filter((e) => e.id == params.id);
       filter = filter[0];
       setTitle(filter.title);
       setBudgetData(filter.budgetData);
       setFilesList(filter.filesList);
       setDateData(filter.dateData);
       setPostUpdateData(filter.postUpdateData);
-      setID(filter.id);
-      console.log("filter", filter);
+      setID(params.id);
+      // console.log("filter", filter);
+      batonsData.forEach((e) => console.log(e.title, "|", e.id));
     } else {
-      // flushData();
+      flushData();
     }
   }, [params]);
 
-  useEffect(() => {
+  // This is to hide the form on fill
+  const resetFormView = () => {
     setActiveTitle("");
     setActiveComponent(null);
+  };
+  useEffect(() => {
+    resetFormView();
   }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
-      <Container className="col">
+      <Container fluid className="col">
         <Container className="col">
           <Modal
             title={activeTitle}
@@ -169,121 +179,127 @@ export default function BatonsForm() {
             }}
           />
 
-          <h4 className="mt-4">Blank</h4>
+          <h4 className="mt-4">{title == "" ? "Blank" : title}</h4>
           {/* FormItems */}
-          <Input
-            size="large"
-            style={{ borderRadius: 5, width: "100%" }}
-            placeholder="Add Text"
-            onChange={(e) => setTitle(e.currentTarget.value)}
-            value={title}
-          />
-
-          <Selectable
-            icon={teamMemberData.icon}
-            image={teamMemberData.image}
-            text={teamMemberData.text}
-            onItemPress={() =>
-              handleFormItemRender(
-                "Select a member",
-                <MemberSelection
-                  itemSelected={teamMemberData}
-                  setItemSelected={setTeamMemberData}
-                  clickOk={handleOk}
-                />,
-                1
-              )
-            }
-            isItemActive={
-              activeItemIndex == 1 ||
-              teamMemberData.text != "Select a team member"
-                ? true
-                : false
-            }
-          />
-          <Selectable
-            icon={<CalendarOutlined />}
-            text={dateData}
-            isItemActive={
-              activeItemIndex == 2 || dateData != "Set a deadline"
-                ? true
-                : false
-            }
-            onItemPress={() =>
-              handleFormItemRender(
-                "Set a deadline",
-                <DateTimeSelection
-                  itemSelected={dateData}
-                  setItemSelected={setDateData}
-                  clickOk={handleOk}
-                />,
-                2
-              )
-            }
-          />
-          <Selectable
-            icon={<DollarOutlined />}
-            text={budgetData}
-            isItemActive={
-              activeItemIndex == 3 || budgetData != "Set a budget"
-                ? true
-                : false
-            }
-            onItemPress={() =>
-              handleFormItemRender(
-                "Set a budget",
-                <BudgetForm
-                  itemSelected={budgetData}
-                  setItemSelected={setBudgetData}
-                  clickOk={handleOk}
-                />,
-                3
-              )
-            }
-          />
-          <Selectable
-            icon={<FileAddOutlined />}
-            text={filesList.text}
-            isItemActive={
-              activeItemIndex == 4 || filesList.text != "Attach a file"
-                ? true
-                : false
-            }
-            onItemPress={() =>
-              handleFormItemRender(
-                "Attach a file",
-                <ImageUpload
-                  boxColor={colors.teal100}
-                  itemSelected={filesList}
-                  setItemSelected={setFilesList}
-                  clickOk={handleOk}
-                />,
-                4
-              )
-            }
-          />
-          <Selectable
-            icon={<FileTextOutlined />}
-            text="Post an Update"
-            isItemActive={
-              activeItemIndex == 5 || postUpdateData != "" ? true : false
-            }
-            onItemPress={() =>
-              handleFormItemRender(
-                "Post an Update",
-                <PostUpdateForm
-                  itemSelected={postUpdateData}
-                  setItemSelected={setPostUpdateData}
-                  clickOk={handleOk}
-                />,
-                5
-              )
-            }
-          />
+          <div className="col-12">
+            <Input
+              size="large"
+              placeholder="Add Text"
+              className="me-3"
+              onChange={(e) => setTitle(e.currentTarget.value)}
+              value={title}
+            />
+          </div>
+          <Container>
+            <Selectable
+              icon={teamMemberData.icon}
+              image={teamMemberData.image}
+              text={teamMemberData.text}
+              onItemPress={() =>
+                handleFormItemRender(
+                  "Select a member",
+                  <MemberSelection
+                    itemSelected={teamMemberData}
+                    setItemSelected={setTeamMemberData}
+                    clickOk={handleOk}
+                  />,
+                  1
+                )
+              }
+              isItemActive={
+                activeItemIndex == 1 ||
+                teamMemberData.text != "Select a team member"
+                  ? true
+                  : false
+              }
+            />
+            <Selectable
+              icon={<CalendarOutlined />}
+              text={dateData}
+              isItemActive={
+                activeItemIndex == 2 || dateData != "Set a deadline"
+                  ? true
+                  : false
+              }
+              onItemPress={() =>
+                handleFormItemRender(
+                  "Set a deadline",
+                  <DateTimeSelection
+                    itemSelected={dateData}
+                    setItemSelected={setDateData}
+                    clickOk={handleOk}
+                  />,
+                  2
+                )
+              }
+            />
+            <Selectable
+              icon={<DollarOutlined />}
+              text={budgetData}
+              isItemActive={
+                activeItemIndex == 3 || budgetData != "Set a budget"
+                  ? true
+                  : false
+              }
+              onItemPress={() =>
+                handleFormItemRender(
+                  "Set a budget",
+                  <BudgetForm
+                    itemSelected={budgetData}
+                    setItemSelected={setBudgetData}
+                    clickOk={handleOk}
+                  />,
+                  3
+                )
+              }
+            />
+            <Selectable
+              icon={<FileAddOutlined />}
+              text={filesList.text}
+              isItemActive={
+                activeItemIndex == 4 || filesList.text != "Attach a file"
+                  ? true
+                  : false
+              }
+              onItemPress={() =>
+                handleFormItemRender(
+                  "Attach a file",
+                  <ImageUpload
+                    boxColor={colors.teal100}
+                    itemSelected={filesList}
+                    setItemSelected={setFilesList}
+                    clickOk={() => {
+                      handleOk();
+                      resetFormView();
+                    }}
+                  />,
+                  4
+                )
+              }
+            />
+            <Selectable
+              icon={<FileTextOutlined />}
+              text="Post an Update"
+              isItemActive={
+                activeItemIndex == 5 || postUpdateData != "" ? true : false
+              }
+              onItemPress={() =>
+                handleFormItemRender(
+                  "Post an Update",
+                  <PostUpdateForm
+                    itemSelected={postUpdateData}
+                    setItemSelected={setPostUpdateData}
+                    clickOk={handleOk}
+                  />,
+                  5
+                )
+              }
+            />
+          </Container>
+          <TealButton className="col-12" onClick={handlePass}>
+            PASS
+          </TealButton>
         </Container>
-        <TealButton className="col-12" onClick={handlePass}>
-          PASS
-        </TealButton>
       </Container>
 
       {/*  */}

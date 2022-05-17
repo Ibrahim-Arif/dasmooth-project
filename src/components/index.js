@@ -7,7 +7,9 @@ import ImageUpload from "./ImageUpload/ImageUpload";
 import MemberSelection from "./MemberSelection/MemberSelection";
 import PostUpdateForm from "./PostUpdateForm/PostUpdateForm";
 import { TealButton } from "./FormButton/FormButton";
+import ListSort from "./ListSort/ListSort";
 export {
+  ListSort,
   TealButton,
   Selectable,
   PostUpdateForm,

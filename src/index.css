@@ -40,7 +40,14 @@ h4 {
 @media screen and (max-width: 360px) {
   h4,
   h5 {
-    font-size: calc(13px + 1vw) !important;
+    font-size: calc(14px + 1vw) !important;
+  }
+  .caret-icon,
+  .bars-icon {
+    font-size: calc(12px + 1vw) !important;
+  }
+  .baton-title-div {
+    padding-top: 3px;
   }
 }
 h4,
@@ -81,4 +88,24 @@ input:-ms-input-placeholder {
 
 .ant-menu {
   font-family: "Heebo", sans-serif;
+}
+
+.list-sort-demo-list.list-drag-selected {
+  box-shadow: 0 8px 20px #e6e6e6;
+}
+.list-sort-demo-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: white;
+  -webkit-box-shadow: 0 0 0px 1000px #161c1f inset;
+  /* transition: background-color 5000s ease-in-out 0s; */
+}
+
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: black;
+  -webkit-box-shadow: 0 0 0px 1000px #161c1f inset;
+  /* transition: background-color 5000s ease-in-out 0s; */
 }

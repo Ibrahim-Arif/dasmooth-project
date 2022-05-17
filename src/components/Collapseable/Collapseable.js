@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Collapse } from "antd";
 import { Container } from "react-bootstrap";
 import {
@@ -19,7 +19,10 @@ export default function Collapseable({
   borderColor = "#5F6B72",
   textColor = colors.dashboardText,
   batonsData = [],
+  className = "",
 }) {
+  // useEffect(() => console.log("Collapseable", batonsData), [batonsData]);
+
   const navigate = useNavigate();
   return (
     <CustomCollapse
@@ -28,10 +31,11 @@ export default function Collapseable({
       expandIcon={({ isActive }) => (
         <CaretRightOutlined
           rotate={isActive ? 90 : 0}
-          style={{ fontSize: 24, marginTop: 5 }}
+          style={{ fontSize: 24, marginTop: 0 }}
+          className="caret-icon"
         />
       )}
-      className="site-collapse-custom-collapse"
+      className={`site-collapse-custom-collapse ${className}`}
       bgcolor={bgColor}
       bordercolor={borderColor}
 
@@ -39,9 +43,11 @@ export default function Collapseable({
     >
       <Panel
         header={
-          <h4 style={{ color: textColor }}>
-            {title} ({batonsData.length})
-          </h4>
+          <div className="baton-title-div">
+            <h4 style={{ color: textColor }}>
+              {title} ({batonsData.length})
+            </h4>
+          </div>
         }
         key="1"
         className="site-collapse-custom-panel"
@@ -52,17 +58,21 @@ export default function Collapseable({
               // If you don't want click extra trigger collapse, you can prevent this:
               event.stopPropagation();
             }}
-            style={{ fontSize: 24, marginTop: 5 }}
+            className="bars-icon"
+            style={{ fontSize: 24, marginTop: 0 }}
           />
         }
       >
         {/* Panel Items */}
         {batonsData.map((e, index) => (
           <PanelItem
-            key={e.id}
+            key={index}
             className="row mx-2 align-items-center justify-content-between my-3"
             bordercolor={borderColor}
-            onClick={() => navigate(`/dashboard/batonsForm/${e.id}`)}
+            onClick={() => {
+              console.log(`/dashboard/batonsForm/${e.id}`);
+              navigate(`/dashboard/batonsForm/${e.id}`);
+            }}
           >
             <Container
               className="col-8  col-md-10 pt-2"
@@ -86,6 +96,7 @@ const CustomCollapse = styledComponents(Collapse)`
     background-color: ${({ bgcolor }) => bgcolor};
     border-top: 3px solid ${({ bordercolor }) => bordercolor};
     position: relative;
+    user-select: none;
 `;
 const PanelItem = styledComponents.div`
     border-left: 5px solid ${({ bordercolor }) => bordercolor};
