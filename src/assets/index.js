@@ -1,2 +1,4 @@
 import placeHolder from "./placeholder.jpeg";
-export { placeHolder };
+import logo from "./logo.jpeg";
+
+export { placeHolder, logo };

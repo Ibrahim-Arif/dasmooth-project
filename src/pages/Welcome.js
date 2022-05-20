@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
-import { placeHolder } from "../assets";
+import { logo, placeHolder } from "../assets";
 
 export default function Welcome() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export default function Welcome() {
   return (
     <Container className="d-flex flex-column mb-5">
       <Container className="d-flex mt-5 justify-content-center align-items-center">
-        <h1 style={{ color: "white" }}>Logo</h1>
+        <img src={logo} />
       </Container>
       <Container className="d-flex flex-column col-12 col-lg-7 mt-5 justify-content-center align-items-center">
         <div className="col-6 col-md-4">

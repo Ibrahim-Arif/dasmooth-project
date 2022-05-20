@@ -17,7 +17,7 @@ import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
 import { menuItems } from "../utilities/MenuItems";
 
-import { placeHolder } from "../assets";
+import { logo, placeHolder } from "../assets";
 
 const { Header, Sider } = Layout;
 
@@ -100,7 +100,7 @@ export default function DashboardMenu() {
               ></Button>
 
               <div className="ms-3">
-                <img src={placeHolder} height="40px" />
+                <img src={logo} height="40px" />
               </div>
             </div>
           )}

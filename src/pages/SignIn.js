@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router";
 
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
+import { logo } from "../assets";
 
 export default function SignIn() {
   const [mode, setMode] = useState(0);
@@ -39,7 +40,7 @@ export default function SignIn() {
   return (
     <Container className="d-flex flex-column" style={{ height: "100vh" }}>
       <Container className="d-flex mt-5 justify-content-center align-items-center">
-        <h1>Logo</h1>
+        <img src={logo} />
       </Container>
       <Container className="d-flex flex-column col-12 col-lg-7 mt-5 justify-content-center align-items-center">
         <Title level={1} className="mb-5">
