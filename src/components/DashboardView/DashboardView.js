@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { Button, List } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -9,6 +9,7 @@ import { useUser } from "../../hooks/useContext";
 import { useNavigate } from "react-router";
 
 import ReactDragListView from "react-drag-listview";
+import { batonsList } from "../../utilities/batonsList";
 
 export default function DashboardView(props) {
   const { batonsData, batons, setBatons } = useUser();
@@ -28,41 +29,54 @@ export default function DashboardView(props) {
     return filtered;
   };
 
-  const filterBatons = (baton) => {
-    // console.log(baton.length);
-    if (baton.length == 0) {
-      var removeIndex = batons.map((item) => item.status).indexOf(`${baton}`);
-      removeIndex && batons.splice(removeIndex, 1);
+  const filterBatons = (batonData,batonName) => {
+    
+    
+    console.log(`${batonName} filter`,batonData.length);
+    if (batonData.length == 0) {
+      console.log(`removing the ${batonName} btaon back in array`)
+      var filteredBatons = batonsList.filter(e=>e.status == batonName)
+      setBatons(filteredBatons)
+    }else if(batonData.length > 0){
+      console.log(`adding the ${batonName} btaon back in array`)
+       let temp = batonsList.filter(e=>e.status == batonName)
+       let tempBatons = batons;
+
+      console.log(temp,batonData)
+      tempBatons.push(temp[0])
+      setBatons(tempBatons)
     }
   };
 
   useEffect(() => {
     console.log("DashBoardView");
-    batonsData.forEach((e) => console.log(e.title, "|", e.id));
+    batonsData.forEach((e) => console.log(e.title, "|", e.docId));
 
     let pending = filterBatonsData("pending");
-    filterBatons(pending);
+    filterBatons(pending,"pending");
     setPendingBatons(pending);
 
     let passed = filterBatonsData("passed");
-    filterBatons(passed);
+    filterBatons(passed,"passed");
     setPassedBatons(passed);
 
     let received = filterBatonsData("recieved");
-    filterBatons(received);
+    filterBatons(received,"received");
     setReceivedBatons(received);
 
     let accepted = filterBatonsData("accepted");
-    filterBatons(accepted);
+    filterBatons(accepted,"accepted");
     setDeclinedBatons(accepted);
 
     let declined = filterBatonsData("declined");
-    filterBatons(declined);
+    filterBatons(declined,"declined");
     setDeclinedBatons(declined);
 
     let complete = filterBatonsData("complete");
-    filterBatons(complete);
+    filterBatons(complete,"complete");
     setCompleteBatons(complete);
+
+    console.log(batons)
   }, [batonsData]);
 
   const getBaton = {

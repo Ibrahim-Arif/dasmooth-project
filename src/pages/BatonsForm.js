@@ -20,12 +20,15 @@ import {
   MemberSelection,
   PostUpdateForm,
   TealButton,
+  Loading,
 } from "../components";
 
 import { useUser } from "../hooks/useContext";
 import { useNavigate, useParams } from "react-router";
+import { handleAddBaton } from "../services";
+import { generateNotification } from "../utilities/generateNotification";
 export default function BatonsForm() {
-  const { batonsData, setBatonsData, teamMembers } = useUser();
+  const { batonsData, setBatonsData, teamMembers,isLogin } = useUser();
   const params = useParams();
   const navigate = useNavigate();
   const [mode, setMode] = useState(0);
@@ -47,8 +50,10 @@ export default function BatonsForm() {
     text: "Attach a file",
     filesList: [],
   });
+  const [filesListB64,setFilesListB64] = useState([])
   const [id, setID] = useState(null);
   const [disabled, setDisabled] = useState(true);
+  const [loading,setLoading] = useState(false)
 
   const flushData = () => {
     setActiveComponent(null);
@@ -68,50 +73,62 @@ export default function BatonsForm() {
       text: "Attach a file",
       filesList: [],
     });
+    setFilesListB64([])
   };
 
   const handlePass = () => {
-    console.log(
-      dateData,
-      budgetData,
-      postUpdateData,
-      filesList.filesList,
-      title
-    );
-    let temp = batonsData;
-
+    // console.log(
+    //   dateData,
+    //   budgetData,
+    //   postUpdateData,
+    //   filesList.filesList,
+    //   title
+    // );
+   
     if (params.id == null) {
       console.log("New");
-      let id = uuidv4();
-      console.log(id);
-      temp.push({
-        dateData,
-        budgetData,
-        postUpdateData,
-        filesList,
+      
+      let post ={
+        deadline:dateData,
+        budget:budgetData,
+        post: postUpdateData,
+        images:filesListB64,
         title,
-        id,
+        authorId: isLogin.uid,
+        memberId:teamMemberData.id,
+        memberName:teamMemberData.text,
         status: "pending",
-      });
-      setBatonsData(temp);
+        created: Date.now()
+      };
+      setLoading(true)
+      console.log(post);
+      handleAddBaton(post).then(()=>{
+        generateNotification("success","Baton Added","You baton is created")
+        setLoading(false)
+        navigate("/main")
+      }).catch((ex)=>{
+        generateNotification("error","Error","Failed to create you baton")
+        setLoading(false)
+      }
+      )
     } else {
       console.log("Edit");
-      temp = temp.map((e) => {
-        if (e.id == params.id)
-          return {
-            ...e,
-            dateData,
-            budgetData,
-            postUpdateData,
-            filesList,
-            title,
-          };
-      });
+      // temp = temp.map((e) => {
+      //   if (e.id == params.id)
+      //     return {
+      //       ...e,
+      //       dateData,
+      //       budgetData,
+      //       postUpdateData,
+      //       filesList,
+      //       title,
+      //     };
+      // });
 
-      console.log(temp);
-      setBatonsData(temp);
+      // console.log(temp);
+      // setBatonsData(temp);
     }
-    navigate("/dashboard/main");
+    // navigate("/main");
   };
 
   const handleOk = () => {
@@ -142,6 +159,7 @@ export default function BatonsForm() {
       setTitle(filter.title);
       setBudgetData(filter.budgetData);
       setFilesList(filter.filesList);
+      // ! here must deal b64 issue
       setDateData(filter.dateData);
       setPostUpdateData(filter.postUpdateData);
       setID(params.id);
@@ -214,7 +232,6 @@ export default function BatonsForm() {
                     itemSelected={teamMemberData}
                     setItemSelected={setTeamMemberData}
                     clickOk={handleOk}
-                    teamMembers={Object.values(teamMembers)}
                   />,
                   1
                 )
@@ -281,6 +298,7 @@ export default function BatonsForm() {
                     boxColor={colors.teal100}
                     itemSelected={filesList}
                     setItemSelected={setFilesList}
+                    setFilesListB64 = {setFilesListB64}
                     clickOk={() => {
                       handleOk();
                       resetFormView();
@@ -309,13 +327,16 @@ export default function BatonsForm() {
               }
             />
           </Container>
+          {loading ? <Loading size="large"/>
+:
           <TealButton
-            className="col-12"
-            onClick={handlePass}
-            disabled={disabled}
+          className="col-12"
+          onClick={handlePass}
+          disabled={disabled}
           >
             PASS
           </TealButton>
+          }
         </Container>
       </Container>
 

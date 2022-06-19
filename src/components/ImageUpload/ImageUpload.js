@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Upload, Button } from "antd";
+import { Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
+import { handleUploadImages } from "../../services";
+import Loading from "../Loading/Loading";
 
 const { Dragger } = Upload;
 // https://prismasoft.medium.com/multiple-files-upload-to-firebase-in-react-using-ant-design-65ba671d9af5
@@ -11,12 +13,14 @@ export default function ImageUpload({
   boxColor,
   itemSelected,
   setItemSelected,
+  setFilesListB64,
   clickOk,
 }) {
   const [imageData, setImageData] = useState({
     fileList: itemSelected.filesList,
-    uploading: false,
   });
+
+  const [uploading, setUploading] = useState(false);
   const props = {
     name: "file",
     multiple: true,
@@ -41,6 +45,33 @@ export default function ImageUpload({
       console.log("Dropped files", e.dataTransfer.files);
     },
   };
+  const handleUpload = () => {
+    setUploading(true);
+
+    console.log(imageData.fileList);
+    let b64 = [];
+    imageData.fileList.map((e) => {
+      getBase64(e, (item) => b64.push(item));
+    });
+    console.log(b64);
+    // setItemSelected({uploading:false,fileList:[...b64]})
+    setFilesListB64(b64)
+    setUploading("b64Converted")
+    clickOk()
+  };
+
+  const getBase64 = (file, addItem) => {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      // console.log(reader.result);
+      addItem(reader.result);
+    };
+    reader.onerror = (error) => {
+      console.log("Error: ", error);
+    };
+  };
+
   useEffect(
     () =>
       imageData.fileList.length == 0
@@ -87,14 +118,19 @@ export default function ImageUpload({
       <div className="mt-5">
         <h6>{imageData.fileList.length} files attached</h6>
       </div>
-      <TealButton
-        onClick={clickOk}
-        disabled={imageData.fileList.length === 0}
-        loading={imageData.uploading}
-        style={{ marginTop: 16 }}
-      >
-        Upload
-      </TealButton>
+      {uploading  == true && uploading != "b64Converted"? (
+        <Loading size="large" />
+      ) : (
+      
+        <TealButton
+          onClick={handleUpload}
+          disabled={imageData.fileList.length === 0 || uploading == "b64Converted"}
+          loading={imageData.uploading}
+          style={{ marginTop: 16 }}
+        >
+          {uploading == "b64Converted" ? "Uploaded ": "Upload"}
+        </TealButton>
+      )}
     </>
   );
 }

@@ -4,12 +4,13 @@ import { colors } from "../../utilities/colors";
 import { PlusOutlined, UserOutlined } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Selectable from "../Selectable/Selectable";
+import { handleSignUp, handleAddTeamMember } from "../../services";
+import { useUser } from "../../hooks/useContext";
 
 export default function MemberSelection({
   itemSelected,
   setItemSelected,
   clickOk,
-  teamMembers = [],
 }) {
   const [currentItem, setCurrentItem] = useState({
     text: "Select a team member",
@@ -20,6 +21,7 @@ export default function MemberSelection({
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [form] = Form.useForm();
+  const { isLogin, teamMembers } = useUser();
 
   const handleOk = () => {
     setIsModalVisible(false);
@@ -30,23 +32,37 @@ export default function MemberSelection({
   };
   const handleCancel = () => {
     setIsModalVisible(false);
+    form.resetFields();
   };
 
-  const handleSubmit = (values) => {
+  const handleAddMemberByEmailSubmit = (values) => {
     console.log(values);
+    // here we create user with email
+    handleSignUp(values.email)
+      .then((user) => {
+        console.log({
+          [user.uid]: values,
+          ...teamMembers,
+        });
+        handleAddTeamMember(isLogin.uid, {
+          [user.uid]: values,
+          ...teamMembers,
+        });
+      })
+      .catch((ex) => console.log(ex));
   };
   const handleChange = (values, allValues) => {
     console.log(values, allValues);
   };
   useEffect(() => {
-    let data = Object.values(teamMembers);
-    // .map((key) => {
-    //   return {
-    //     email: teamMembers[key].email,
-    //     name: teamMembers[key].name,
-    //     id: key,
-    //   };
-    // });
+    let data = Object.keys(teamMembers)
+    .map((key) => {
+      return {
+        email: teamMembers[key].email,
+        name: teamMembers[key].name,
+        id: key,
+      };
+    });
     // console.log(searchText);
     // console.log(data);
     // return;
@@ -58,7 +74,7 @@ export default function MemberSelection({
       );
       setMembers(data);
     }
-  }, [teamMembers, searchText]);
+  }, [teamMembers]);
   return (
     <>
       {/* Invite Member Modal Section */}
@@ -74,7 +90,7 @@ export default function MemberSelection({
           className="login-form d-flex col-12 flex-column align-items-center"
           initialValues={{}}
           layout="vertical"
-          onFinish={handleSubmit}
+          onFinish={handleAddMemberByEmailSubmit}
         >
           <Form.Item
             className="col-12"
@@ -131,7 +147,7 @@ export default function MemberSelection({
           customColor={{ color: colors.teal100, bgColor: colors.cgLight95 }}
           onItemPress={showModal}
         />
-        <Selectable
+        {/* <Selectable
           onItemPress={() => {
             setCurrentItem({
               text: "Oswaldo Mondenza",
@@ -154,7 +170,7 @@ export default function MemberSelection({
               image: <Avatar>LW</Avatar>,
             });
           }}
-        />
+        /> */}
         {members.map((e, index) => (
           <Selectable
             key={index}
@@ -166,8 +182,10 @@ export default function MemberSelection({
             onItemPress={() => {
               setCurrentItem({
                 text: e.name,
-                image: <Avatar>LW</Avatar>,
+                // image: <Avatar>LW</Avatar>,
+                id:e.id
               });
+              console.log(currentItem)
             }}
           />
         ))}
@@ -183,7 +201,9 @@ export default function MemberSelection({
             text: currentItem.text,
             image: currentItem.image,
             icon: currentItem.icon,
+            id: currentItem.id ? currentItem.id : ""
           });
+          console.log(itemSelected)
           clickOk();
         }}
         className="col-12"

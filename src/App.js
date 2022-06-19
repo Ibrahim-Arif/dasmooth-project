@@ -9,7 +9,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap";
 import "antd/dist/antd.min.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { handleGetTeamMembers } from "./services";
+import { handleGetBatons, handleGetTeamMembers } from "./services";
+import { batonsList } from "./utilities/batonsList";
 
 initializeApp(firebaseConfig);
 const auth = getAuth();
@@ -19,44 +20,7 @@ const App = () => {
   const [isLoading, setLoading] = useState(false);
   const [batonsData, setBatonsData] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
-  const [batons, setBatons] = useState([
-    {
-      title: "Pending Batons",
-      borderColor: null,
-      bgColor: null,
-      status: "pending",
-    },
-    {
-      title: "Passed Batons",
-      borderColor: "#EFB029",
-      bgColor: "#FDF7E6",
-      status: "passed",
-    },
-    {
-      title: "Received Batons",
-      borderColor: "#8217B1",
-      bgColor: "#F7EFFD",
-      status: "received",
-    },
-    {
-      title: "Accepted Batons",
-      borderColor: "#409000",
-      bgColor: "#F4FDF2",
-      status: "accepted",
-    },
-    {
-      title: "Complete Batons",
-      borderColor: "#196DB2",
-      bgColor: "#F2F8FB",
-      status: "complete",
-    },
-    {
-      title: "Declined Batons",
-      borderColor: "#EA4400",
-      bgColor: "#FDEEE7",
-      status: "declined",
-    },
-  ]);
+  const [batons, setBatons] = useState(batonsList);
 
   const userContextValues = {
     isLogin,
@@ -68,17 +32,23 @@ const App = () => {
     teamMembers,
     setTeamMembers,
   };
+
   onAuthStateChanged(auth, (user) => {
-    if (user) {
+    const uid = localStorage.getItem("uid");
+    if (user.uid == uid) {
       setIsLogin(user);
     }
   });
+
   useEffect(() => {
+    // console.log(isLogin);
     if (isLogin) {
       handleGetTeamMembers(auth.currentUser.uid, setTeamMembers);
+      handleGetBatons(auth.currentUser.uid,setBatonsData)
     }
   }, [isLogin]);
 
+  useEffect(()=>{console.log("batonsData useEffect, App.js",batonsData)},[batonsData])
   return (
     <StateProvider values={userContextValues}>
       <BrowserRouter>

@@ -1,30 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Container } from "react-bootstrap";
-import { Modal, Input } from "antd";
-import {
-  UserOutlined,
-  CalendarOutlined,
-  DollarOutlined,
-  FileAddOutlined,
-  FileTextOutlined,
-  ArrowLeftOutlined,
-} from "@ant-design/icons";
-import { v4 as uuidv4 } from "uuid";
-
-import { colors } from "../utilities/colors";
-import {
-  BudgetForm,
-  DashboardView,
-  DateTimeSelection,
-  Selectable,
-  ImageUpload,
-  MemberSelection,
-  PostUpdateForm,
-  TealButton,
-} from "../components";
-
-import { useUser } from "../hooks/useContext";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router";
+import { DashboardView } from "../components";
 
 export default function Dashboard() {
   return (

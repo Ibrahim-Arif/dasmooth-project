@@ -51,6 +51,7 @@ export default function SignIn() {
       handleSignIn(values.email, values.password)
         .then((user) => {
           setLoading(false);
+          localStorage.setItem("uid", user.uid);
           setIsLogin(user);
           navigate("/");
         })
