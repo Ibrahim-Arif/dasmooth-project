@@ -7,32 +7,64 @@ import { useNavigate, useParams } from "react-router";
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
 import { logo } from "../assets";
+import { handleForgotPassword, handleSignUp } from "../services";
+import { generateNotification } from "../utilities/generateNotification";
+import { Loading } from "../components";
+import { useUser } from "../hooks/useContext";
+import { handleSignIn } from "../services/handleSignIn";
 
 export default function SignIn() {
   const [mode, setMode] = useState(0);
   const [focusedEmail, setFocusedEmail] = useState(false);
   const [focusedPassword, setFocusedPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { setIsLogin } = useUser();
+
   const navigate = useNavigate();
   const { id } = useParams();
+
   useEffect(() => {
     if (id == 1) setMode(1);
-
     document.getElementById("body").style.backgroundColor = colors.htmlColor;
   }, []);
 
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
+    setLoading(true);
     if (mode) {
-      alert("signUp");
+      handleSignUp(values.email)
+        .then((user) => {
+          generateNotification(
+            "success",
+            "Registered",
+            `An email has been sent to ${values.email}. Kindly check your email for reseting the password! If you do not see any email, check your spam section`
+          );
+          setLoading(false);
+        })
+        .catch((ex) => {
+          generateNotification("error", "Error", ex.message);
+          setLoading(false);
+        });
     } else {
-      console.log("Received values of form: ", values);
-      navigate("/dashboard");
+      setLoading(true);
+      handleSignIn(values.email, values.password)
+        .then((user) => {
+          setLoading(false);
+          setIsLogin(user);
+          navigate("/");
+        })
+        .catch((ex) => {
+          generateNotification("error", "Error", ex.message);
+          setLoading(false);
+        });
     }
   };
 
   const handleForgotPress = () => {
-    alert("forgot");
+    // handleForgotPassword("bilalnaeem166@gmail.com")
+    //   .then(() => console.log("done"))
+    //   .catch((ex) => console.log(ex));
   };
 
   const { Title } = Typography;
@@ -86,38 +118,46 @@ export default function SignIn() {
               onBlur={() => setFocusedEmail(false)}
             />
           </Form.Item>
-          <Form.Item
-            className="col-12"
-            name="password"
-            rules={[
-              { min: 6, message: "Password length should not be less than 6" },
-              {
-                required: true,
-                message: "Please input your Password!",
-              },
-            ]}
-          >
-            <FormPassword
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              style={{
-                backgroundColor: focusedPassword ? "white" : "transparent",
-                color: focusedPassword ? "black" : "white",
-              }}
-              type="password"
-              placeholder="Password"
-              onFocus={() => setFocusedPassword(true)}
-              onBlur={() => setFocusedPassword(false)}
-            />
-          </Form.Item>
-
-          <Form.Item className="mt-4">
-            <LoginButton
-              htmlType="submit"
-              bgcolor={colors.teal100}
-              className="login-form-button px-5"
+          {!mode && (
+            <Form.Item
+              className="col-12"
+              name="password"
+              rules={[
+                {
+                  min: 6,
+                  message: "Password length should not be less than 6",
+                },
+                {
+                  required: true,
+                  message: "Please input your Password!",
+                },
+              ]}
             >
-              {!mode ? "Log in" : "Sign up"}
-            </LoginButton>
+              <FormPassword
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                style={{
+                  backgroundColor: focusedPassword ? "white" : "transparent",
+                  color: focusedPassword ? "black" : "white",
+                }}
+                type="password"
+                placeholder="Password"
+                onFocus={() => setFocusedPassword(true)}
+                onBlur={() => setFocusedPassword(false)}
+              />
+            </Form.Item>
+          )}
+          <Form.Item className="mt-4">
+            {loading ? (
+              <Loading size="large" color={colors.teal100} />
+            ) : (
+              <LoginButton
+                htmlType="submit"
+                bgcolor={colors.teal100}
+                className="login-form-button px-5"
+              >
+                {!mode ? "Log in" : "Sign up"}
+              </LoginButton>
+            )}
             {/* Or <a href="">register now!</a> */}
           </Form.Item>
           {!mode ? (

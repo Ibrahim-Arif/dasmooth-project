@@ -25,14 +25,12 @@ import {
 import { useUser } from "../hooks/useContext";
 import { useNavigate, useParams } from "react-router";
 export default function BatonsForm() {
-  const { batonsData, setBatonsData } = useUser();
+  const { batonsData, setBatonsData, teamMembers } = useUser();
   const params = useParams();
   const navigate = useNavigate();
   const [mode, setMode] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
+
   const [activeTitle, setActiveTitle] = useState("");
   const [activeComponent, setActiveComponent] = useState(null);
   const [activeItemIndex, setActiveItemIndex] = useState(-1);
@@ -50,6 +48,7 @@ export default function BatonsForm() {
     filesList: [],
   });
   const [id, setID] = useState(null);
+  const [disabled, setDisabled] = useState(true);
 
   const flushData = () => {
     setActiveComponent(null);
@@ -72,13 +71,13 @@ export default function BatonsForm() {
   };
 
   const handlePass = () => {
-    // console.log(
-    //   dateData,
-    //   budgetData,
-    //   postUpdateData,
-    //   filesList.filesList,
-    //   title
-    // );
+    console.log(
+      dateData,
+      budgetData,
+      postUpdateData,
+      filesList.filesList,
+      title
+    );
     let temp = batonsData;
 
     if (params.id == null) {
@@ -119,6 +118,9 @@ export default function BatonsForm() {
     setIsModalVisible(false);
   };
 
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
   const handleCancel = () => {
     setIsModalVisible(false);
   };
@@ -157,6 +159,16 @@ export default function BatonsForm() {
   };
   useEffect(() => {
     resetFormView();
+    if (
+      dateData != "Set a deadline" &&
+      budgetData != "Set a budget" &&
+      postUpdateData != "" &&
+      teamMemberData != "Select a team member" &&
+      filesList.filesList.length != 0 &&
+      title != ""
+    )
+      setDisabled(false);
+    else setDisabled(true);
   }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
@@ -175,11 +187,11 @@ export default function BatonsForm() {
           <ArrowLeftOutlined
             style={{ fontSize: 20 }}
             onClick={() => {
-              navigate("/dashboard/main");
+              navigate("/main");
             }}
           />
 
-          <h4 className="mt-4">{title == "" ? "Blank" : title}</h4>
+          <h4 className="mt-4">{title == "" ? "Add Title" : title}</h4>
           {/* FormItems */}
           <div className="col-12">
             <Input
@@ -202,6 +214,7 @@ export default function BatonsForm() {
                     itemSelected={teamMemberData}
                     setItemSelected={setTeamMemberData}
                     clickOk={handleOk}
+                    teamMembers={Object.values(teamMembers)}
                   />,
                   1
                 )
@@ -296,7 +309,11 @@ export default function BatonsForm() {
               }
             />
           </Container>
-          <TealButton className="col-12" onClick={handlePass}>
+          <TealButton
+            className="col-12"
+            onClick={handlePass}
+            disabled={disabled}
+          >
             PASS
           </TealButton>
         </Container>

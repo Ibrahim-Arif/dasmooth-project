@@ -44,7 +44,7 @@ export default function Welcome() {
         </div>
         <LoginButton
           htmlType="submit"
-          bgColor={colors.teal100}
+          bgcolor={colors.teal100}
           className="login-form-button px-5 mt-3"
           onClick={() => navigate("/signIn/1")}
         >
@@ -75,11 +75,11 @@ const LoginButton = styledComponents(Button)`
         height: 50px;
         border-radius: 5px;
         color: ${(props) => (props.color ? props.color : "white")};
-        border-color:${({ bgColor, ...props }) => bgColor};
-        background-color:${({ bgColor, ...props }) => bgColor};
+        border-color:${({ bgcolor, ...props }) => bgcolor};
+        background-color:${({ bgcolor, ...props }) => bgcolor};
         :hover{
-          color: ${({ bgColor, ...props }) => bgColor};
-          border-color:${({ bgColor, ...props }) => bgColor};
+          color: ${({ bgcolor, ...props }) => bgcolor};
+          border-color:${({ bgcolor, ...props }) => bgcolor};
         }
 `;
 

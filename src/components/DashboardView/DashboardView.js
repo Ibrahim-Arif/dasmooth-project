@@ -20,11 +20,49 @@ export default function DashboardView(props) {
   const [CompleteBatons, setCompleteBatons] = useState([]);
 
   const navigate = useNavigate();
+
+  const statuses = ["pending", "passed", "received", "declined", "complete"];
+
+  const filterBatonsData = (status) => {
+    let filtered = batonsData.filter((e) => e.status == status);
+    return filtered;
+  };
+
+  const filterBatons = (baton) => {
+    // console.log(baton.length);
+    if (baton.length == 0) {
+      var removeIndex = batons.map((item) => item.status).indexOf(`${baton}`);
+      removeIndex && batons.splice(removeIndex, 1);
+    }
+  };
+
   useEffect(() => {
     console.log("DashBoardView");
     batonsData.forEach((e) => console.log(e.title, "|", e.id));
-    let pending = batonsData.filter((e) => e.status == "pending");
+
+    let pending = filterBatonsData("pending");
+    filterBatons(pending);
     setPendingBatons(pending);
+
+    let passed = filterBatonsData("passed");
+    filterBatons(passed);
+    setPassedBatons(passed);
+
+    let received = filterBatonsData("recieved");
+    filterBatons(received);
+    setReceivedBatons(received);
+
+    let accepted = filterBatonsData("accepted");
+    filterBatons(accepted);
+    setDeclinedBatons(accepted);
+
+    let declined = filterBatonsData("declined");
+    filterBatons(declined);
+    setDeclinedBatons(declined);
+
+    let complete = filterBatonsData("complete");
+    filterBatons(complete);
+    setCompleteBatons(complete);
   }, [batonsData]);
 
   const getBaton = {
@@ -38,7 +76,6 @@ export default function DashboardView(props) {
 
   const onDragEnd = (fromIndex, toIndex) => {
     if (toIndex < 0) return; // Ignores if outside designated area
-
     const items = [...batons];
     const item = items.splice(fromIndex, 1)[0];
     items.splice(toIndex, 0, item);
@@ -60,7 +97,7 @@ export default function DashboardView(props) {
           size="large"
           icon={<PlusOutlined />}
           className="d-flex flex-row align-items-center"
-          onClick={() => navigate("/dashboard/batonsForm")}
+          onClick={() => navigate("/batonsForm")}
         >
           CREATE A NEW BATON
         </Button>

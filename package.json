@@ -9,6 +9,8 @@
     "@testing-library/user-event": "^13.5.0",
     "antd": "^4.20.3",
     "bootstrap": "^5.1.3",
+    "firebase": "^9.8.3",
+    "generate-password": "^1.7.0",
     "moment": "^2.29.3",
     "prop-types": "^15.8.1",
     "rc-queue-anim": "^2.0.0",

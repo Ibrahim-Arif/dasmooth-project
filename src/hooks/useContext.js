@@ -3,8 +3,16 @@ import { createContext, useContext } from "react";
 const UserContext = createContext();
 
 export const useUser = () => {
-  const { isLogin, setIsLogin, batonsData, setBatonsData, batons, setBatons } =
-    useContext(UserContext);
+  const {
+    isLogin,
+    setIsLogin,
+    batonsData,
+    setBatonsData,
+    batons,
+    setBatons,
+    teamMembers,
+    setTeamMembers,
+  } = useContext(UserContext);
 
   return {
     isLogin,
@@ -13,12 +21,22 @@ export const useUser = () => {
     setBatonsData,
     batons,
     setBatons,
+    teamMembers,
+    setTeamMembers,
   };
 };
 
 export const StateProvider = ({ values, children }) => {
-  const { isLogin, setIsLogin, batonsData, setBatonsData, batons, setBatons } =
-    values;
+  const {
+    isLogin,
+    setIsLogin,
+    batonsData,
+    setBatonsData,
+    batons,
+    setBatons,
+    teamMembers,
+    setTeamMembers,
+  } = values;
 
   return (
     <UserContext.Provider
@@ -29,6 +47,8 @@ export const StateProvider = ({ values, children }) => {
         setBatonsData,
         batons,
         setBatons,
+        teamMembers,
+        setTeamMembers,
       }}
     >
       {children}

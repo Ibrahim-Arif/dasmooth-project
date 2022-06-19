@@ -8,7 +8,10 @@ import MemberSelection from "./MemberSelection/MemberSelection";
 import PostUpdateForm from "./PostUpdateForm/PostUpdateForm";
 import { TealButton } from "./FormButton/FormButton";
 import ListSort from "./ListSort/ListSort";
+import Loading from "./Loading/Loading";
+
 export {
+  Loading,
   ListSort,
   TealButton,
   Selectable,

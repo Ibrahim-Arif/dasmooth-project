@@ -24,7 +24,7 @@ const { Header, Sider } = Layout;
 export default function DashboardMenu() {
   const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
-  const { setIsLogin } = useUser();
+  const { setIsLogin, isLogin } = useUser();
   const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
 
@@ -153,7 +153,9 @@ export default function DashboardMenu() {
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
             <Avatar src="https://joeschmoe.io/api/v1/random" size={70} />
-            <h5 className="mt-3">UserName</h5>
+            <label style={{ fontWeight: "bold" }} className="mt-3">
+              {isLogin ? isLogin.email : "UserName"}
+            </label>
           </Container>
 
           <Menu
