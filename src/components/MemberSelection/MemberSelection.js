@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Input, Avatar, Modal, Form } from "antd";
+import { Input, Avatar, Modal, Form, notification } from "antd";
 import { colors } from "../../utilities/colors";
 import { PlusOutlined, UserOutlined } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Selectable from "../Selectable/Selectable";
 import { handleSignUp, handleAddTeamMember } from "../../services";
 import { useUser } from "../../hooks/useContext";
+import { generateNotification } from "../../utilities/generateNotification";
+import { click } from "@testing-library/user-event/dist/click";
 
 export default function MemberSelection({
   itemSelected,
@@ -48,21 +50,29 @@ export default function MemberSelection({
           [user.uid]: values,
           ...teamMembers,
         });
+       
+        generateNotification("success","Invite Sent",`An invite has been sent to ${values.email}`)
+        setItemSelected({text: values.name,        
+          id: user.uid})
+        clickOk();
       })
-      .catch((ex) => console.log(ex));
+      .catch((ex) => generateNotification("error","Error","Failed to send invite!"));
   };
   const handleChange = (values, allValues) => {
     console.log(values, allValues);
   };
   useEffect(() => {
-    let data = Object.keys(teamMembers)
-    .map((key) => {
-      return {
-        email: teamMembers[key].email,
-        name: teamMembers[key].name,
-        id: key,
-      };
-    });
+    let data = []
+    if(teamMembers != undefined && teamMembers != null ){
+       data = Object.keys(teamMembers)
+      .map((key) => {
+        return {
+          email: teamMembers[key].email,
+          name: teamMembers[key].name,
+          id: key,
+        };
+      });
+    }
     // console.log(searchText);
     // console.log(data);
     // return;
@@ -107,7 +117,7 @@ export default function MemberSelection({
               },
             ]}
           >
-            <Input type="text" placeholder="Email" autoComplete="off" />
+            <Input type="text" placeholder="Email" className="normal-input" autoComplete="off" />
           </Form.Item>
 
           <Form.Item
@@ -121,7 +131,7 @@ export default function MemberSelection({
               },
             ]}
           >
-            <Input type="text" placeholder="Name" />
+            <Input type="text" placeholder="Name" className="normal-input" />
           </Form.Item>
 
           <Form.Item className="mt-4 col-12">
@@ -138,6 +148,7 @@ export default function MemberSelection({
         size="large"
         style={{ borderRadius: 5, width: "100%" }}
         onChange={(e) => setSearchText(e.currentTarget.value)}
+        className="normal-input"
       />
       <div className="px-3">
         <Selectable

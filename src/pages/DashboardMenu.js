@@ -18,6 +18,7 @@ import { colors } from "../utilities/colors";
 import { menuItems } from "../utilities/MenuItems";
 
 import { logo, placeHolder } from "../assets";
+import { getAuth } from "firebase/auth";
 
 const { Header, Sider } = Layout;
 
@@ -49,6 +50,8 @@ export default function DashboardMenu() {
 
     switch (key) {
       case "logout":
+        getAuth().signOut();
+        window.localStorage.clear();
         setIsLogin(false);
         navigate("/");
         break;
@@ -109,6 +112,7 @@ export default function DashboardMenu() {
               size="large"
               placeholder="Search by name, email or team member"
               prefix={<SearchOutlined />}
+              className="normal-input"
             />
           )}
         </Container>
