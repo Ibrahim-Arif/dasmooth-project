@@ -151,20 +151,40 @@ export default function BatonsForm() {
     }
   };
 
+ const dataUrlToFile = async (dataUrl, fileName) => {
+
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+    return new File([blob], fileName, { type: 'image/png' });
+}
+ 
   useEffect(() => {
     console.log(params);
     if (params.id) {
-      let filter = batonsData.filter((e) => e.id == params.id);
+      let filter = batonsData.filter((e) => e.docId == params.id);
       filter = filter[0];
+      console.log(filter)
       setTitle(filter.title);
-      setBudgetData(filter.budgetData);
-      setFilesList(filter.filesList);
+      setBudgetData(filter.budget);
+
+      // let imageList = filter.images.map(async (e,index)=>{
+      //   const res = await dataUrlToFile(e,index)
+      //   return res
+          
+      //   }
+      // )
+      // imageList  = imageList.map(e=>e.then(res=>res))
+      // console.log(imageList)
+      setFilesList({filesList:filter.images});
       // ! here must deal b64 issue
-      setDateData(filter.dateData);
-      setPostUpdateData(filter.postUpdateData);
+      setDateData(filter.deadline);
+      setPostUpdateData(filter.post);
+      setTeamMemberData({text:filter.memberName,
+                        icon: <UserOutlined />,
+                        image: null,})
       setID(params.id);
       // console.log("filter", filter);
-      batonsData.forEach((e) => console.log(e.title, "|", e.id));
+      batonsData.forEach((e) => console.log(e.title, "|", e.docId));
     } else {
       flushData();
     }

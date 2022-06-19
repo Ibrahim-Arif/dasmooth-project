@@ -19,6 +19,7 @@ export default function DashboardView(props) {
   const [DeclinedBatons, setDeclinedBatons] = useState([]);
   const [AcceptedBatons, setAcceptedBatons] = useState([]);
   const [CompleteBatons, setCompleteBatons] = useState([]);
+  const [activeBatons,setActiveBatons] = useState(Object.values(batons))
 
   const navigate = useNavigate();
 
@@ -30,21 +31,22 @@ export default function DashboardView(props) {
   };
 
   const filterBatons = (batonData,batonName) => {
-    
-    
-    console.log(`${batonName} filter`,batonData.length);
+    // console.log(batonsList)
     if (batonData.length == 0) {
       console.log(`removing the ${batonName} btaon back in array`)
-      var filteredBatons = batonsList.filter(e=>e.status == batonName)
-      setBatons(filteredBatons)
+      let temp = batons;
+      delete temp[batonName];
+      setBatons(temp)
+      setActiveBatons(Object.values(temp))
+
     }else if(batonData.length > 0){
       console.log(`adding the ${batonName} btaon back in array`)
-       let temp = batonsList.filter(e=>e.status == batonName)
-       let tempBatons = batons;
-
-      console.log(temp,batonData)
-      tempBatons.push(temp[0])
-      setBatons(tempBatons)
+      let temp = batons;
+      temp[batonName] = batonsList[batonName]
+      // console.log(batonsList)
+      setBatons(temp)
+      temp =Object.values(temp);
+      setActiveBatons(Object.values(temp))
     }
   };
 
@@ -73,6 +75,7 @@ export default function DashboardView(props) {
     setDeclinedBatons(declined);
 
     let complete = filterBatonsData("complete");
+    console.log("coomp",complete)
     filterBatons(complete,"complete");
     setCompleteBatons(complete);
 
@@ -124,7 +127,7 @@ export default function DashboardView(props) {
           onDragEnd={onDragEnd}
         >
           <List
-            dataSource={batons}
+            dataSource={activeBatons}
             renderItem={(e) => (
               <List.Item className="col-12 mt-5 draggble">
                 <Collapseable

@@ -70,8 +70,9 @@ export default function Collapseable({
             className="row mx-2 align-items-center justify-content-between my-3"
             bordercolor={borderColor}
             onClick={() => {
-              console.log(`/dashboard/batonsForm/${e.id}`);
-              navigate(`/dashboard/batonsForm/${e.id}`);
+              // console.log(e)
+              console.log(`/batonsForm/${e.docId}`);
+              navigate(`/batonsForm/${e.docId}`);
             }}
           >
             <Container

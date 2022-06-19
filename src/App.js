@@ -20,7 +20,7 @@ const App = () => {
   const [isLoading, setLoading] = useState(false);
   const [batonsData, setBatonsData] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
-  const [batons, setBatons] = useState(batonsList);
+  const [batons, setBatons] = useState({...batonsList});
 
   const userContextValues = {
     isLogin,
