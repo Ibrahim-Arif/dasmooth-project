@@ -12,7 +12,7 @@ import {
   DeleteFilled,
   CopyOutlined,
 } from "@ant-design/icons";
-// import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import { colors } from "../utilities/colors";
 import {
@@ -55,7 +55,7 @@ export default function BatonsForm() {
     text: "Attach a file",
     filesList: [],
   });
-  const [filesListB64, setFilesListB64] = useState([]);
+ 
   const [id, setID] = useState(null);
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -84,7 +84,7 @@ export default function BatonsForm() {
       text: "Attach a file",
       filesList: [],
     });
-    setFilesListB64([]);
+    // setFilesListB64([]);
   };
 
   const handlePass = () => {
@@ -102,8 +102,6 @@ export default function BatonsForm() {
       let post = {
         deadline: dateData,
         budget: budgetData,
-        post: postUpdateData,
-        images: filesListB64,
         title,
         authorId: isLogin.uid,
         memberId: teamMemberData.id,
@@ -170,11 +168,6 @@ export default function BatonsForm() {
     }
   };
 
-  const dataUrlToFile = async (dataUrl, fileName) => {
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
-    return new File([blob], fileName, { type: "image/png" });
-  };
 
   useEffect(() => {
     console.log("params:", params);
@@ -184,10 +177,10 @@ export default function BatonsForm() {
       filter = filter[0];
       console.log(filter);
       if (filter == undefined) return;
-      if (filter.authorPostStatus == "passed") setIsEditable(false);
+      if (filter.authorPostStatus == "passed" ||filter.memberPostStatus == "received" ) setIsEditable(false);
       if (
         filter.authorPostStatus == "deleted" ||
-        filter.authorPostState == "received"
+        filter.authorPostStatus == "received"
       )
         setIsDeleted(true);
       console.log("editable:", isEditable);
@@ -202,7 +195,7 @@ export default function BatonsForm() {
       // )
       // imageList  = imageList.map(e=>e.then(res=>res))
       // console.log(imageList)
-      setFilesList({ filesList: filter.images });
+      // setFilesList({ filesList: filter.images });
       // ! here must deal b64 issue
       setDateData(filter.deadline);
       setPostUpdateData(filter.post);
@@ -229,9 +222,7 @@ export default function BatonsForm() {
     if (
       dateData != "Set a deadline" &&
       budgetData != "Set a budget" &&
-      postUpdateData != "" &&
       teamMemberData != "Select a team member" &&
-      filesList.filesList.length != 0 &&
       title != ""
     )
       setDisabled(false);
@@ -458,7 +449,8 @@ export default function BatonsForm() {
                     boxColor={colors.teal100}
                     itemSelected={filesList}
                     setItemSelected={setFilesList}
-                    setFilesListB64={setFilesListB64}
+                    // setFilesListB64={setFilesListB64}
+                    batonId={id}
                     clickOk={() => {
                       handleOk();
                       resetFormView();
@@ -482,6 +474,8 @@ export default function BatonsForm() {
                     itemSelected={postUpdateData}
                     setItemSelected={setPostUpdateData}
                     clickOk={handleOk}
+                    batonId={id}
+                    username={isLogin.email}
                   />,
                   5
                 )
@@ -493,7 +487,7 @@ export default function BatonsForm() {
               <Loading size="large" color={colors.teal100} />
             </div>
           ) : (
-            isEditable &&
+            !isEditable &&
             !isDeleted && (
               <TealButton
                 className="col-12"

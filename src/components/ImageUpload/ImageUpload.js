@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
-import { handleUploadImages } from "../../services";
 import Loading from "../Loading/Loading";
+import { handleAddBatonFiles } from "../../services";
+import { generateNotification } from "../../utilities/generateNotification";
+import { v4 } from "uuid";
 
 const { Dragger } = Upload;
 // https://prismasoft.medium.com/multiple-files-upload-to-firebase-in-react-using-ant-design-65ba671d9af5
@@ -13,31 +15,29 @@ export default function ImageUpload({
   boxColor,
   itemSelected,
   setItemSelected,
-  setFilesListB64,
+  batonId,
   clickOk,
 }) {
-  const [imageData, setImageData] = useState({
-    fileList: itemSelected.filesList,
-  });
-
+  const [imageData, setImageData] = useState({filesList:[]});
   const [uploading, setUploading] = useState(false);
+
   const props = {
     name: "file",
     multiple: true,
     beforeUpload: (file) => {
       setImageData((imageData) => ({
-        fileList: [...imageData.fileList, file],
+        filesList: [...imageData.filesList, file],
       }));
 
       return false;
     },
     onRemove: (file) => {
       setImageData((imageData) => {
-        const index = imageData.fileList.indexOf(file);
-        const newFileList = imageData.fileList.slice();
+        const index = imageData.filesList.indexOf(file);
+        const newFileList = imageData.filesList.slice();
         newFileList.splice(index, 1);
         return {
-          fileList: newFileList,
+          filesList: newFileList,
         };
       });
     },
@@ -45,20 +45,40 @@ export default function ImageUpload({
       console.log("Dropped files", e.dataTransfer.files);
     },
   };
+
   const handleUpload = () => {
     setUploading(true);
 
-    console.log(imageData.fileList);
+    // console.log(imageData);
     let b64 = [];
-    imageData.fileList.map((e) => {
-      getBase64(e, (item) => b64.push(item));
-    });
-    console.log(b64);
-    // setItemSelected({uploading:false,fileList:[...b64]})
-    setFilesListB64(b64)
-    setUploading("b64Converted")
-    clickOk()
-  };
+  
+    // imageData.filesList.map((e) => {
+    // });
+    for(let  i = 0;i<imageData.filesList.length;i++){
+      var reader = new FileReader();
+
+      reader.onloadend = function() {
+      // b64.push(reader.result)
+        let imagesData = {[v4()]: reader.result, batonId:batonId};
+   
+        handleAddBatonFiles(imagesData).then(()=>{
+          generateNotification("success", "Images uploaded successfully");
+          setUploading(false);
+          clickOk();
+        }).catch(ex=>{
+          generateNotification("error", ex.message);  
+          setUploading(false);})
+        };
+
+        reader.readAsDataURL(imageData.filesList[i]);
+      }
+     
+      // getBase64(imageData.filesList[i], (item) => b64.push(item));
+    }
+    // console.log(b64);
+    // return;
+    // console.log(imagesData);
+    // return;
 
   const getBase64 = (file, addItem) => {
     var reader = new FileReader();
@@ -73,40 +93,25 @@ export default function ImageUpload({
   };
 
   useEffect(
-    () =>
-      imageData.fileList.length == 0
-        ? setItemSelected({
-            filesList: imageData.fileList,
-            text: "Attach a file",
-          })
-        : setItemSelected({
-            filesList: imageData.fileList,
-            text: `${imageData.fileList.length} files attached`,
-          }),
+    () =>{
+      console.log(imageData)
+      if(imageData.filesList.length == 0)
+      setItemSelected({
+        filesList: imageData,
+        text: "Attach a file",
+      });
+      else 
+      setItemSelected({
+        filesList: imageData,
+        text: `${imageData.filesList.length} files attached`,
+      });
+    },
     [imageData]
   );
-  // const props = {
-  //   onRemove: (file) => {
-  //     setImageData((imageData) => {
-  //       const index = imageData.fileList.indexOf(file);
-  //       const newFileList = imageData.fileList.slice();
-  //       newFileList.splice(index, 1);
-  //       return {
-  //         fileList: newFileList,
-  //       };
-  //     });
-  //   },
-  //   beforeUpload: (file) => {
-  //     setImageData((imageData) => ({
-  //       fileList: [...imageData.fileList, file],
-  //     }));
-  //     return false;
-  //   },
-  //   fileList: imageData.fileList,
-  // };
+  
   return (
     <>
-      <Dragger {...props} defaultFileList={itemSelected.filesList}>
+      <Dragger {...props} defaultFileList={imageData.filesList} value>
         <p className="ant-upload-drag-icon">
           <InboxOutlined style={{ color: boxColor }} />
         </p>
@@ -116,7 +121,7 @@ export default function ImageUpload({
       </Dragger>
 
       <div className="mt-5">
-        <h6>{imageData.fileList.length} files attached</h6>
+        <h6>{imageData.length} files attached</h6>
       </div>
       {uploading  == true && uploading != "b64Converted"? (
         <Loading size="large" />
@@ -124,8 +129,8 @@ export default function ImageUpload({
       
         <TealButton
           onClick={handleUpload}
-          disabled={imageData.fileList.length === 0 || uploading == "b64Converted"}
-          loading={imageData.uploading}
+          disabled={imageData.length === 0 || uploading == "b64Converted"}
+          loading={uploading}
           style={{ marginTop: 16 }}
         >
           {uploading == "b64Converted" ? "Uploaded ": "Upload"}

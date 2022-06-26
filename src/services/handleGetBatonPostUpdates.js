@@ -5,17 +5,17 @@ import {
   onSnapshot,
   getFirestore,
 } from "firebase/firestore";
-export const handleGetMyBatons = async (uid, data, setData) => {
+export const handleGetBatonPostUpdates = async (id, setData) => {
   try {
     const db = getFirestore();
-    const q = query(collection(db, "batons"), where("authorId", "==", uid));
+    const q = query(collection(db, "batonUpdates"), where("batonId", "==", id));
 
     onSnapshot(q, (querySnapshot) => {
       let tempData = [];
       querySnapshot.forEach((doc) => {
         tempData.push({ docId: doc.id, ...doc.data() });
       });
-      console.log(tempData);
+      tempData.sort(function(a,b){return   new Date(b.timestamp).getTime()-new Date(a.timestamp).getTime()});
       setData(tempData);
     });
   } catch (ex) {
