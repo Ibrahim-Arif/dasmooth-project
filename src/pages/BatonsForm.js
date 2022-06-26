@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
-import { Modal, Input } from "antd";
+import { Modal, Input, Button, Dropdown, Menu } from "antd";
 import {
   UserOutlined,
   CalendarOutlined,
@@ -8,6 +8,8 @@ import {
   FileAddOutlined,
   FileTextOutlined,
   ArrowLeftOutlined,
+  EllipsisOutlined,
+  DeleteFilled,
 } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
 
@@ -25,13 +27,13 @@ import {
 
 import { useUser } from "../hooks/useContext";
 import { useNavigate, useParams } from "react-router";
-import { handleAddBaton } from "../services";
+import { handleAddBaton, handleDeleteBaton } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 export default function BatonsForm() {
-  const { batonsData, setBatonsData, teamMembers,isLogin } = useUser();
+  const { batonsData, setBatonsData, teamMembers, isLogin } = useUser();
   const params = useParams();
   const navigate = useNavigate();
-  const [mode, setMode] = useState(0);
+  const [isEditable, setIsEditable] = useState(true);
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [activeTitle, setActiveTitle] = useState("");
@@ -50,10 +52,13 @@ export default function BatonsForm() {
     text: "Attach a file",
     filesList: [],
   });
-  const [filesListB64,setFilesListB64] = useState([])
+  const [filesListB64, setFilesListB64] = useState([]);
   const [id, setID] = useState(null);
   const [disabled, setDisabled] = useState(true);
-  const [loading,setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
+  const [fetchedDataObject, setFetchedDataObject] = useState({
+    status: "pending",
+  });
 
   const flushData = () => {
     setActiveComponent(null);
@@ -73,7 +78,7 @@ export default function BatonsForm() {
       text: "Attach a file",
       filesList: [],
     });
-    setFilesListB64([])
+    setFilesListB64([]);
   };
 
   const handlePass = () => {
@@ -84,33 +89,40 @@ export default function BatonsForm() {
     //   filesList.filesList,
     //   title
     // );
-   
+
     if (params.id == null) {
       console.log("New");
-      
-      let post ={
-        deadline:dateData,
-        budget:budgetData,
+
+      let post = {
+        deadline: dateData,
+        budget: budgetData,
         post: postUpdateData,
-        images:filesListB64,
+        images: filesListB64,
         title,
         authorId: isLogin.uid,
-        memberId:teamMemberData.id,
-        memberName:teamMemberData.text,
+        memberId: teamMemberData.id,
+        memberName: teamMemberData.text,
         status: "pending",
-        created: Date.now()
+        isDeleted: false,
+        created: Date.now(),
       };
-      setLoading(true)
+
+      setLoading(true);
       console.log(post);
-      handleAddBaton(post).then(()=>{
-        generateNotification("success","Baton Added","You baton is created")
-        setLoading(false)
-        navigate("/main")
-      }).catch((ex)=>{
-        generateNotification("error","Error","Failed to create you baton")
-        setLoading(false)
-      }
-      )
+      handleAddBaton(post)
+        .then(() => {
+          generateNotification(
+            "success",
+            "Baton Added",
+            "You baton is created"
+          );
+          setLoading(false);
+          navigate("/main");
+        })
+        .catch((ex) => {
+          generateNotification("error", "Error", "Failed to create you baton");
+          setLoading(false);
+        });
     } else {
       console.log("Edit");
       // temp = temp.map((e) => {
@@ -151,37 +163,41 @@ export default function BatonsForm() {
     }
   };
 
- const dataUrlToFile = async (dataUrl, fileName) => {
-
+  const dataUrlToFile = async (dataUrl, fileName) => {
     const res = await fetch(dataUrl);
     const blob = await res.blob();
-    return new File([blob], fileName, { type: 'image/png' });
-}
- 
+    return new File([blob], fileName, { type: "image/png" });
+  };
+
   useEffect(() => {
     console.log(params);
     if (params.id) {
       let filter = batonsData.filter((e) => e.docId == params.id);
       filter = filter[0];
-      console.log(filter)
+      console.log(filter);
+      if (filter == undefined) return;
+      if (filter.status == "pending") setIsEditable(false);
+
+      setFetchedDataObject(filter);
       setTitle(filter.title);
       setBudgetData(filter.budget);
-
       // let imageList = filter.images.map(async (e,index)=>{
       //   const res = await dataUrlToFile(e,index)
       //   return res
-          
+
       //   }
       // )
       // imageList  = imageList.map(e=>e.then(res=>res))
       // console.log(imageList)
-      setFilesList({filesList:filter.images});
+      setFilesList({ filesList: filter.images });
       // ! here must deal b64 issue
       setDateData(filter.deadline);
       setPostUpdateData(filter.post);
-      setTeamMemberData({text:filter.memberName,
-                        icon: <UserOutlined />,
-                        image: null,})
+      setTeamMemberData({
+        text: filter.memberName,
+        icon: <UserOutlined />,
+        image: null,
+      });
       setID(params.id);
       // console.log("filter", filter);
       batonsData.forEach((e) => console.log(e.title, "|", e.docId));
@@ -208,26 +224,110 @@ export default function BatonsForm() {
       setDisabled(false);
     else setDisabled(true);
   }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
+
+  const handleDeleteClick = () => {
+    let ret = window.confirm("Are you sure you want to delete this baton?");
+    if (!ret) return;
+    setLoading(true);
+    handleDeleteBaton(fetchedDataObject.docId)
+      .then(() => {
+        setLoading(false);
+        generateNotification(
+          "success",
+          "Baton Deleted!",
+          "Your baton is deleted!"
+        );
+        navigate("/main");
+      })
+      .catch(() => {
+        setLoading(false);
+        generateNotification("error", "Error", "Failed to delete your baton");
+      });
+  };
+
+  const handleDuplicateClick = () => {
+    let ret = window.confirm("Are you sure you want to duplicate this baton?");
+    if (!ret) return;
+
+    setLoading(true);
+    let temp = fetchedDataObject;
+    temp.title = `${temp.title} (Duplicate)`;
+    handleAddBaton(temp)
+      .then(() => {
+        generateNotification(
+          "success",
+          "Baton Added",
+          "You baton is duplicated"
+        );
+        setLoading(false);
+        navigate("/main");
+      })
+      .catch((ex) => {
+        generateNotification("error", "Error", "Failed to create you baton");
+        setLoading(false);
+      });
+  };
+
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: (
+            <div
+              className="d-flex flex-row justify-content-between align-items-center"
+              onClick={handleDeleteClick}
+            >
+              <DeleteFilled />
+              Delete
+            </div>
+          ),
+        },
+        {
+          key: "2",
+          label: (
+            <a href="#" onClick={handleDuplicateClick}>
+              Duplicate
+            </a>
+          ),
+        },
+      ]}
+    />
+  );
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
+      <Modal
+        title={activeTitle}
+        visible={isModalVisible}
+        onCancel={handleCancel}
+        footer={null}
+        mask={false}
+      >
+        {activeComponent}
+      </Modal>
       <Container fluid className="col">
         <Container className="col">
-          <Modal
-            title={activeTitle}
-            visible={isModalVisible}
-            onCancel={handleCancel}
-            footer={null}
-            mask={false}
-          >
-            {activeComponent}
-          </Modal>
-
-          <ArrowLeftOutlined
-            style={{ fontSize: 20 }}
-            onClick={() => {
-              navigate("/main");
-            }}
-          />
+          <div className="d-flex flex-row justify-content-between">
+            <ArrowLeftOutlined
+              style={{ fontSize: 20 }}
+              onClick={() => {
+                navigate("/main");
+              }}
+            />
+            <Dropdown
+              overlay={menu}
+              placement="bottomRight"
+              arrow={{ pointAtCenter: true }}
+            >
+              <EllipsisOutlined
+                style={{ fontSize: 20 }}
+                onClick={() => {
+                  // navigate("/main");
+                }}
+                rotate={90}
+              />
+            </Dropdown>
+          </div>
 
           <h4 className="mt-4">{title == "" ? "Add Title" : title}</h4>
           {/* FormItems */}
@@ -246,6 +346,7 @@ export default function BatonsForm() {
               image={teamMemberData.image}
               text={teamMemberData.text}
               onItemPress={() =>
+                isEditable &&
                 handleFormItemRender(
                   "Select a member",
                   <MemberSelection
@@ -272,6 +373,7 @@ export default function BatonsForm() {
                   : false
               }
               onItemPress={() =>
+                isEditable &&
                 handleFormItemRender(
                   "Set a deadline",
                   <DateTimeSelection
@@ -292,6 +394,7 @@ export default function BatonsForm() {
                   : false
               }
               onItemPress={() =>
+                isEditable &&
                 handleFormItemRender(
                   "Set a budget",
                   <BudgetForm
@@ -318,7 +421,7 @@ export default function BatonsForm() {
                     boxColor={colors.teal100}
                     itemSelected={filesList}
                     setItemSelected={setFilesList}
-                    setFilesListB64 = {setFilesListB64}
+                    setFilesListB64={setFilesListB64}
                     clickOk={() => {
                       handleOk();
                       resetFormView();
@@ -347,16 +450,21 @@ export default function BatonsForm() {
               }
             />
           </Container>
-          {loading ? <Loading size="large"/>
-:
-          <TealButton
-          className="col-12"
-          onClick={handlePass}
-          disabled={disabled}
-          >
-            PASS
-          </TealButton>
-          }
+          {loading ? (
+            <div className="d-flex mt-3 justify-content-center">
+              <Loading size="large" color={colors.teal100} />
+            </div>
+          ) : (
+            isEditable && (
+              <TealButton
+                className="col-12"
+                onClick={handlePass}
+                disabled={disabled}
+              >
+                PASS
+              </TealButton>
+            )
+          )}
         </Container>
       </Container>
 

@@ -7,7 +7,6 @@ import Selectable from "../Selectable/Selectable";
 import { handleSignUp, handleAddTeamMember } from "../../services";
 import { useUser } from "../../hooks/useContext";
 import { generateNotification } from "../../utilities/generateNotification";
-import { click } from "@testing-library/user-event/dist/click";
 
 export default function MemberSelection({
   itemSelected,
@@ -50,22 +49,26 @@ export default function MemberSelection({
           [user.uid]: values,
           ...teamMembers,
         });
-       
-        generateNotification("success","Invite Sent",`An invite has been sent to ${values.email}`)
-        setItemSelected({text: values.name,        
-          id: user.uid})
+
+        generateNotification(
+          "success",
+          "Invite Sent",
+          `An invite has been sent to ${values.email}`
+        );
+        setItemSelected({ text: values.name, id: user.uid });
         clickOk();
       })
-      .catch((ex) => generateNotification("error","Error","Failed to send invite!"));
+      .catch((ex) =>
+        generateNotification("error", "Error", "Failed to send invite!")
+      );
   };
   const handleChange = (values, allValues) => {
     console.log(values, allValues);
   };
   useEffect(() => {
-    let data = []
-    if(teamMembers != undefined && teamMembers != null ){
-       data = Object.keys(teamMembers)
-      .map((key) => {
+    let data = [];
+    if (teamMembers != undefined && teamMembers != null) {
+      data = Object.keys(teamMembers).map((key) => {
         return {
           email: teamMembers[key].email,
           name: teamMembers[key].name,
@@ -84,7 +87,7 @@ export default function MemberSelection({
       );
       setMembers(data);
     }
-  }, [teamMembers]);
+  }, [teamMembers, searchText]);
   return (
     <>
       {/* Invite Member Modal Section */}
@@ -117,7 +120,12 @@ export default function MemberSelection({
               },
             ]}
           >
-            <Input type="text" placeholder="Email" className="normal-input" autoComplete="off" />
+            <Input
+              type="text"
+              placeholder="Email"
+              className="normal-input"
+              autoComplete="off"
+            />
           </Form.Item>
 
           <Form.Item
@@ -194,9 +202,9 @@ export default function MemberSelection({
               setCurrentItem({
                 text: e.name,
                 // image: <Avatar>LW</Avatar>,
-                id:e.id
+                id: e.id,
               });
-              console.log(currentItem)
+              console.log(currentItem);
             }}
           />
         ))}
@@ -212,9 +220,9 @@ export default function MemberSelection({
             text: currentItem.text,
             image: currentItem.image,
             icon: currentItem.icon,
-            id: currentItem.id ? currentItem.id : ""
+            id: currentItem.id ? currentItem.id : "",
           });
-          console.log(itemSelected)
+          console.log(itemSelected);
           clickOk();
         }}
         className="col-12"
