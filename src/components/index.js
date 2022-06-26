@@ -9,8 +9,9 @@ import PostUpdateForm from "./PostUpdateForm/PostUpdateForm";
 import { TealButton } from "./FormButton/FormButton";
 import ListSort from "./ListSort/ListSort";
 import Loading from "./Loading/Loading";
-
+import NotificationBox from "./NotificationBox/NotificationBox";
 export {
+  NotificationBox,
   Loading,
   ListSort,
   TealButton,

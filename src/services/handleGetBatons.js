@@ -10,8 +10,8 @@ export const handleGetBatons = async (uid, setData) => {
     const db = getFirestore();
     const q = query(
       collection(db, "batons"),
-      where("authorId", "==", uid),
-      where("isDeleted", "==", false)
+      where("authorId", "==", uid)
+      // where("isDeleted", "==", false)
     );
     onSnapshot(q, (querySnapshot) => {
       const data = [];
