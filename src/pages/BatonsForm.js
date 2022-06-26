@@ -10,8 +10,9 @@ import {
   ArrowLeftOutlined,
   EllipsisOutlined,
   DeleteFilled,
+  CopyOutlined   
 } from "@ant-design/icons";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 
 import { colors } from "../utilities/colors";
 import {
