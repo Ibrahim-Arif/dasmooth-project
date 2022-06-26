@@ -10,7 +10,7 @@ import {
   ArrowLeftOutlined,
   EllipsisOutlined,
   DeleteFilled,
-  CopyOutlined   
+  CopyOutlined,
 } from "@ant-design/icons";
 // import { v4 as uuidv4 } from "uuid";
 
@@ -24,6 +24,7 @@ import {
   PostUpdateForm,
   TealButton,
   Loading,
+  NotificationBox,
 } from "../components";
 
 import { useUser } from "../hooks/useContext";
@@ -34,7 +35,7 @@ export default function BatonsForm() {
   const { batonsData, setBatonsData, teamMembers, isLogin } = useUser();
   const params = useParams();
   const navigate = useNavigate();
-  const [isEditable, setIsEditable] = useState(true);
+
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [activeTitle, setActiveTitle] = useState("");
@@ -61,6 +62,8 @@ export default function BatonsForm() {
     status: "pending",
   });
 
+  const [isEditable, setIsEditable] = useState(true);
+  const [isDeleted, setIsDeleted] = useState(false);
   const flushData = () => {
     setActiveComponent(null);
     setActiveItemIndex(-1);
@@ -104,8 +107,8 @@ export default function BatonsForm() {
         memberId: teamMemberData.id,
         memberName: teamMemberData.text,
         status: "pending",
-        isDeleted: false,
-        created: Date.now(),
+        createdOn: Date.now(),
+        deletedOn: 0,
       };
 
       setLoading(true);
@@ -171,14 +174,16 @@ export default function BatonsForm() {
   };
 
   useEffect(() => {
-    console.log(params);
+    console.log("params:", params);
     if (params.id) {
+      if (batonsData.length == 0) return;
       let filter = batonsData.filter((e) => e.docId == params.id);
       filter = filter[0];
       console.log(filter);
-      if (filter == undefined) return;
-      if (filter.status == "pending") setIsEditable(false);
-
+      // if (filter == undefined) return;
+      if (filter.status == "passed") setIsEditable(false);
+      if (filter.status == "deleted") setIsDeleted(true);
+      console.log("editable:", isEditable);
       setFetchedDataObject(filter);
       setTitle(filter.title);
       setBudgetData(filter.budget);
@@ -276,7 +281,7 @@ export default function BatonsForm() {
           key: "1",
           label: (
             <div
-              className="d-flex flex-row justify-content-between align-items-center"
+              className="d-flex flex-row align-items-center"
               onClick={handleDeleteClick}
             >
               <DeleteFilled />
@@ -287,9 +292,13 @@ export default function BatonsForm() {
         {
           key: "2",
           label: (
-            <a href="#" onClick={handleDuplicateClick}>
+            <div
+              className="d-flex flex-row align-items-center"
+              onClick={handleDuplicateClick}
+            >
+              <CopyOutlined />
               Duplicate
-            </a>
+            </div>
           ),
         },
       ]}
@@ -297,6 +306,7 @@ export default function BatonsForm() {
   );
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
+      {/* Invite by email modal */}
       <Modal
         title={activeTitle}
         visible={isModalVisible}
@@ -306,40 +316,49 @@ export default function BatonsForm() {
       >
         {activeComponent}
       </Modal>
+
       <Container fluid className="col">
         <Container className="col">
+          {/* ArrowBack, DropDown menu div */}
           <div className="d-flex flex-row justify-content-between">
             <ArrowLeftOutlined
               style={{ fontSize: 20 }}
               onClick={() => {
-                navigate("/main");
+                if (isDeleted) navigate("/deleteBaton");
+                else navigate("/main");
               }}
             />
-            <Dropdown
-              overlay={menu}
-              placement="bottomRight"
-              arrow={{ pointAtCenter: true }}
-            >
-              <EllipsisOutlined
-                style={{ fontSize: 20 }}
-                onClick={() => {
-                  // navigate("/main");
-                }}
-                rotate={90}
-              />
-            </Dropdown>
+            {!isDeleted && (
+              <Dropdown
+                overlay={menu}
+                placement="bottomRight"
+                arrow={{ pointAtCenter: true }}
+              >
+                <EllipsisOutlined
+                  style={{ fontSize: 20 }}
+                  onClick={() => {
+                    // navigate("/main");
+                  }}
+                  rotate={90}
+                />
+              </Dropdown>
+            )}
           </div>
-
+          {/* -------------- */}
+          {isDeleted && <NotificationBox />}
           <h4 className="mt-4">{title == "" ? "Add Title" : title}</h4>
+
           {/* FormItems */}
           <div className="col-12">
-            <Input
-              size="large"
-              placeholder="Add Text"
-              className="me-3"
-              onChange={(e) => setTitle(e.currentTarget.value)}
-              value={title}
-            />
+            {!isDeleted && (
+              <Input
+                size="large"
+                placeholder="Add Text"
+                className="me-3"
+                onChange={(e) => setTitle(e.currentTarget.value)}
+                value={title}
+              />
+            )}
           </div>
           <Container>
             <Selectable
@@ -348,6 +367,7 @@ export default function BatonsForm() {
               text={teamMemberData.text}
               onItemPress={() =>
                 isEditable &&
+                !isDeleted &&
                 handleFormItemRender(
                   "Select a member",
                   <MemberSelection
@@ -375,6 +395,7 @@ export default function BatonsForm() {
               }
               onItemPress={() =>
                 isEditable &&
+                !isDeleted &&
                 handleFormItemRender(
                   "Set a deadline",
                   <DateTimeSelection
@@ -396,6 +417,7 @@ export default function BatonsForm() {
               }
               onItemPress={() =>
                 isEditable &&
+                !isDeleted &&
                 handleFormItemRender(
                   "Set a budget",
                   <BudgetForm
@@ -416,6 +438,7 @@ export default function BatonsForm() {
                   : false
               }
               onItemPress={() =>
+                !isDeleted &&
                 handleFormItemRender(
                   "Attach a file",
                   <ImageUpload
@@ -439,6 +462,7 @@ export default function BatonsForm() {
                 activeItemIndex == 5 || postUpdateData != "" ? true : false
               }
               onItemPress={() =>
+                !isDeleted &&
                 handleFormItemRender(
                   "Post an Update",
                   <PostUpdateForm
@@ -456,7 +480,8 @@ export default function BatonsForm() {
               <Loading size="large" color={colors.teal100} />
             </div>
           ) : (
-            isEditable && (
+            isEditable &&
+            !isDeleted && (
               <TealButton
                 className="col-12"
                 onClick={handlePass}

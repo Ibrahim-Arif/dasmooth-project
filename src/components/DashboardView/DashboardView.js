@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-
 import { Button, List } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
@@ -10,6 +9,7 @@ import { useNavigate } from "react-router";
 
 import ReactDragListView from "react-drag-listview";
 import { batonsList } from "../../utilities/batonsList";
+import { filterBatonsData } from "../../utilities/filterBatonsData";
 
 export default function DashboardView(props) {
   const { batonsData, batons, setBatons } = useUser();
@@ -19,34 +19,28 @@ export default function DashboardView(props) {
   const [DeclinedBatons, setDeclinedBatons] = useState([]);
   const [AcceptedBatons, setAcceptedBatons] = useState([]);
   const [CompleteBatons, setCompleteBatons] = useState([]);
-  const [activeBatons,setActiveBatons] = useState(Object.values(batons))
+  const [activeBatons, setActiveBatons] = useState(Object.values(batons));
 
   const navigate = useNavigate();
 
   const statuses = ["pending", "passed", "received", "declined", "complete"];
 
-  const filterBatonsData = (status) => {
-    let filtered = batonsData.filter((e) => e.status == status);
-    return filtered;
-  };
-
-  const filterBatons = (batonData,batonName) => {
+  const filterBatons = (batonData, batonName) => {
     // console.log(batonsList)
     if (batonData.length == 0) {
-      console.log(`removing the ${batonName} btaon back in array`)
+      console.log(`removing the ${batonName} btaon back in array`);
       let temp = batons;
       delete temp[batonName];
-      setBatons(temp)
-      setActiveBatons(Object.values(temp))
-
-    }else if(batonData.length > 0){
-      console.log(`adding the ${batonName} btaon back in array`)
+      setBatons(temp);
+      setActiveBatons(Object.values(temp));
+    } else if (batonData.length > 0) {
+      console.log(`adding the ${batonName} btaon back in array`);
       let temp = batons;
-      temp[batonName] = batonsList[batonName]
+      temp[batonName] = batonsList[batonName];
       // console.log(batonsList)
-      setBatons(temp)
-      temp =Object.values(temp);
-      setActiveBatons(Object.values(temp))
+      setBatons(temp);
+      temp = Object.values(temp);
+      setActiveBatons(Object.values(temp));
     }
   };
 
@@ -54,32 +48,32 @@ export default function DashboardView(props) {
     console.log("DashBoardView");
     batonsData.forEach((e) => console.log(e.title, "|", e.docId));
 
-    let pending = filterBatonsData("pending");
-    filterBatons(pending,"pending");
+    let pending = filterBatonsData(batonsData, "pending");
+    filterBatons(pending, "pending");
     setPendingBatons(pending);
 
-    let passed = filterBatonsData("passed");
-    filterBatons(passed,"passed");
+    let passed = filterBatonsData(batonsData, "passed");
+    filterBatons(passed, "passed");
     setPassedBatons(passed);
 
-    let received = filterBatonsData("recieved");
-    filterBatons(received,"received");
+    let received = filterBatonsData(batonsData, "recieved");
+    filterBatons(received, "received");
     setReceivedBatons(received);
 
-    let accepted = filterBatonsData("accepted");
-    filterBatons(accepted,"accepted");
+    let accepted = filterBatonsData(batonsData, "accepted");
+    filterBatons(accepted, "accepted");
     setDeclinedBatons(accepted);
 
-    let declined = filterBatonsData("declined");
-    filterBatons(declined,"declined");
+    let declined = filterBatonsData(batonsData, "declined");
+    filterBatons(declined, "declined");
     setDeclinedBatons(declined);
 
-    let complete = filterBatonsData("complete");
-    console.log("coomp",complete)
-    filterBatons(complete,"complete");
+    let complete = filterBatonsData(batonsData, "complete");
+    console.log("coomp", complete);
+    filterBatons(complete, "complete");
     setCompleteBatons(complete);
 
-    console.log(batons)
+    console.log(batons);
   }, [batonsData]);
 
   const getBaton = {
@@ -120,28 +114,30 @@ export default function DashboardView(props) {
         </Button>
       </Container>
       {/* Batons Container */}
-      <Container>
-        <ReactDragListView
-          nodeSelector=".ant-list-item.draggble"
-          handleSelector=".bars-icon"
-          onDragEnd={onDragEnd}
-        >
-          <List
-            dataSource={activeBatons}
-            renderItem={(e) => (
-              <List.Item className="col-12 mt-5 draggble">
-                <Collapseable
-                  title={e.title}
-                  batonsData={getBaton[e.title.replace(/\s+/g, "")]}
-                  bgColor={e.bgColor}
-                  borderColor={e.borderColor}
-                  className="col-12"
-                />
-              </List.Item>
-            )}
-          />
-        </ReactDragListView>
-      </Container>
+      {batonsData.length > 0 && (
+        <Container>
+          <ReactDragListView
+            nodeSelector=".ant-list-item.draggble"
+            handleSelector=".bars-icon"
+            onDragEnd={onDragEnd}
+          >
+            <List
+              dataSource={activeBatons}
+              renderItem={(e) => (
+                <List.Item className="col-12 mt-5 draggble">
+                  <Collapseable
+                    title={e.title}
+                    batonsData={getBaton[e.title.replace(/\s+/g, "")]}
+                    bgColor={e.bgColor}
+                    borderColor={e.borderColor}
+                    className="col-12"
+                  />
+                </List.Item>
+              )}
+            />
+          </ReactDragListView>
+        </Container>
+      )}
     </>
   );
 }
