@@ -7,6 +7,7 @@ import Selectable from "../Selectable/Selectable";
 import { handleSignUp, handleAddTeamMember } from "../../services";
 import { useUser } from "../../hooks/useContext";
 import { generateNotification } from "../../utilities/generateNotification";
+import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
 
 export default function MemberSelection({
   itemSelected,
@@ -45,9 +46,12 @@ export default function MemberSelection({
           [user.uid]: values,
           ...teamMembers,
         });
-        handleAddTeamMember(isLogin.uid, {
-          [user.uid]: values,
-          ...teamMembers,
+        handleAddTeamMemberByInvite(isLogin.uid, {
+          receiverId: user.uid,
+          receiverEmail: user.email,
+          isLoginFirstTime: true,
+          inviteBy: isLogin.uid,
+          name: values.name,
         });
 
         generateNotification(

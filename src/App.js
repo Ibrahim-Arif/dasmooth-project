@@ -9,7 +9,11 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap";
 import "antd/dist/antd.min.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { handleGetBatons, handleGetTeamMembers } from "./services";
+import {
+  handleGetMyBatons,
+  handleGetOtherBatons,
+  handleGetTeamMembers,
+} from "./services";
 import { batonsList } from "./utilities/batonsList";
 
 initializeApp(firebaseConfig);
@@ -20,13 +24,15 @@ const App = () => {
   const [isLoading, setLoading] = useState(false);
   const [batonsData, setBatonsData] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
-  const [batons, setBatons] = useState({...batonsList});
+  const [batons, setBatons] = useState({ ...batonsList });
+  const [myBatons, setMyBatons] = useState([]);
+  const [otherBatons, setOtherBatons] = useState([]);
 
   const userContextValues = {
     isLogin,
     setIsLogin,
-    batonsData,
-    setBatonsData,
+    batonsData: batonsData,
+    setBatonsData: setBatonsData,
     batons,
     setBatons,
     teamMembers,
@@ -35,7 +41,7 @@ const App = () => {
 
   onAuthStateChanged(auth, (user) => {
     const uid = localStorage.getItem("uid");
-    if (user.uid == uid) {
+    if (uid != null && user.uid == uid) {
       setIsLogin(user);
     }
   });
@@ -43,12 +49,21 @@ const App = () => {
   useEffect(() => {
     // console.log(isLogin);
     if (isLogin) {
-      handleGetTeamMembers(auth.currentUser.uid, setTeamMembers);
-      handleGetBatons(auth.currentUser.uid,setBatonsData)
+      handleGetTeamMembers(isLogin.uid, setTeamMembers);
+      handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
+      handleGetOtherBatons(isLogin.uid, otherBatons, setOtherBatons);
+    } else {
+      setBatonsData([]);
+      setMyBatons([]);
+      setOtherBatons([]);
     }
   }, [isLogin]);
 
-  useEffect(()=>{console.log("batonsData useEffect, App.js",batonsData)},[batonsData])
+  useEffect(() => {
+    // console.log("batonsData useEffect, App.js", batonsData);
+    let temp = [...myBatons, ...otherBatons];
+    setBatonsData([...new Set(temp)]);
+  }, [myBatons, otherBatons]);
   return (
     <StateProvider values={userContextValues}>
       <BrowserRouter>

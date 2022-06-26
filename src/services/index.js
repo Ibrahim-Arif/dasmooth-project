@@ -2,14 +2,16 @@ import { handleAddBaton } from "./handleAddBaton";
 import { handleAddTeamMember } from "./handleAddTeamMember";
 import { handleDeleteBaton } from "./handleDeleteBaton";
 import { handleForgotPassword } from "./handleForgotPassword";
-import { handleGetBatons } from "./handleGetBatons";
+import { handleGetMyBatons } from "./handleGetMyBatons";
+import { handleGetOtherBatons } from "./handleGetOtherBatons";
 import { handleGetTeamMembers } from "./handleGetTeamMembers";
 import { handleSignUp } from "./handleSignUp";
 import { handleUploadImages } from "./handleUploadImages";
 
 export {
   handleSignUp,
-  handleGetBatons,
+  handleGetOtherBatons,
+  handleGetMyBatons,
   handleDeleteBaton,
   handleForgotPassword,
   handleGetTeamMembers,

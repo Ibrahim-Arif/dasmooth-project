@@ -25,7 +25,7 @@ const { Header, Sider } = Layout;
 export default function DashboardMenu() {
   const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
-  const { setIsLogin, isLogin } = useUser();
+  const { setIsLogin, isLogin, setBatonsData } = useUser();
   const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
 
@@ -50,6 +50,7 @@ export default function DashboardMenu() {
 
     switch (key) {
       case "logout":
+        setBatonsData([]);
         getAuth().signOut();
         window.localStorage.clear();
         setIsLogin(false);

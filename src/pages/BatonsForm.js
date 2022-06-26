@@ -31,6 +31,7 @@ import { useUser } from "../hooks/useContext";
 import { useNavigate, useParams } from "react-router";
 import { handleAddBaton, handleDeleteBaton } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
+import moment from "moment";
 export default function BatonsForm() {
   const { batonsData, setBatonsData, teamMembers, isLogin } = useUser();
   const params = useParams();
@@ -60,6 +61,7 @@ export default function BatonsForm() {
   const [loading, setLoading] = useState(false);
   const [fetchedDataObject, setFetchedDataObject] = useState({
     status: "pending",
+    deletedOn: 0,
   });
 
   const [isEditable, setIsEditable] = useState(true);
@@ -106,7 +108,8 @@ export default function BatonsForm() {
         authorId: isLogin.uid,
         memberId: teamMemberData.id,
         memberName: teamMemberData.text,
-        status: "pending",
+        authorPostStatus: "pending",
+        memberPostStatus: "received",
         createdOn: Date.now(),
         deletedOn: 0,
       };
@@ -180,9 +183,13 @@ export default function BatonsForm() {
       let filter = batonsData.filter((e) => e.docId == params.id);
       filter = filter[0];
       console.log(filter);
-      // if (filter == undefined) return;
-      if (filter.status == "passed") setIsEditable(false);
-      if (filter.status == "deleted") setIsDeleted(true);
+      if (filter == undefined) return;
+      if (filter.authorPostStatus == "passed") setIsEditable(false);
+      if (
+        filter.authorPostStatus == "deleted" ||
+        filter.authorPostState == "received"
+      )
+        setIsDeleted(true);
       console.log("editable:", isEditable);
       setFetchedDataObject(filter);
       setTitle(filter.title);
@@ -345,7 +352,13 @@ export default function BatonsForm() {
             )}
           </div>
           {/* -------------- */}
-          {isDeleted && <NotificationBox />}
+          {isDeleted && (
+            <NotificationBox
+              text={`You deleted this on ${moment(
+                fetchedDataObject.deletedOn
+              ).format("MMMM DD ,YYYY")}`}
+            />
+          )}
           <h4 className="mt-4">{title == "" ? "Add Title" : title}</h4>
 
           {/* FormItems */}

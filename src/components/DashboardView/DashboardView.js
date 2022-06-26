@@ -12,7 +12,7 @@ import { batonsList } from "../../utilities/batonsList";
 import { filterBatonsData } from "../../utilities/filterBatonsData";
 
 export default function DashboardView(props) {
-  const { batonsData, batons, setBatons } = useUser();
+  const { batonsData, batons, setBatons, isLogin } = useUser();
   const [PendingBatons, setPendingBatons] = useState([]);
   const [PassedBatons, setPassedBatons] = useState([]);
   const [ReceivedBatons, setReceivedBatons] = useState([]);
@@ -28,13 +28,13 @@ export default function DashboardView(props) {
   const filterBatons = (batonData, batonName) => {
     // console.log(batonsList)
     if (batonData.length == 0) {
-      console.log(`removing the ${batonName} btaon back in array`);
+      // console.log(`removing the ${batonName} btaon back in array`);
       let temp = batons;
       delete temp[batonName];
       setBatons(temp);
       setActiveBatons(Object.values(temp));
     } else if (batonData.length > 0) {
-      console.log(`adding the ${batonName} btaon back in array`);
+      // console.log(`adding the ${batonName} btaon back in array`);
       let temp = batons;
       temp[batonName] = batonsList[batonName];
       // console.log(batonsList)
@@ -48,28 +48,28 @@ export default function DashboardView(props) {
     console.log("DashBoardView");
     batonsData.forEach((e) => console.log(e.title, "|", e.docId));
 
-    let pending = filterBatonsData(batonsData, "pending");
+    let pending = filterBatonsData(batonsData, "pending", isLogin.uid);
     filterBatons(pending, "pending");
     setPendingBatons(pending);
 
-    let passed = filterBatonsData(batonsData, "passed");
+    let passed = filterBatonsData(batonsData, "passed", isLogin.uid);
     filterBatons(passed, "passed");
     setPassedBatons(passed);
 
-    let received = filterBatonsData(batonsData, "recieved");
+    let received = filterBatonsData(batonsData, "received", isLogin.uid);
     filterBatons(received, "received");
     setReceivedBatons(received);
 
-    let accepted = filterBatonsData(batonsData, "accepted");
+    let accepted = filterBatonsData(batonsData, "accepted", isLogin.uid);
     filterBatons(accepted, "accepted");
     setDeclinedBatons(accepted);
 
-    let declined = filterBatonsData(batonsData, "declined");
+    let declined = filterBatonsData(batonsData, "declined", isLogin.uid);
     filterBatons(declined, "declined");
     setDeclinedBatons(declined);
 
     let complete = filterBatonsData(batonsData, "complete");
-    console.log("coomp", complete);
+    // console.log("coomp", complete);
     filterBatons(complete, "complete");
     setCompleteBatons(complete);
 
