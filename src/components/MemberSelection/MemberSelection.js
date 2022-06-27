@@ -205,7 +205,7 @@ export default function MemberSelection({
             onItemPress={() => {
               setCurrentItem({
                 text: e.name,
-                // image: <Avatar>LW</Avatar>,
+                image: <Avatar>{e.name.substring(0,2).toUpperCase()}</Avatar>,
                 id: e.id,
               });
               console.log(currentItem);

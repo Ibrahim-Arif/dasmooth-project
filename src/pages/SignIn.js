@@ -33,12 +33,12 @@ export default function SignIn() {
   const onFinish = (values) => {
     setLoading(true);
     if (mode) {
-      handleSignUp(values.email)
+      handleSignUp(values.email,values.password)
         .then((user) => {
           generateNotification(
             "success",
             "Registered",
-            `An email has been sent to ${values.email}. Kindly check your email for reseting the password! If you do not see any email, check your spam section`
+            `An email has been sent to ${values.email}. Kindly check your email! If you do not see any email, check your spam section`
           );
           setLoading(false);
         })
@@ -51,9 +51,14 @@ export default function SignIn() {
       handleSignIn(values.email, values.password)
         .then((user) => {
           setLoading(false);
-          localStorage.setItem("uid", user.uid);
-          setIsLogin(user);
-          navigate("/");
+          if(!user.emailVerified) {
+            generateNotification("error","Verify Email","Kindly verify your email to continue");
+            return;
+          }else{
+            localStorage.setItem("uid", user.uid);
+            setIsLogin(user);
+            navigate("/");
+          }
         })
         .catch((ex) => {
           generateNotification("error", "Error", ex.message);
@@ -119,7 +124,7 @@ export default function SignIn() {
               onBlur={() => setFocusedEmail(false)}
             />
           </Form.Item>
-          {!mode && (
+          
             <Form.Item
               className="col-12"
               name="password"
@@ -146,7 +151,7 @@ export default function SignIn() {
                 onBlur={() => setFocusedPassword(false)}
               />
             </Form.Item>
-          )}
+          
           <Form.Item className="mt-4">
             {loading ? (
               <Loading size="large" color={colors.teal100} />

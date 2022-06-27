@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Upload } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
+import { Upload ,List} from "antd";
+import { DownloadOutlined, FileOutlined, InboxOutlined } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Loading from "../Loading/Loading";
-import { handleAddBatonFiles } from "../../services";
+import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
 import { generateNotification } from "../../utilities/generateNotification";
 import { v4 } from "uuid";
+import { colors } from "../../utilities/colors";
 
 const { Dragger } = Upload;
 // https://prismasoft.medium.com/multiple-files-upload-to-firebase-in-react-using-ant-design-65ba671d9af5
@@ -19,6 +20,7 @@ export default function ImageUpload({
   clickOk,
 }) {
   const [imageData, setImageData] = useState({filesList:[]});
+  const [uploadedFiles,setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
 
   const props = {
@@ -49,53 +51,39 @@ export default function ImageUpload({
   const handleUpload = () => {
     setUploading(true);
 
-    // console.log(imageData);
-    let b64 = [];
-  
-    // imageData.filesList.map((e) => {
-    // });
     for(let  i = 0;i<imageData.filesList.length;i++){
       var reader = new FileReader();
 
       reader.onloadend = function() {
       // b64.push(reader.result)
-        let imagesData = {[v4()]: reader.result, batonId:batonId};
+        let imagesData = {image: reader.result, batonId:batonId,fileName:imageData.filesList[i].name};
    
         handleAddBatonFiles(imagesData).then(()=>{
           generateNotification("success", "Images uploaded successfully");
           setUploading(false);
           clickOk();
         }).catch(ex=>{
-          generateNotification("error", ex.message);  
+          generateNotification("error", "Failed to upload files!");  
           setUploading(false);})
         };
 
         reader.readAsDataURL(imageData.filesList[i]);
       }
      
-      // getBase64(imageData.filesList[i], (item) => b64.push(item));
     }
-    // console.log(b64);
-    // return;
-    // console.log(imagesData);
-    // return;
-
-  const getBase64 = (file, addItem) => {
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      // console.log(reader.result);
-      addItem(reader.result);
-    };
-    reader.onerror = (error) => {
-      console.log("Error: ", error);
-    };
-  };
+  
+    function downloadBase64File(base64Data, fileName) {
+      const linkSource = `${base64Data}`;
+      const downloadLink = document.createElement("a");
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+  }
 
   useEffect(
     () =>{
       console.log(imageData)
-      if(imageData.filesList.length == 0)
+      if(imageData.filesList.length == 0 && uploadedFiles.length == 0)
       setItemSelected({
         filesList: imageData,
         text: "Attach a file",
@@ -103,12 +91,12 @@ export default function ImageUpload({
       else 
       setItemSelected({
         filesList: imageData,
-        text: `${imageData.filesList.length} files attached`,
+        text: `${uploadedFiles.length} files attached`,
       });
     },
-    [imageData]
+    [imageData,uploadedFiles]
   );
-  
+  useEffect(()=>{handleGetBatonFiles(batonId,setUploadedFiles)},[])
   return (
     <>
       <Dragger {...props} defaultFileList={imageData.filesList} value>
@@ -121,8 +109,23 @@ export default function ImageUpload({
       </Dragger>
 
       <div className="mt-5">
-        <h6>{imageData.length} files attached</h6>
+        <h6>{(imageData.length == undefined ? uploadedFiles.length : uploadedFiles.length+imageData.length)} files attached</h6>
       </div>
+      <List
+        itemLayout="horizontal"
+        dataSource={uploadedFiles}
+        renderItem={item => (    
+          <List.Item className="px-3" style={{backgroundColor:colors.cgLight95}} onClick={()=>downloadBase64File(item.image,item.fileName)}>
+          
+            <List.Item.Meta       
+              avatar={<FileOutlined/>}
+              title={<label>{item.fileName}</label>}
+              />
+              <DownloadOutlined/>
+          </List.Item>
+  
+        )}
+      />
       {uploading  == true && uploading != "b64Converted"? (
         <Loading size="large" />
       ) : (

@@ -7,6 +7,7 @@ import { generateNotification } from "../../utilities/generateNotification";
 import styled from "styled-components";
 import moment from "moment";
 import { colors } from "../../utilities/colors";
+import { useUser } from "../../hooks/useContext";
 
 export default function PostUpdateForm({
   // itemSelected,
@@ -15,14 +16,19 @@ export default function PostUpdateForm({
   username,
   clickOk,
 }) {
+
   const [value, setValue] = useState("");
   const [postData, setPostData] = useState([]);
+  const{isLogin} = useUser();
+  
   const onChange = (e) => {
     console.log("changed", e.target.value);
     setValue(e.target.value);
   };
-  useEffect(() => {
-    handleGetBatonPostUpdates(batonId, setPostData);
+
+  useEffect(() => {   
+    if(batonId != null)
+      handleGetBatonPostUpdates(batonId, setPostData);
   }, []);
  
   return (
@@ -36,8 +42,10 @@ export default function PostUpdateForm({
       <TealButton
         className="col-12"
         onClick={() => {
-          let data = { batonId, text: value, timestamp: Date.now(), username };
-          handleAddPostUpdate(data)
+          if(batonId != null)
+          {
+            let data = { batonId, text: value, timestamp: Date.now(), username };
+            handleAddPostUpdate(data)
             .then(() => {
               generateNotification(
                 "success",
@@ -48,8 +56,15 @@ export default function PostUpdateForm({
               setValue("")
             })
             .catch((ex) =>
-              generateNotification("error", ex.message, ex.message)
+             generateNotification("error", ex.message, ex.message)
             );
+          }else {
+            generateNotification(
+              "warning",
+              "Post Update",
+              "You need add add a baton first"
+            );
+          }
         }}
       >
         POST UPDATE
@@ -58,9 +73,12 @@ export default function PostUpdateForm({
         {postData.map((e) => (
           <UpdatesContainer className="d-flex flex-row">
             <div className="d-flex flex-column pt-2">
+              {isLogin.photoURL !="" ? <Avatar src={isLogin.photoURL}/>
+              :
               <Avatar style={{ backgroundColor: colors.teal100 }}>
                 {e.username.substring(0, 2).toUpperCase()}
               </Avatar>
+              }
             </div>
             <div className="d-flex flex-column justify-content-center ms-3">
               <label style={{ fontSize: 13 }}>{e.username}</label>

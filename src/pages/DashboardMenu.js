@@ -25,7 +25,9 @@ const { Header, Sider } = Layout;
 export default function DashboardMenu() {
   const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
-  const { setIsLogin, isLogin, setBatonsData } = useUser();
+  const [search,setSearch] = useState("");
+  const { setIsLogin, isLogin, setBatonsData ,batonsData,permanentData} = useUser();
+  
   const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
 
@@ -34,6 +36,16 @@ export default function DashboardMenu() {
     navigate("main");
   }, []);
 
+  useEffect(()=>{
+    if(search == ""){
+      setBatonsData(permanentData);
+    }else{
+      let temp = [...permanentData];
+      temp = temp.filter(e=> e.title.toLowerCase().includes(search.toLowerCase()) ||
+      e.memberName.toLowerCase().includes(search.toLowerCase()));
+      setBatonsData(temp);
+    }
+  },[search])
   const onCollapse = (collapsed, type) => {
     // console.log(collapsed, type);
     setCollapsed(collapsed);
@@ -114,6 +126,7 @@ export default function DashboardMenu() {
               placeholder="Search by name, email or team member"
               prefix={<SearchOutlined />}
               className="normal-input"
+              onChange={(e) => {setSearch(e.currentTarget.value)}}
             />
           )}
         </Container>
@@ -130,10 +143,11 @@ export default function DashboardMenu() {
           />
 
           <SearchBar
-            className="d-none d-lg-flex w-50"
+            className="normal-input d-none d-lg-flex w-50 "
             size="large"
             placeholder="Search by name, email or team member"
             prefix={<SearchOutlined />}
+            onChange={(e) => {setSearch(e.currentTarget.value)}}
           />
         </Container>
       </DashboardHeader>
@@ -157,9 +171,9 @@ export default function DashboardMenu() {
           width={siderW}
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
-            <Avatar src="https://joeschmoe.io/api/v1/random" size={70} />
+            <Avatar src={isLogin.photoURL} size={70} />
             <label style={{ fontWeight: "bold" }} className="mt-3">
-              {isLogin ? isLogin.email : "UserName"}
+              {isLogin ? isLogin.displayName : "UserName"}
             </label>
           </Container>
 

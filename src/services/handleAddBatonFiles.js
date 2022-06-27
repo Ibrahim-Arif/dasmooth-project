@@ -5,7 +5,7 @@ export const handleAddBatonFiles = async (data) => {
     let temp = data;
     delete temp["docId"];
     const db = getFirestore();
-    const docRef = await setDoc(doc(db, "batonImages", data.batonId), temp);
+    const docRef = await addDoc(collection(db, "batonImages"), temp);
     console.log("Document written with ID: ", docRef.id);
   } catch (ex) {
     throw new Error(ex);

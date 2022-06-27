@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
-import { Modal, Input, Button, Dropdown, Menu } from "antd";
+import { Modal, Input, Button, Dropdown, Menu, Avatar } from "antd";
 import {
   UserOutlined,
   CalendarOutlined,
@@ -326,7 +326,7 @@ export default function BatonsForm() {
                 else navigate("/main");
               }}
             />
-            {!isDeleted && (
+            {!isDeleted && params.id && (
               <Dropdown
                 overlay={menu}
                 placement="bottomRight"
@@ -362,11 +362,12 @@ export default function BatonsForm() {
                 onChange={(e) => setTitle(e.currentTarget.value)}
                 value={title}
               />
+              // <label>error</label>
             )}
           </div>
           <Container>
             <Selectable
-              icon={teamMemberData.icon}
+              icon={<Avatar>{teamMemberData.text.substring(0,2).toUpperCase()}</Avatar>}
               image={teamMemberData.image}
               text={teamMemberData.text}
               onItemPress={() =>
@@ -487,7 +488,7 @@ export default function BatonsForm() {
               <Loading size="large" color={colors.teal100} />
             </div>
           ) : (
-            !isEditable &&
+            isEditable &&
             !isDeleted && (
               <TealButton
                 className="col-12"

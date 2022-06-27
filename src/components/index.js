@@ -10,7 +10,9 @@ import { TealButton } from "./FormButton/FormButton";
 import ListSort from "./ListSort/ListSort";
 import Loading from "./Loading/Loading";
 import NotificationBox from "./NotificationBox/NotificationBox";
+import ImagePicker from "./ImagePicker/ImagePicker";
 export {
+  ImagePicker,
   NotificationBox,
   Loading,
   ListSort,

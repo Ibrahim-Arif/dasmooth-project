@@ -5,10 +5,10 @@ export const filterBatonsData = (data, status, userUid = "") => {
     filtered = data.filter(
       (e) => e["memberPostStatus"] == "received" && e["memberId"] == userUid
     );
-    console.log(filtered, data);
   } else
-    filtered = data.filter(
-      (e) => e["authorPostStatus"] == status && e["authorId"] == userUid
+  filtered = data.filter(
+    (e) => e["authorPostStatus"] == status && e["authorId"] == userUid
     );
+    console.log(filtered, data);
   return filtered;
 };
