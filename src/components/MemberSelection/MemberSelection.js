@@ -40,7 +40,7 @@ export default function MemberSelection({
   const handleAddMemberByEmailSubmit = (values) => {
     console.log(values);
     // here we create user with email
-    handleSignUp(values.email)
+    handleSignUp(values.email,null,true)
       .then((user) => {
         console.log({
           [user.uid]: values,

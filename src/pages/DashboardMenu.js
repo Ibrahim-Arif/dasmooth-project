@@ -173,7 +173,7 @@ export default function DashboardMenu() {
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
             <Avatar src={isLogin.photoURL} size={70} />
             <label style={{ fontWeight: "bold" }} className="mt-3">
-              {isLogin ? isLogin.displayName : "UserName"}
+              {isLogin.displayName != null ? isLogin.displayName  : isLogin.email}
             </label>
           </Container>
 

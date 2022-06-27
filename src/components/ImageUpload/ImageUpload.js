@@ -7,6 +7,7 @@ import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
 import { generateNotification } from "../../utilities/generateNotification";
 import { v4 } from "uuid";
 import { colors } from "../../utilities/colors";
+import styled from "styled-components";
 
 const { Dragger } = Upload;
 // https://prismasoft.medium.com/multiple-files-upload-to-firebase-in-react-using-ant-design-65ba671d9af5
@@ -122,14 +123,16 @@ export default function ImageUpload({
         itemLayout="horizontal"
         dataSource={uploadedFiles}
         renderItem={item => (    
-          <List.Item className="px-3" style={{backgroundColor:colors.cgLight95}} onClick={()=>downloadBase64File(item.image,item.fileName)}>
-          
+          <DownloadDiv className="px-3" style={{backgroundColor:colors.cgLight95}} onClick={()=>downloadBase64File(item.image,item.fileName)}>
+
+          <List.Item  >
             <List.Item.Meta       
               avatar={<FileOutlined/>}
               title={<label>{item.fileName}</label>}
               />
               <DownloadOutlined/>
           </List.Item>
+              </DownloadDiv>
       )}
   />
 }
@@ -149,3 +152,11 @@ export default function ImageUpload({
     </>
   );
 }
+
+const DownloadDiv = styled.div`
+
+:hover{
+  cursor: pointer;
+}
+
+`;
