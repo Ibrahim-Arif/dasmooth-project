@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Input, Avatar, Modal, Form, notification } from "antd";
+import { Input, Avatar, Modal, Form, Dropdown, Menu } from "antd";
 import { colors } from "../../utilities/colors";
-import { PlusOutlined, UserOutlined } from "@ant-design/icons";
+import { PlusOutlined, UserOutlined, DeleteFilled } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Selectable from "../Selectable/Selectable";
-import { handleSignUp, handleAddTeamMember } from "../../services";
+import { handleSignUp } from "../../services";
 import { useUser } from "../../hooks/useContext";
 import { generateNotification } from "../../utilities/generateNotification";
 import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
@@ -13,6 +13,7 @@ export default function MemberSelection({
   itemSelected,
   setItemSelected,
   clickOk,
+  formMode,
 }) {
   const [currentItem, setCurrentItem] = useState({
     text: "Select a team member",
@@ -40,16 +41,16 @@ export default function MemberSelection({
   const handleAddMemberByEmailSubmit = (values) => {
     console.log(values);
     // here we create user with email
-    handleSignUp(values.email,null,true)
+    handleSignUp(values.email, null, true)
       .then((user) => {
         console.log({
           [user.uid]: values,
           ...teamMembers,
         });
-        handleAddTeamMemberByInvite(isLogin.uid, {
+        handleAddTeamMemberByInvite({
           receiverId: user.uid,
           receiverEmail: user.email,
-          isLoginFirstTime: true,
+          status: "pending",
           inviteBy: isLogin.uid,
           name: values.name,
         });
@@ -59,12 +60,10 @@ export default function MemberSelection({
           "Invite Sent",
           `An invite has been sent to ${values.email}`
         );
-        setItemSelected({ text: values.name, id: user.uid });
+        if (formMode) setItemSelected({ text: values.name, id: user.uid });
         clickOk();
       })
-      .catch((ex) =>
-        generateNotification("error", "Error", "Failed to send invite!")
-      );
+      .catch((ex) => generateNotification("error", "Error", ex.message));
   };
   const handleChange = (values, allValues) => {
     console.log(values, allValues);
@@ -72,13 +71,7 @@ export default function MemberSelection({
   useEffect(() => {
     let data = [];
     if (teamMembers != undefined && teamMembers != null) {
-      data = Object.keys(teamMembers).map((key) => {
-        return {
-          email: teamMembers[key].email,
-          name: teamMembers[key].name,
-          id: key,
-        };
-      });
+      data = teamMembers;
     }
     // console.log(searchText);
     // console.log(data);
@@ -86,12 +79,32 @@ export default function MemberSelection({
     if (searchText == "") {
       setMembers(data);
     } else {
-      data = data.filter(
+      data = teamMembers.filter(
         (e) => e.email.includes(searchText) || e.name.includes(searchText)
       );
       setMembers(data);
     }
   }, [teamMembers, searchText]);
+
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: (
+            <div
+              className="d-flex flex-row align-items-center"
+              style={{ width: 100 }}
+              // onClick={handleDeleteClick}
+            >
+              <DeleteFilled />
+              Delete
+            </div>
+          ),
+        },
+      ]}
+    />
+  );
   return (
     <>
       {/* Invite Member Modal Section */}
@@ -108,6 +121,7 @@ export default function MemberSelection({
           initialValues={{}}
           layout="vertical"
           onFinish={handleAddMemberByEmailSubmit}
+          form={form}
         >
           <Form.Item
             className="col-12"
@@ -170,69 +184,70 @@ export default function MemberSelection({
           customColor={{ color: colors.teal100, bgColor: colors.cgLight95 }}
           onItemPress={showModal}
         />
-        {/* <Selectable
-          onItemPress={() => {
-            setCurrentItem({
-              text: "Oswaldo Mondenza",
-              image: <Avatar src="https://joeschmoe.io/api/v1/random" />,
-            });
-          }}
-          image={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-          text="Oswaldo Mondenza"
-          isItemActive={currentItem.text === "Oswaldo Mondenza" ? true : false}
-        />
-        <Selectable
-          image={
-            <Avatar style={{ backgroundColor: colors.teal100 }}>LW</Avatar>
-          }
-          text="Lynda Well"
-          isItemActive={currentItem.text === "Lynda Well" ? true : false}
-          onItemPress={() => {
-            setCurrentItem({
-              text: "Lynda Well",
-              image: <Avatar>LW</Avatar>,
-            });
-          }}
-        /> */}
-        {members.map((e, index) => (
-          <Selectable
-            key={index}
-            image={
-              <Avatar style={{ backgroundColor: colors.teal100 }}>LW</Avatar>
-            }
-            text={e.name}
-            isItemActive={currentItem.text === e.name ? true : false}
-            onItemPress={() => {
-              setCurrentItem({
-                text: e.name,
-                image: <Avatar>{e.name.substring(0,2).toUpperCase()}</Avatar>,
-                id: e.id,
-              });
-              console.log(currentItem);
-            }}
-          />
-        ))}
-        {/* <FormItemSelect
-          image={<Avatar style={{ position: "absolute" }}>JW</Avatar>}
-          text="James White"
-          isItemActive={false}
-        /> */}
+
+        {formMode
+          ? members.map((e, index) => (
+              <Selectable
+                key={index}
+                image={
+                  <Avatar style={{ backgroundColor: colors.teal100 }}>
+                    {e.name.substring(0, 2).toUpperCase()}
+                  </Avatar>
+                }
+                text={e.name}
+                isItemActive={currentItem.text === e.name ? true : false}
+                onItemPress={() => {
+                  setCurrentItem({
+                    text: e.name,
+                    image: (
+                      <Avatar>{e.name.substring(0, 2).toUpperCase()}</Avatar>
+                    ),
+                    id: e.receiverId,
+                  });
+                  console.log(currentItem);
+                }}
+                status={e.status}
+              />
+            ))
+          : members.map((e, index) => (
+              <Dropdown
+                overlay={menu}
+                placement="bottomRight"
+                arrow={{ pointAtCenter: true }}
+              >
+                <div>
+                  <Selectable
+                    key={index}
+                    image={
+                      <Avatar style={{ backgroundColor: colors.teal100 }}>
+                        {e.name.substring(0, 2).toUpperCase()}
+                      </Avatar>
+                    }
+                    text={e.name}
+                    isItemActive={false}
+                    status={e.status}
+                  />
+                </div>
+              </Dropdown>
+            ))}
       </div>
-      <TealButton
-        onClick={() => {
-          setItemSelected({
-            text: currentItem.text,
-            image: currentItem.image,
-            icon: currentItem.icon,
-            id: currentItem.id ? currentItem.id : "",
-          });
-          console.log(itemSelected);
-          clickOk();
-        }}
-        className="col-12"
-      >
-        SELECT TEAM MEMBER
-      </TealButton>
+      {formMode && (
+        <TealButton
+          onClick={() => {
+            setItemSelected({
+              text: currentItem.text,
+              image: currentItem.image,
+              icon: currentItem.icon,
+              id: currentItem.id ? currentItem.id : "",
+            });
+            console.log(itemSelected);
+            clickOk();
+          }}
+          className="col-12"
+        >
+          SELECT TEAM MEMBER
+        </TealButton>
+      )}
     </>
   );
 }

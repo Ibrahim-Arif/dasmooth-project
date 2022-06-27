@@ -112,8 +112,9 @@ export default function BatonsForm() {
         deletedOn: 0,
       };
 
-      setLoading(true);
       console.log(post);
+      // return;
+      setLoading(true);
       handleAddBaton(post)
         .then(() => {
           generateNotification(
@@ -386,6 +387,7 @@ export default function BatonsForm() {
                     itemSelected={teamMemberData}
                     setItemSelected={setTeamMemberData}
                     clickOk={handleOk}
+                    formMode={true}
                   />,
                   1
                 )

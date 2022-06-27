@@ -9,6 +9,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { handleAddTeamMember } from "./handleAddTeamMember";
+import { handleUpdateBatonStatus } from "./handleUpdateBatonStatus";
 export const handleSignIn = async (email, password) => {
   try {
     const auth = getAuth();
@@ -18,43 +19,35 @@ export const handleSignIn = async (email, password) => {
       password
     );
     const db = getFirestore();
+    
     const q = query(
-      collection(db, "inviteMembers"),
+      collection(db, "teamMembers"),
       where("receiverId", "==", userCredential.user.uid)
     );
+
     onSnapshot(q, (querySnapshot) => {
       querySnapshot.forEach(async (document) => {
-        // console.log([document.data().receiverId]);
-        // console.log({
-        //   email: document.data().receiverEmail,
-        //   name: document.data().name,
-        // });
-        if (document.data().isLoginFirstTime === true) {
-          const inviteMembersRef = doc(db, "inviteMembers", document.id);
-          const batonQ = query(
+        if (document.data().status == "pending") {
+          // updating member status
+          const inviteMembersRef = doc(db,"teamMembers",document.id);
+          await updateDoc(inviteMembersRef, { status:"accepted"});
+
+          // updating batons status
+          const q = query(
             collection(db, "batons"),
-            where("memberId", "==", document.data().receiverId),
-            where("authorId", "==", document.data().inviteBy)
+            where("memberId", "==", document.data().receiverId)
+            ,where("authorId","==",document.data().inviteBy)
           );
 
-          onSnapshot(batonQ, (querySnapshot) => {
-            console.log("batonQ");
-            querySnapshot.forEach(async (batonDocument) => {
-              console.log(batonDocument.data());
-              await updateDoc(doc(db, "batons", batonDocument.id), {
-                authorPostStatus: "passed",
-              });
+          onSnapshot(q, (querySnapshot) => {
+            querySnapshot.forEach(async (document) => {
+                // updating member status
+                await handleUpdateBatonStatus(document.id, "passed", "received");
+                console.log("here")
             });
           });
-          // console.log(document.id);
-          await updateDoc(inviteMembersRef, { isLoginFirstTime: false });
-          await handleAddTeamMember(document.data().inviteBy, {
-            [document.data().receiverId]: {
-              email: document.data().receiverEmail,
-              name: document.data().name,
-            },
-          });
-          console.log("first");
+
+
         }
       });
     });

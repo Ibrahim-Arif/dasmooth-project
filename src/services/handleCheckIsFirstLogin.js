@@ -11,7 +11,6 @@ export const handleCheckIsFirstLogin = async (uid) => {
     const q = query(
       collection(db, "teamMembers"),
       where(uid, "==", uid)
-      // where("isDeleted", "==", false)
     );
   } catch (ex) {
     throw new Error(ex);

@@ -1,11 +1,10 @@
-import { doc, getFirestore, setDoc } from "firebase/firestore";
+import { collection, getFirestore, addDoc } from "firebase/firestore";
 
-export const handleAddTeamMemberByInvite = async (uid, data) => {
+export const handleAddTeamMemberByInvite = async (data) => {
   try {
-    console.log(uid);
+    
     const db = getFirestore();
-    const teamMembersRef = doc(db, "inviteMembers", uid);
-    await setDoc(teamMembersRef, data);
+    await addDoc(collection(db, "teamMembers"),data);
   } catch (ex) {
     throw new Error(ex);
   }

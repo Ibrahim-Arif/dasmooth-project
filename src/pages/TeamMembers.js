@@ -5,6 +5,7 @@ import { Container } from "react-bootstrap";
 import { useUser } from "../hooks/useContext";
 import { Avatar, List } from 'antd';
 import { colors } from "../utilities/colors";
+import { MemberSelection } from "../components";
 
 export default function TeamMembers() {
   const {teamMembers} = useUser()
@@ -31,9 +32,11 @@ export default function TeamMembers() {
   return <Container className="p-3 justify-content-start d-flex flex-column">
     <h5>Team Members</h5>
     <Container className="col-6 justify-content-start ms-0">
-      <List
+
+      <MemberSelection itemSelected={teamMembers} formMode={false}/>
+      {/* <List
             itemLayout="horizontal"
-            dataSource={Object.values(teamMembers)}
+            dataSource={teamMembers}
             renderItem={item => (
                 <Dropdown
                   overlay={menu}
@@ -43,8 +46,9 @@ export default function TeamMembers() {
                 >
               <List.Item style={{backgroundColor:colors.cgLight80,borderRadius:15,padding:10,marginTop:15}}>
                 <List.Item.Meta       
-                  avatar={<Avatar style={{backgroundColor:colors.teal100}}>{item.email.substring(0,2).toUpperCase()}</Avatar>}
-                  title={<label>{item.email}</label>}
+                  avatar={<Avatar style={{backgroundColor:colors.teal100}}>{item.name.substring(0,2).toUpperCase()}</Avatar>}
+                  title={<label>{`${item.name} (${item.status})`}</label>}
+                  description={item.receiverEmail}
                   />
                  <EllipsisOutlined
                   style={{ fontSize: 20 }}
@@ -57,7 +61,7 @@ export default function TeamMembers() {
           </Dropdown>
             )}
           />
-       
+        */}
           
         
         </Container>

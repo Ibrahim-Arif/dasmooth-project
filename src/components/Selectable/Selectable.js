@@ -10,6 +10,7 @@ export default function Selectable({
   onItemPress = () => null,
   isItemActive,
   customColor = null,
+  status = null
 }) {
   const passive = { color: colors.teal100, bgColor: colors.tealLight90 };
   const active = { color: "white", bgColor: colors.tealDark30 };
@@ -40,6 +41,7 @@ export default function Selectable({
         {image ? image : icon}
         <div className="me-3"></div>
         {text}
+        {status && (`   (${status})`)}
       </Container>
     </CustomButton>
   );

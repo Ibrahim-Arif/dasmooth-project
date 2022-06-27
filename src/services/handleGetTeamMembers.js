@@ -1,15 +1,22 @@
-import { doc, onSnapshot, getFirestore } from "firebase/firestore";
+import {  onSnapshot, getFirestore,query,where,collection } from "firebase/firestore";
+
 export const handleGetTeamMembers = async (uid, setData) => {
   try {
     const db = getFirestore();
-
-    onSnapshot(doc(db, "teammembers", uid), (doc) => {
-      // console.log("Current data: ", doc.data());
-      // console.log(Object.assign(doc.data()));
-      let data = doc.data();
-      // console.log(data);
-      setData(data);
+    const q = query(
+      collection(db, "teamMembers"),
+      where("inviteBy", "==", uid),
+      where("status", "!=", "deleted")
+    );
+    onSnapshot(q, (querySnapshot) => {
+      let items = []
+      querySnapshot.forEach(async (document) => {
+        items.push({docId:document.id, ...document.data()})
+         
+      });
+      setData(items);
     });
+  
   } catch (ex) {
     throw new Error(ex);
   }
