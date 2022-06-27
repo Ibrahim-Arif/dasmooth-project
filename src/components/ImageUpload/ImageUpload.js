@@ -49,6 +49,11 @@ export default function ImageUpload({
   };
 
   const handleUpload = () => {
+    if(batonId == null)
+    {
+      generateNotification("error", "Error", "Please pass a baton first");
+      return;
+    }
     setUploading(true);
 
     for(let  i = 0;i<imageData.filesList.length;i++){
@@ -111,7 +116,9 @@ export default function ImageUpload({
       <div className="mt-5">
         <h6>{(imageData.length == undefined ? uploadedFiles.length : uploadedFiles.length+imageData.length)} files attached</h6>
       </div>
-      <List
+      {uploadedFiles.length > 0 && 
+
+        <List
         itemLayout="horizontal"
         dataSource={uploadedFiles}
         renderItem={item => (    
@@ -123,9 +130,9 @@ export default function ImageUpload({
               />
               <DownloadOutlined/>
           </List.Item>
-  
-        )}
-      />
+      )}
+  />
+}
       {uploading  == true && uploading != "b64Converted"? (
         <Loading size="large" />
       ) : (

@@ -60,6 +60,11 @@ export const handleSignIn = async (email, password) => {
     });
     return userCredential.user;
   } catch (ex) {
-    throw new Error(ex);
+    if(ex.code == 'auth/user-not-found')
+      ex.message = "No user found with this email";
+    else if(ex.code == 'auth/wrong-password')
+      ex.message = "Wrong password";
+    // console.log(ex.code)
+    throw new Error(ex.message);
   }
 };

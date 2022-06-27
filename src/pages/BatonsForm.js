@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
-import { Modal, Input, Button, Dropdown, Menu, Avatar } from "antd";
+import { Modal, Input, Button, Dropdown, Menu, Avatar, Form } from "antd";
 import {
   UserOutlined,
   CalendarOutlined,
@@ -177,7 +177,8 @@ export default function BatonsForm() {
       filter = filter[0];
       console.log(filter);
       if (filter == undefined) return;
-      if (filter.authorPostStatus == "passed" ||filter.memberPostStatus == "received" ) setIsEditable(false);
+      if (filter.authorPostStatus == "passed" || 
+      (filter.memberPostStatus == "received" && filter.memberId == isLogin.uid) ) setIsEditable(false);
       if (
         filter.authorPostStatus == "deleted" ||
         filter.authorPostStatus == "received"
@@ -201,8 +202,8 @@ export default function BatonsForm() {
       setPostUpdateData(filter.post);
       setTeamMemberData({
         text: filter.memberName,
-        icon: <UserOutlined />,
-        image: null,
+        icon: <Avatar>{teamMemberData.text.substring(0,2).toUpperCase()}</Avatar>,
+        // image: ,
       });
       setID(params.id);
       // console.log("filter", filter);
@@ -355,19 +356,25 @@ export default function BatonsForm() {
           {/* FormItems */}
           <div className="col-12">
             {!isDeleted && (
+             
+              
+
               <Input
                 size="large"
                 placeholder="Add Text"
                 className="me-3"
                 onChange={(e) => setTitle(e.currentTarget.value)}
                 value={title}
-              />
+                status={title=="" && "error"}
+                // prefix="Please input baton title!"
+                />
+             
               // <label>error</label>
             )}
           </div>
           <Container>
             <Selectable
-              icon={<Avatar>{teamMemberData.text.substring(0,2).toUpperCase()}</Avatar>}
+              icon={teamMemberData.icon}
               image={teamMemberData.image}
               text={teamMemberData.text}
               onItemPress={() =>

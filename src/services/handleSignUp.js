@@ -19,6 +19,8 @@ export const handleSignUp = async (email,password = null) => {
         await sendEmailVerification(userCredential.user);
     return userCredential.user;
   } catch (ex) {
-    throw new Error(ex);
+    if(ex.code == "auth/email-already-in-use")
+      ex.message = "Email already in use!";
+    throw new Error(ex.message);
   }
 };
