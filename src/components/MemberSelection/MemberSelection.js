@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Avatar, Modal, Form, Dropdown, Menu } from "antd";
+import { Input, Avatar, Modal, Form } from "antd";
 import { colors } from "../../utilities/colors";
 import { PlusOutlined, UserOutlined, DeleteFilled } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
@@ -69,10 +69,8 @@ export default function MemberSelection({
     console.log(values, allValues);
   };
   useEffect(() => {
-    let data = [];
-    if (teamMembers != undefined && teamMembers != null) {
-      data = teamMembers;
-    }
+    let data = teamMembers;
+
     // console.log(searchText);
     // console.log(data);
     // return;
@@ -80,31 +78,14 @@ export default function MemberSelection({
       setMembers(data);
     } else {
       data = teamMembers.filter(
-        (e) => e.email.includes(searchText) || e.name.includes(searchText)
+        (e) =>
+          e.receiverEmail.toLowerCase().includes(searchText.toLowerCase()) ||
+          e.name.toLowerCase().includes(searchText.toLowerCase())
       );
       setMembers(data);
     }
   }, [teamMembers, searchText]);
 
-  const menu = (
-    <Menu
-      items={[
-        {
-          key: "1",
-          label: (
-            <div
-              className="d-flex flex-row align-items-center"
-              style={{ width: 100 }}
-              // onClick={handleDeleteClick}
-            >
-              <DeleteFilled />
-              Delete
-            </div>
-          ),
-        },
-      ]}
-    />
-  );
   return (
     <>
       {/* Invite Member Modal Section */}
@@ -210,25 +191,19 @@ export default function MemberSelection({
               />
             ))
           : members.map((e, index) => (
-              <Dropdown
-                overlay={menu}
-                placement="bottomRight"
-                arrow={{ pointAtCenter: true }}
-              >
-                <div>
-                  <Selectable
-                    key={index}
-                    image={
-                      <Avatar style={{ backgroundColor: colors.teal100 }}>
-                        {e.name.substring(0, 2).toUpperCase()}
-                      </Avatar>
-                    }
-                    text={e.name}
-                    isItemActive={false}
-                    status={e.status}
-                  />
-                </div>
-              </Dropdown>
+              <div>
+                <Selectable
+                  key={e.docId}
+                  image={
+                    <Avatar style={{ backgroundColor: colors.teal100 }}>
+                      {e.name.substring(0, 2).toUpperCase()}
+                    </Avatar>
+                  }
+                  text={e.name}
+                  isItemActive={false}
+                  status={e.status}
+                />
+              </div>
             ))}
       </div>
       {formMode && (

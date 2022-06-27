@@ -3,7 +3,7 @@ import { Layout, Menu, Input, Button, Avatar } from "antd";
 import { SearchOutlined, RightOutlined, BarsOutlined } from "@ant-design/icons";
 
 import { Container } from "react-bootstrap";
-import { useNavigate, Routes, Route } from "react-router-dom";
+import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
 import styledComponents from "styled-components";
 
 import Notification from "./Notification";
@@ -17,7 +17,7 @@ import { useUser } from "../hooks/useContext";
 import { colors } from "../utilities/colors";
 import { menuItems } from "../utilities/MenuItems";
 
-import { logo, placeHolder } from "../assets";
+import { logo } from "../assets";
 import { getAuth } from "firebase/auth";
 
 const { Header, Sider } = Layout;
@@ -25,27 +25,32 @@ const { Header, Sider } = Layout;
 export default function DashboardMenu() {
   const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
-  const [search,setSearch] = useState("");
-  const { setIsLogin, isLogin, setBatonsData ,batonsData,permanentData} = useUser();
-  
+  const [search, setSearch] = useState("");
+  const { setIsLogin, isLogin, setBatonsData, batonsData, permanentData } =
+    useUser();
+
   const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     document.getElementById("body").style.backgroundColor = "white";
     navigate("main");
   }, []);
 
-  useEffect(()=>{
-    if(search == ""){
+  useEffect(() => {
+    if (search == "") {
       setBatonsData(permanentData);
-    }else{
+    } else {
       let temp = [...permanentData];
-      temp = temp.filter(e=> e.title.toLowerCase().includes(search.toLowerCase()) ||
-      e.memberName.toLowerCase().includes(search.toLowerCase()));
+      temp = temp.filter(
+        (e) =>
+          e.title.toLowerCase().includes(search.toLowerCase()) ||
+          e.memberName.toLowerCase().includes(search.toLowerCase())
+      );
       setBatonsData(temp);
     }
-  },[search])
+  }, [search]);
   const onCollapse = (collapsed, type) => {
     // console.log(collapsed, type);
     setCollapsed(collapsed);
@@ -120,35 +125,42 @@ export default function DashboardMenu() {
               </div>
             </div>
           )}
-          {renderSearchBar && (
+          {renderSearchBar && location.pathname == "/main" && (
             <SearchBar
               size="large"
               placeholder="Search by name, email or team member"
               prefix={<SearchOutlined />}
               className="normal-input"
-              onChange={(e) => {setSearch(e.currentTarget.value)}}
+              onChange={(e) => {
+                setSearch(e.currentTarget.value);
+              }}
             />
           )}
         </Container>
 
         {/* Search Bar */}
         <Container className="d-flex justify-content-end justify-content-lg-start mx-0">
-          <Button
-            shape="circle"
-            className="d-inline-block d-lg-none"
-            icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
-            size="large"
-            color={colors.teal100}
-            onClick={handleSearchBarShow}
-          />
-
-          <SearchBar
-            className="normal-input d-none d-lg-flex w-50 "
-            size="large"
-            placeholder="Search by name, email or team member"
-            prefix={<SearchOutlined />}
-            onChange={(e) => {setSearch(e.currentTarget.value)}}
-          />
+          {location.pathname == "/main" && (
+            <>
+              <Button
+                shape="circle"
+                className="d-inline-block d-lg-none"
+                icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
+                size="large"
+                color={colors.teal100}
+                onClick={handleSearchBarShow}
+              />
+              <SearchBar
+                className="normal-input d-none d-lg-flex w-50"
+                size="large"
+                placeholder="Search by name, email or team member"
+                prefix={<SearchOutlined />}
+                onChange={(e) => {
+                  setSearch(e.currentTarget.value);
+                }}
+              />
+            </>
+          )}
         </Container>
       </DashboardHeader>
 
@@ -173,7 +185,9 @@ export default function DashboardMenu() {
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
             <Avatar src={isLogin.photoURL} size={70} />
             <label style={{ fontWeight: "bold" }} className="mt-3">
-              {isLogin.displayName != null ? isLogin.displayName  : isLogin.email}
+              {isLogin.displayName != null
+                ? isLogin.displayName
+                : isLogin.email}
             </label>
           </Container>
 

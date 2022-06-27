@@ -1,40 +1,25 @@
-import { EllipsisOutlined,DeleteFilled } from "@ant-design/icons";
-import { Dropdown,Menu } from "antd";
+import { EllipsisOutlined, DeleteFilled } from "@ant-design/icons";
+import { Dropdown, Menu } from "antd";
 import React from "react";
 import { Container } from "react-bootstrap";
 import { useUser } from "../hooks/useContext";
-import { Avatar, List } from 'antd';
+import { Avatar, List } from "antd";
 import { colors } from "../utilities/colors";
 import { MemberSelection } from "../components";
 
 export default function TeamMembers() {
-  const {teamMembers} = useUser()
-  const menu = (
-    <Menu
-      items={[
-        {
-          key: "1",
-          label: (
-            <div
-              className="d-flex flex-row align-items-center"
-              style={{width:100}}
-              // onClick={handleDeleteClick}
-            >
-              <DeleteFilled />
-              Delete
-            </div>
-          ),
-        },
-      
-      ]}
-    />
-  );
-  return <Container className="p-3 justify-content-start d-flex flex-column">
-    <h5>Team Members</h5>
-    <Container className="col-6 justify-content-start ms-0">
+  const { teamMembers, setTeamMembers } = useUser();
 
-      <MemberSelection itemSelected={teamMembers} formMode={false}/>
-      {/* <List
+  return (
+    <Container className="p-3 justify-content-start d-flex flex-column">
+      <h5>Team Members</h5>
+      <Container className="col-6 justify-content-start ms-0">
+        <MemberSelection
+          itemSelected={teamMembers}
+          formMode={false}
+          setItemSelected={setTeamMembers}
+        />
+        {/* <List
             itemLayout="horizontal"
             dataSource={teamMembers}
             renderItem={item => (
@@ -62,8 +47,7 @@ export default function TeamMembers() {
             )}
           />
         */}
-          
-        
-        </Container>
-  </Container>;
+      </Container>
+    </Container>
+  );
 }
