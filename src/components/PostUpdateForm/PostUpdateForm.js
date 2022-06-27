@@ -16,21 +16,19 @@ export default function PostUpdateForm({
   username,
   clickOk,
 }) {
-
   const [value, setValue] = useState("");
   const [postData, setPostData] = useState([]);
-  const{isLogin} = useUser();
-  
+  const { isLogin } = useUser();
+
   const onChange = (e) => {
     console.log("changed", e.target.value);
     setValue(e.target.value);
   };
 
-  useEffect(() => {   
-    if(batonId != null)
-      handleGetBatonPostUpdates(batonId, setPostData);
+  useEffect(() => {
+    if (batonId != null) handleGetBatonPostUpdates(batonId, setPostData);
   }, []);
- 
+
   return (
     <Container className="mt-3">
       <Input
@@ -42,23 +40,28 @@ export default function PostUpdateForm({
       <TealButton
         className="col-12"
         onClick={() => {
-          if(batonId != null)
-          {
-            let data = { batonId, text: value, timestamp: Date.now(), username };
+          if (batonId != null) {
+            if (value == "") return;
+            let data = {
+              batonId,
+              text: value,
+              timestamp: Date.now(),
+              username,
+            };
             handleAddPostUpdate(data)
-            .then(() => {
-              generateNotification(
-                "success",
-                "Post Update Successfully",
-                "Post Update Successfully"
+              .then(() => {
+                generateNotification(
+                  "success",
+                  "Post Update Successfully",
+                  "Post Update Successfully"
+                );
+                clickOk();
+                setValue("");
+              })
+              .catch((ex) =>
+                generateNotification("error", ex.message, ex.message)
               );
-              clickOk();
-              setValue("")
-            })
-            .catch((ex) =>
-             generateNotification("error", ex.message, ex.message)
-            );
-          }else {
+          } else {
             generateNotification(
               "warning",
               "Post Update",
@@ -73,18 +76,18 @@ export default function PostUpdateForm({
         {postData.map((e) => (
           <UpdatesContainer className="d-flex flex-row">
             <div className="d-flex flex-column pt-2">
-              {isLogin.photoURL !="" ? <Avatar src={isLogin.photoURL}/>
-              :
-              <Avatar style={{ backgroundColor: colors.teal100 }}>
-                {e.username.substring(0, 2).toUpperCase()}
-              </Avatar>
-              }
+              {isLogin.photoURL != "" ? (
+                <Avatar src={isLogin.photoURL} />
+              ) : (
+                <Avatar style={{ backgroundColor: colors.teal100 }}>
+                  {e.username.substring(0, 2).toUpperCase()}
+                </Avatar>
+              )}
             </div>
             <div className="d-flex flex-column justify-content-center ms-3">
               <label style={{ fontSize: 13 }}>{e.username}</label>
               <label style={{ fontSize: 13 }}>
                 {moment(e.timestamp).format("MMMM DD, YYYY - hh:mm:ss A ")}
-             
               </label>
               <label style={{ fontWeight: "600" }}>{e.text}</label>
             </div>

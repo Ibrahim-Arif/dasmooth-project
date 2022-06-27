@@ -6,9 +6,9 @@ export const filterBatonsData = (data, status, userUid = "") => {
       (e) => e["memberPostStatus"] == "received" && e["memberId"] == userUid
     );
   } else
-  filtered = data.filter(
-    (e) => e["authorPostStatus"] == status && e["authorId"] == userUid
+    filtered = data.filter(
+      (e) => e["authorPostStatus"] == status && e["authorId"] == userUid
     );
-    console.log(filtered, data);
+  // console.log(filtered, data);
   return filtered;
 };

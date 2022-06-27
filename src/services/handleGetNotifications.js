@@ -5,17 +5,23 @@ import {
   onSnapshot,
   getFirestore,
 } from "firebase/firestore";
-export const handleGetMyBatons = async (uid, data, setData) => {
+export const handleGetNotifications = async (uid, setData) => {
   try {
+    console.log(uid);
     const db = getFirestore();
-    const q = query(collection(db, "batons"), where("authorId", "==", uid));
+    const q = query(
+      collection(db, "notifications"),
+      where("uid", "==", uid),
+      where("seen", "==", false)
+    );
 
+    // console.log(uid);
     onSnapshot(q, (querySnapshot) => {
       let tempData = [];
       querySnapshot.forEach((doc) => {
         tempData.push({ docId: doc.id, ...doc.data() });
       });
-      // console.log(tempData);
+      //   console.log(tempData);
       setData(tempData);
     });
   } catch (ex) {

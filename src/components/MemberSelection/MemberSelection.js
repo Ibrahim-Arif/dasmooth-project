@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Input, Avatar, Modal, Form } from "antd";
+import { Input, Avatar, Modal, Form, Dropdown, Menu } from "antd";
 import { colors } from "../../utilities/colors";
 import { PlusOutlined, UserOutlined, DeleteFilled } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Selectable from "../Selectable/Selectable";
-import { handleSignUp } from "../../services";
+import {
+  handleAddSystemUserToMember,
+  handleSignUp,
+  handleUpdateTeamMemberStatus,
+} from "../../services";
 import { useUser } from "../../hooks/useContext";
 import { generateNotification } from "../../utilities/generateNotification";
 import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
@@ -43,10 +47,10 @@ export default function MemberSelection({
     // here we create user with email
     handleSignUp(values.email, null, true)
       .then((user) => {
-        console.log({
-          [user.uid]: values,
-          ...teamMembers,
-        });
+        // console.log({
+        //   [user.uid]: values,
+        //   ...teamMembers,
+        // });
         handleAddTeamMemberByInvite({
           receiverId: user.uid,
           receiverEmail: user.email,
@@ -60,10 +64,32 @@ export default function MemberSelection({
           "Invite Sent",
           `An invite has been sent to ${values.email}`
         );
-        if (formMode) setItemSelected({ text: values.name, id: user.uid });
-        clickOk();
+        if (formMode) {
+          setItemSelected({
+            text: values.name,
+            inviteBy: isLogin.uid,
+            name: values.name,
+          });
+          clickOk();
+        }
       })
-      .catch((ex) => generateNotification("error", "Error", ex.message));
+      .catch((ex) => {
+        if (ex.message == "auth/email-already-in-use") {
+          handleAddSystemUserToMember({
+            email: values.email,
+            inviteBy: isLogin.uid,
+            name: values.name,
+          }).then(() =>
+            generateNotification(
+              "success",
+              "Member Added",
+              `${values.email} added`
+            )
+          );
+        } else {
+          generateNotification("error", "Error", ex.message);
+        }
+      });
   };
   const handleChange = (values, allValues) => {
     console.log(values, allValues);
@@ -85,6 +111,14 @@ export default function MemberSelection({
       setMembers(data);
     }
   }, [teamMembers, searchText]);
+  const onClick = ({ key, label }) => {
+    // alert(`Click on item ${key} ${label}`);
+    handleUpdateTeamMemberStatus(key, "deleted")
+      .then(() => generateNotification("success", "Success", "Member deleted"))
+      .catch((ex) =>
+        generateNotification("error", "Error", "Error deleting member")
+      );
+  };
 
   return (
     <>
@@ -184,6 +218,7 @@ export default function MemberSelection({
                       <Avatar>{e.name.substring(0, 2).toUpperCase()}</Avatar>
                     ),
                     id: e.receiverId,
+                    status: e.status,
                   });
                   console.log(currentItem);
                 }}
@@ -191,21 +226,39 @@ export default function MemberSelection({
               />
             ))
           : members.map((e, index) => (
-              <div>
-                <Selectable
-                  key={e.docId}
-                  image={
-                    <Avatar style={{ backgroundColor: colors.teal100 }}>
-                      {e.name.substring(0, 2).toUpperCase()}
-                    </Avatar>
-                  }
-                  text={e.name}
-                  isItemActive={false}
-                  status={e.status}
-                />
-              </div>
+              <Dropdown
+                overlay={() => (
+                  <Menu
+                    items={[
+                      {
+                        label: "Delete",
+                        key: e.docId,
+                        icon: <DeleteFilled />,
+                      },
+                    ]}
+                    onClick={onClick}
+                  />
+                )}
+                trigger={["click"]}
+              >
+                <div>
+                  <Selectable
+                    key={e.docId}
+                    image={
+                      <Avatar style={{ backgroundColor: colors.teal100 }}>
+                        {e.name.substring(0, 2).toUpperCase()}
+                      </Avatar>
+                    }
+                    text={e.name}
+                    isItemActive={false}
+                    status={e.status}
+                    onItemPress={() => {}}
+                  />
+                </div>
+              </Dropdown>
             ))}
       </div>
+
       {formMode && (
         <TealButton
           onClick={() => {
@@ -214,6 +267,7 @@ export default function MemberSelection({
               image: currentItem.image,
               icon: currentItem.icon,
               id: currentItem.id ? currentItem.id : "",
+              status: currentItem.status,
             });
             console.log(itemSelected);
             clickOk();

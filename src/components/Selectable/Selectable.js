@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
 import styledComponents from "styled-components";
+import { DeleteFilled } from "@ant-design/icons";
 
 export default function Selectable({
   icon,
@@ -10,7 +11,7 @@ export default function Selectable({
   onItemPress = () => null,
   isItemActive,
   customColor = null,
-  status = null
+  status = null,
 }) {
   const passive = { color: colors.teal100, bgColor: colors.tealLight90 };
   const active = { color: "white", bgColor: colors.tealDark30 };
@@ -41,7 +42,7 @@ export default function Selectable({
         {image ? image : icon}
         <div className="me-3"></div>
         {text}
-        {status && (`   (${status})`)}
+        {status && `   (${status})`}
       </Container>
     </CustomButton>
   );

@@ -12,7 +12,10 @@ export const useUser = () => {
     setBatons,
     teamMembers,
     setTeamMembers,
-    permanentData,setPermanentData
+    permanentData,
+    setPermanentData,
+    notifications,
+    setNotifications,
   } = useContext(UserContext);
 
   return {
@@ -24,7 +27,10 @@ export const useUser = () => {
     setBatons,
     teamMembers,
     setTeamMembers,
-    permanentData,setPermanentData
+    permanentData,
+    setPermanentData,
+    notifications,
+    setNotifications,
   };
 };
 
@@ -38,7 +44,10 @@ export const StateProvider = ({ values, children }) => {
     setBatons,
     teamMembers,
     setTeamMembers,
-    permanentData,setPermanentData
+    permanentData,
+    setPermanentData,
+    notifications,
+    setNotifications,
   } = values;
 
   return (
@@ -52,7 +61,10 @@ export const StateProvider = ({ values, children }) => {
         setBatons,
         teamMembers,
         setTeamMembers,
-        permanentData,setPermanentData
+        permanentData,
+        setPermanentData,
+        notifications,
+        setNotifications,
       }}
     >
       {children}

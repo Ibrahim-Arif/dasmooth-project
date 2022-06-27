@@ -29,9 +29,15 @@ import {
 
 import { useUser } from "../hooks/useContext";
 import { useNavigate, useParams } from "react-router";
-import { handleAddBaton, handleDeleteBaton } from "../services";
+import {
+  handleAddBaton,
+  handleDeleteBaton,
+  handleGetBatonFiles,
+} from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import moment from "moment";
+import { handleAddNotification } from "../services/handleAddNotification";
+import { upload } from "@testing-library/user-event/dist/upload";
 export default function BatonsForm() {
   const { batonsData, setBatonsData, teamMembers, isLogin } = useUser();
   const params = useParams();
@@ -55,7 +61,7 @@ export default function BatonsForm() {
     text: "Attach a file",
     filesList: [],
   });
- 
+
   const [id, setID] = useState(null);
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -105,8 +111,11 @@ export default function BatonsForm() {
         title,
         authorId: isLogin.uid,
         memberId: teamMemberData.id,
+        authorName:
+          isLogin.displayName != null ? isLogin.displayName : isLogin.email,
         memberName: teamMemberData.text,
-        authorPostStatus: "pending",
+        authorPostStatus:
+          teamMemberData.status == "accepted" ? "passed" : "pending",
         memberPostStatus: "received",
         createdOn: Date.now(),
         deletedOn: 0,
@@ -115,8 +124,18 @@ export default function BatonsForm() {
       console.log(post);
       // return;
       setLoading(true);
+      console.log("Adding new post");
       handleAddBaton(post)
-        .then(() => {
+        .then((docId) => {
+          handleAddNotification({
+            seen: false,
+            message: "Baton Received",
+            description: `You received a new Baton from ${post.authorName}`,
+            type: "success",
+            uid: post.memberId,
+            date: Date.now(),
+            batonId: docId,
+          });
           generateNotification(
             "success",
             "Baton Added",
@@ -169,17 +188,37 @@ export default function BatonsForm() {
     }
   };
 
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+
+  // useEffect to update filesList if uploadfiles changes
+  useEffect(
+    () =>
+      setFilesList({
+        ...filesList,
+        text: `${uploadedFiles.length} files attached`,
+      }),
+    [uploadedFiles]
+  );
 
   useEffect(() => {
-    console.log("params:", params);
+    // console.log("params:", params);
     if (params.id) {
+      handleGetBatonFiles(params.id, setUploadedFiles);
+
       if (batonsData.length == 0) return;
+
       let filter = batonsData.filter((e) => e.docId == params.id);
       filter = filter[0];
-      console.log(filter);
+      // console.log(filter);
+
       if (filter == undefined) return;
-      if (filter.authorPostStatus == "passed" || 
-      (filter.memberPostStatus == "received" && filter.memberId == isLogin.uid) ) setIsEditable(false);
+
+      if (
+        filter.authorPostStatus == "passed" ||
+        (filter.memberPostStatus == "received" &&
+          filter.memberId == isLogin.uid)
+      )
+        setIsEditable(false);
       if (
         filter.authorPostStatus == "deleted" ||
         filter.authorPostStatus == "received"
@@ -203,7 +242,9 @@ export default function BatonsForm() {
       setPostUpdateData(filter.post);
       setTeamMemberData({
         text: filter.memberName,
-        icon: <Avatar>{teamMemberData.text.substring(0,2).toUpperCase()}</Avatar>,
+        icon: (
+          <Avatar>{teamMemberData.text.substring(0, 2).toUpperCase()}</Avatar>
+        ),
         // image: ,
       });
       setID(params.id);
@@ -357,19 +398,16 @@ export default function BatonsForm() {
           {/* FormItems */}
           <div className="col-12">
             {!isDeleted && (
-             
-              
-
               <Input
                 size="large"
                 placeholder="Add Text"
                 className="me-3"
                 onChange={(e) => setTitle(e.currentTarget.value)}
                 value={title}
-                status={title=="" && "error"}
+                status={title == "" && "error"}
                 // prefix="Please input baton title!"
-                />
-             
+              />
+
               // <label>error</label>
             )}
           </div>

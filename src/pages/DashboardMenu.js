@@ -26,8 +26,14 @@ export default function DashboardMenu() {
   const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
   const [search, setSearch] = useState("");
-  const { setIsLogin, isLogin, setBatonsData, batonsData, permanentData } =
-    useUser();
+  const {
+    setIsLogin,
+    isLogin,
+    setBatonsData,
+    batonsData,
+    permanentData,
+    notifications,
+  } = useUser();
 
   const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
@@ -91,10 +97,14 @@ export default function DashboardMenu() {
     }
     window.innerWidth < 768 && setCollapsed(true);
   };
-  useEffect(
-    () => (window.innerWidth < 768 ? setSiderW("100vw") : setSiderW("200px")),
-    [window.innerWidth]
-  );
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      setSiderW("100vw");
+    } else {
+      setSiderW("200px");
+      setRenderSearchBar(false);
+    }
+  }, [window.innerWidth]);
   return (
     <div
       style={{
@@ -105,11 +115,12 @@ export default function DashboardMenu() {
         bgcolor={colors.teal100}
         className="d-flex flex-row align-items-center"
       >
-        <Container
-          className="align-self-center justify-content-center justify-content-lg-start mx-0"
-          style={{ width: 250 }}
-        >
-          {!renderSearchBar && (
+        {/* Search bar mobile */}
+        {!renderSearchBar && (
+          <Container
+            className="d-flex align-self-center justify-content-center justify-content-lg-start mx-0"
+            style={{ width: 250 }}
+          >
             <div className="d-flex flex-row align-items-center">
               <Button
                 style={{ backgroundColor: colors.teal100, color: "white" }}
@@ -124,7 +135,11 @@ export default function DashboardMenu() {
                 <img src={logo} height="40px" />
               </div>
             </div>
-          )}
+          </Container>
+        )}
+
+        {/* Search Bar */}
+        <Container className="d-flex justify-content-end justify-content-lg-start mx-0">
           {renderSearchBar && location.pathname == "/main" && (
             <SearchBar
               size="large"
@@ -136,15 +151,11 @@ export default function DashboardMenu() {
               }}
             />
           )}
-        </Container>
-
-        {/* Search Bar */}
-        <Container className="d-flex justify-content-end justify-content-lg-start mx-0">
           {location.pathname == "/main" && (
             <>
               <Button
                 shape="circle"
-                className="d-inline-block d-lg-none"
+                className="d-inline-block d-lg-none ms-3 ms-lg-0"
                 icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
                 size="large"
                 color={colors.teal100}
@@ -200,11 +211,11 @@ export default function DashboardMenu() {
             }}
             defaultSelectedKeys={["dashboard"]}
             mode="inline"
-            items={menuItems}
+            items={menuItems(notifications.length)}
             onClick={handleItemClick}
           ></Menu>
         </Sider>
-
+        {/* {console.log(notifications.length)} */}
         {/* Nested Routing */}
         <Routes>
           <Route path="/main" element={<Dashboard />} />

@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Upload ,List} from "antd";
-import { DownloadOutlined, FileOutlined, InboxOutlined } from "@ant-design/icons";
+import { Upload, List } from "antd";
+import {
+  DownloadOutlined,
+  FileOutlined,
+  InboxOutlined,
+} from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Loading from "../Loading/Loading";
 import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
@@ -20,8 +24,8 @@ export default function ImageUpload({
   batonId,
   clickOk,
 }) {
-  const [imageData, setImageData] = useState({filesList:[]});
-  const [uploadedFiles,setUploadedFiles] = useState([]);
+  const [imageData, setImageData] = useState({ filesList: [] });
+  const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
 
   const props = {
@@ -50,59 +54,67 @@ export default function ImageUpload({
   };
 
   const handleUpload = () => {
-    if(batonId == null)
-    {
+    if (batonId == null) {
       generateNotification("error", "Error", "Please pass a baton first");
       return;
     }
     setUploading(true);
 
-    for(let  i = 0;i<imageData.filesList.length;i++){
+    for (let i = 0; i < imageData.filesList.length; i++) {
       var reader = new FileReader();
 
-      reader.onloadend = function() {
-      // b64.push(reader.result)
-        let imagesData = {image: reader.result, batonId:batonId,fileName:imageData.filesList[i].name};
-   
-        handleAddBatonFiles(imagesData).then(()=>{
-          generateNotification("success", "Images uploaded successfully");
-          setUploading(false);
-          clickOk();
-        }).catch(ex=>{
-          generateNotification("error", "Failed to upload files!");  
-          setUploading(false);})
+      reader.onloadend = function () {
+        // b64.push(reader.result)
+        let imagesData = {
+          image: reader.result,
+          batonId: batonId,
+          fileName: imageData.filesList[i].name,
         };
 
-        reader.readAsDataURL(imageData.filesList[i]);
-      }
-     
+        handleAddBatonFiles(imagesData)
+          .then(() => {
+            generateNotification("success", "Images uploaded successfully");
+            setUploading(false);
+            clickOk();
+          })
+          .catch((ex) => {
+            generateNotification("error", "Failed to upload files!");
+            setUploading(false);
+          });
+      };
+
+      reader.readAsDataURL(imageData.filesList[i]);
     }
-  
-    function downloadBase64File(base64Data, fileName) {
-      const linkSource = `${base64Data}`;
-      const downloadLink = document.createElement("a");
-      downloadLink.href = linkSource;
-      downloadLink.download = fileName;
-      downloadLink.click();
+  };
+
+  function downloadBase64File(base64Data, fileName) {
+    const linkSource = `${base64Data}`;
+    const downloadLink = document.createElement("a");
+    downloadLink.href = linkSource;
+    downloadLink.download = fileName;
+    downloadLink.click();
   }
 
-  useEffect(
-    () =>{
-      console.log(imageData)
-      if(imageData.filesList.length == 0 && uploadedFiles.length == 0)
+  useEffect(() => {
+    console.log(imageData);
+    if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
       setItemSelected({
         filesList: imageData,
         text: "Attach a file",
       });
-      else 
+    else
       setItemSelected({
         filesList: imageData,
-        text: `${uploadedFiles.length} files attached`,
+        text: `${
+          uploadedFiles.length + imageData.filesList.length
+        } files attached`,
       });
-    },
-    [imageData,uploadedFiles]
-  );
-  useEffect(()=>{handleGetBatonFiles(batonId,setUploadedFiles)},[])
+  }, [imageData, uploadedFiles]);
+
+  useEffect(() => {
+    handleGetBatonFiles(batonId, setUploadedFiles);
+  }, []);
+
   return (
     <>
       <Dragger {...props} defaultFileList={imageData.filesList} value>
@@ -115,38 +127,44 @@ export default function ImageUpload({
       </Dragger>
 
       <div className="mt-5">
-        <h6>{(imageData.length == undefined ? uploadedFiles.length : uploadedFiles.length+imageData.length)} files attached</h6>
+        <h6>
+          {imageData.filesList.length == undefined
+            ? uploadedFiles.length
+            : uploadedFiles.length + imageData.filesList.length}{" "}
+          files attached
+        </h6>
       </div>
-      {uploadedFiles.length > 0 && 
-
+      {uploadedFiles.length > 0 && (
         <List
-        itemLayout="horizontal"
-        dataSource={uploadedFiles}
-        renderItem={item => (    
-          <DownloadDiv className="px-3" style={{backgroundColor:colors.cgLight95}} onClick={()=>downloadBase64File(item.image,item.fileName)}>
-
-          <List.Item  >
-            <List.Item.Meta       
-              avatar={<FileOutlined/>}
-              title={<label>{item.fileName}</label>}
-              />
-              <DownloadOutlined/>
-          </List.Item>
-              </DownloadDiv>
+          itemLayout="horizontal"
+          dataSource={uploadedFiles}
+          renderItem={(item) => (
+            <DownloadDiv
+              className="px-3"
+              style={{ backgroundColor: colors.cgLight95 }}
+              onClick={() => downloadBase64File(item.image, item.fileName)}
+            >
+              <List.Item>
+                <List.Item.Meta
+                  avatar={<FileOutlined />}
+                  title={<label>{item.fileName}</label>}
+                />
+                <DownloadOutlined />
+              </List.Item>
+            </DownloadDiv>
+          )}
+        />
       )}
-  />
-}
-      {uploading  == true && uploading != "b64Converted"? (
+      {uploading == true && uploading != "b64Converted" ? (
         <Loading size="large" />
       ) : (
-      
         <TealButton
           onClick={handleUpload}
           disabled={imageData.length === 0 || uploading == "b64Converted"}
           loading={uploading}
           style={{ marginTop: 16 }}
         >
-          {uploading == "b64Converted" ? "Uploaded ": "Upload"}
+          {uploading == "b64Converted" ? "Uploaded " : "Upload"}
         </TealButton>
       )}
     </>
@@ -154,9 +172,7 @@ export default function ImageUpload({
 }
 
 const DownloadDiv = styled.div`
-
-:hover{
-  cursor: pointer;
-}
-
+  :hover {
+    cursor: pointer;
+  }
 `;
