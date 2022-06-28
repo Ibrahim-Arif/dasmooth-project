@@ -9,7 +9,6 @@ import { TealButton } from "../FormButton/FormButton";
 import Loading from "../Loading/Loading";
 import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
 import { generateNotification } from "../../utilities/generateNotification";
-import { v4 } from "uuid";
 import { colors } from "../../utilities/colors";
 import styled from "styled-components";
 
@@ -55,7 +54,7 @@ export default function ImageUpload({
 
   const handleUpload = () => {
     if (batonId == null) {
-      generateNotification("error", "Error", "Please pass a baton first");
+      generateNotification("error", "Error", "Baton Id is null");
       return;
     }
     setUploading(true);
@@ -100,7 +99,7 @@ export default function ImageUpload({
     if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
       setItemSelected({
         filesList: imageData,
-        text: "Attach a file",
+        text: "Attach a file (Optional)",
       });
     else
       setItemSelected({

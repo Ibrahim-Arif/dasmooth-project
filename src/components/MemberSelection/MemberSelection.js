@@ -12,6 +12,7 @@ import {
 import { useUser } from "../../hooks/useContext";
 import { generateNotification } from "../../utilities/generateNotification";
 import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
+import Loading from "../Loading/Loading";
 
 export default function MemberSelection({
   itemSelected,
@@ -181,10 +182,16 @@ export default function MemberSelection({
             <Input type="text" placeholder="Name" className="normal-input" />
           </Form.Item>
 
-          <Form.Item className="mt-4 col-12">
-            <TealButton htmlType="submit" className="col-12">
-              Submit
-            </TealButton>
+          <Form.Item className="mt-4 col-12 d-flex">
+            {loading ? (
+              <div className="d-flex justify-content-center">
+                <Loading />
+              </div>
+            ) : (
+              <TealButton htmlType="submit" className="col-12">
+                Submit
+              </TealButton>
+            )}
           </Form.Item>
         </Form>
       </Modal>
@@ -260,7 +267,7 @@ export default function MemberSelection({
                     status={e.status}
                     onItemPress={() => {}}
                     statusColor={
-                      e.status == "pending" ? "yellow" : colors.teal100
+                      e.status == "pending" ? "#F29339" : colors.teal100
                     }
                   />
                 </div>

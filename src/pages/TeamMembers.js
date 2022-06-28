@@ -9,7 +9,7 @@ import { MemberSelection } from "../components";
 import { useCheckSignIn } from "../hooks/useCheckSignIn";
 
 export default function TeamMembers() {
-  useCheckSignIn();
+  // useCheckSignIn();
   const { teamMembers, setTeamMembers } = useUser();
 
   return (

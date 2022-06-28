@@ -51,7 +51,9 @@ export default function Selectable({
         </Container>
         {status && (
           <Container>
-            <label style={{ color: statusColor }}>{`(${status})`}</label>
+            <label
+              style={{ color: isActive ? activeColor.color : statusColor }}
+            >{`${status.charAt(0).toUpperCase() + status.slice(1)}`}</label>
           </Container>
         )}
       </div>

@@ -41,7 +41,6 @@ export default function PostUpdateForm({
         className="col-12"
         onClick={() => {
           if (batonId != null) {
-            if (value == "") return;
             let data = {
               batonId,
               text: value,
@@ -62,12 +61,6 @@ export default function PostUpdateForm({
               .catch((ex) =>
                 generateNotification("error", ex.message, ex.message)
               );
-          } else {
-            generateNotification(
-              "warning",
-              "Post Update",
-              "You need add add a baton first"
-            );
           }
         }}
       >
@@ -77,7 +70,7 @@ export default function PostUpdateForm({
         {postData.map((e) => (
           <UpdatesContainer className="d-flex flex-row mt-2">
             <div className="d-flex flex-column pt-2">
-              {console.log(e.photoURL)}
+              {/* {console.log(e.photoURL)} */}
               {e.photoURL != "" && e.photoURL ? (
                 <Avatar src={e.photoURL} />
               ) : (

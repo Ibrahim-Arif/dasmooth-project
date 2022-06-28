@@ -12,7 +12,7 @@ import {
   DeleteFilled,
   CopyOutlined,
 } from "@ant-design/icons";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4, v4 } from "uuid";
 
 import { colors } from "../utilities/colors";
 import {
@@ -60,11 +60,11 @@ export default function BatonsForm() {
   const [postUpdateData, setPostUpdateData] = useState("");
   const [title, setTitle] = useState("");
   const [filesList, setFilesList] = useState({
-    text: "Attach a file",
+    text: "Attach a file (Optional)",
     filesList: [],
   });
 
-  const [id, setID] = useState(null);
+  const [id, setID] = useState();
   const [disabled, setDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [fetchedDataObject, setFetchedDataObject] = useState({
@@ -74,10 +74,12 @@ export default function BatonsForm() {
 
   const [isEditable, setIsEditable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
+  const [isNewPost, setIsNewPost] = useState(true);
+
   const flushData = () => {
     setActiveComponent(null);
     setActiveItemIndex(-1);
-    setID(null);
+    // setID(null);
     setTitle("");
     setActiveTitle("");
     setTeamMemberData({
@@ -89,7 +91,7 @@ export default function BatonsForm() {
     setBudgetData("Set a budget");
     setPostUpdateData("");
     setFilesList({
-      text: "Attach a file",
+      text: "Attach a file (Optional)",
       filesList: [],
     });
     // setFilesListB64([]);
@@ -104,7 +106,7 @@ export default function BatonsForm() {
     //   title
     // );
 
-    if (params.id == null) {
+    if (isNewPost) {
       console.log("New");
 
       let post = {
@@ -123,11 +125,11 @@ export default function BatonsForm() {
         deletedOn: 0,
       };
 
-      console.log(post);
+      // console.log(post);
       // return;
       setLoading(true);
-      console.log("Adding new post");
-      handleAddBaton(post)
+      // console.log("Adding new post");
+      handleAddBaton(post, id)
         .then((docId) => {
           handleAddNotification({
             seen: false,
@@ -148,6 +150,7 @@ export default function BatonsForm() {
         })
         .catch((ex) => {
           generateNotification("error", "Error", "Failed to create you baton");
+          console.log(ex);
           setLoading(false);
         });
     } else {
@@ -206,7 +209,7 @@ export default function BatonsForm() {
     // console.log("params:", params);
     if (params.id) {
       handleGetBatonFiles(params.id, setUploadedFiles);
-
+      setIsNewPost(false);
       if (batonsData.length == 0) return;
 
       let filter = batonsData.filter((e) => e.docId == params.id);
@@ -251,8 +254,11 @@ export default function BatonsForm() {
       });
       setID(params.id);
       // console.log("filter", filter);
-      batonsData.forEach((e) => console.log(e.title, "|", e.docId));
+      // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
     } else {
+      let tempId = v4();
+      setID(tempId);
+      setIsNewPost(true);
       flushData();
     }
   }, [params]);
@@ -288,9 +294,10 @@ export default function BatonsForm() {
         );
         navigate("/main");
       })
-      .catch(() => {
+      .catch((ex) => {
         setLoading(false);
         generateNotification("error", "Error", "Failed to delete your baton");
+        // console.log(ex);
       });
   };
 
@@ -301,7 +308,7 @@ export default function BatonsForm() {
     setLoading(true);
     let temp = fetchedDataObject;
     temp.title = `${temp.title} (Duplicate)`;
-    handleAddBaton(temp)
+    handleAddBaton(temp, v4())
       .then(() => {
         generateNotification(
           "success",
@@ -403,15 +410,21 @@ export default function BatonsForm() {
           {/* FormItems */}
           <div className="col-12">
             {!isDeleted && (
-              <Input
-                size="large"
-                placeholder="Add Text"
-                className="me-3"
-                onChange={(e) => setTitle(e.currentTarget.value)}
-                value={title}
-                status={title == "" && "error"}
-                // prefix="Please input baton title!"
-              />
+              <Form.Item
+                validateStatus={title == "" && "error"}
+                help={title != "" ? null : "This field is required"}
+              >
+                <Input
+                  size="large"
+                  placeholder="Add Text"
+                  className="me-3"
+                  onChange={(e) => setTitle(e.currentTarget.value)}
+                  value={title}
+                  status={title == "" && "error"}
+                  disabled={params.id != null}
+                  // prefix="Please input baton title!"
+                />
+              </Form.Item>
 
               // <label>error</label>
             )}
@@ -490,14 +503,15 @@ export default function BatonsForm() {
               icon={<FileAddOutlined />}
               text={filesList.text}
               isItemActive={
-                activeItemIndex == 4 || filesList.text != "Attach a file"
+                activeItemIndex == 4 ||
+                filesList.text != "Attach a file (Optional)"
                   ? true
                   : false
               }
               onItemPress={() =>
                 !isDeleted &&
                 handleFormItemRender(
-                  "Attach a file",
+                  "Attach a file (Optional)",
                   <ImageUpload
                     boxColor={colors.teal100}
                     itemSelected={filesList}
@@ -515,14 +529,14 @@ export default function BatonsForm() {
             />
             <Selectable
               icon={<FileTextOutlined />}
-              text="Post an Update"
+              text="Post an Update (Optional)"
               isItemActive={
                 activeItemIndex == 5 || postUpdateData != "" ? true : false
               }
               onItemPress={() =>
                 !isDeleted &&
                 handleFormItemRender(
-                  "Post an Update",
+                  "Post an Update (Optional)",
                   <PostUpdateForm
                     itemSelected={postUpdateData}
                     setItemSelected={setPostUpdateData}
