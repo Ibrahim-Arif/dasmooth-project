@@ -87,10 +87,10 @@ export default function DashboardView(props) {
 
   const onDragEnd = (fromIndex, toIndex) => {
     if (toIndex < 0) return; // Ignores if outside designated area
-    const items = [...batons];
+    const items = [...activeBatons];
     const item = items.splice(fromIndex, 1)[0];
     items.splice(toIndex, 0, item);
-    setBatons(items);
+    setActiveBatons(items);
   };
 
   return (

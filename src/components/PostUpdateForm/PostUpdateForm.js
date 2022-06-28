@@ -47,6 +47,7 @@ export default function PostUpdateForm({
               text: value,
               timestamp: Date.now(),
               username,
+              photoURL: isLogin.photoURL,
             };
             handleAddPostUpdate(data)
               .then(() => {
@@ -74,10 +75,11 @@ export default function PostUpdateForm({
       </TealButton>
       <div className="mt-3">
         {postData.map((e) => (
-          <UpdatesContainer className="d-flex flex-row">
+          <UpdatesContainer className="d-flex flex-row mt-2">
             <div className="d-flex flex-column pt-2">
-              {isLogin.photoURL != "" ? (
-                <Avatar src={isLogin.photoURL} />
+              {console.log(e.photoURL)}
+              {e.photoURL != "" && e.photoURL ? (
+                <Avatar src={e.photoURL} />
               ) : (
                 <Avatar style={{ backgroundColor: colors.teal100 }}>
                   {e.username.substring(0, 2).toUpperCase()}

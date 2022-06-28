@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 import { StateProvider } from "./hooks/useContext";
-import { DashboardMenu, SignIn, Welcome } from "./pages";
+import { DashboardMenu, SignIn, Welcome, ForgotPassword } from "./pages";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./config/firebaseConfig";
 
@@ -51,6 +51,7 @@ const App = () => {
     const uid = localStorage.getItem("uid");
     if (uid != null && user.uid == uid && user.emailVerified) {
       setIsLogin(user);
+    } else {
     }
   });
 
@@ -103,6 +104,8 @@ const App = () => {
                   <Route path="/" element={<Welcome />} />
                   <Route path="signIn/" element={<SignIn />} />
                   <Route path="signIn/:id" element={<SignIn />} />
+                  <Route path="forgotpassword" element={<ForgotPassword />} />
+                  <Route path="/*" element={<SignIn />} />
                 </>
               ) : (
                 <Route path="/*" element={<DashboardMenu />} />

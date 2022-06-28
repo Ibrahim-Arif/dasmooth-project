@@ -12,6 +12,7 @@ export default function Selectable({
   isItemActive,
   customColor = null,
   status = null,
+  statusColor = colors.teal100,
 }) {
   const passive = { color: colors.teal100, bgColor: colors.tealLight90 };
   const active = { color: "white", bgColor: colors.tealDark30 };
@@ -38,12 +39,22 @@ export default function Selectable({
         onItemPress();
       }}
     >
-      <Container className="col-12 d-flex flex-row align-items-center">
-        {image ? image : icon}
-        <div className="me-3"></div>
-        {text}
-        {status && `   (${status})`}
-      </Container>
+      <div className="d-flex flex-row justify-content-between">
+        <Container
+          className={`${
+            status ? "col-8" : "col-12"
+          } d-flex flex-row align-items-center`}
+        >
+          {image ? image : icon}
+          <div className="me-3"></div>
+          {text}
+        </Container>
+        {status && (
+          <Container>
+            <label style={{ color: statusColor }}>{`(${status})`}</label>
+          </Container>
+        )}
+      </div>
     </CustomButton>
   );
 }

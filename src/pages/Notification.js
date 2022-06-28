@@ -5,15 +5,17 @@ import { useUser } from "../hooks/useContext";
 import { handleUpdateNotificationStatus } from "../services";
 import moment from "moment";
 import { useNavigate } from "react-router";
+import { useCheckSignIn } from "../hooks/useCheckSignIn";
 
 export default function Notification() {
+  // useCheckSignIn();
   const { notifications } = useUser();
   const navigate = useNavigate();
 
   return (
-    <Container className="p-3 justify-content-start d-flex flex-column">
+    <Container className="p-3 justify-content-start ms-0 d-flex flex-column">
       <h5>Notifications</h5>
-      <Container className="col-6 justify-content-start ms-0">
+      <Container className="col-12 col-lg-6 justify-content-start ms-0">
         {notifications.length == 0 && (
           <h5 className="mt-5">You do not have any notifications</h5>
         )}

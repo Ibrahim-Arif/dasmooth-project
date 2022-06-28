@@ -69,9 +69,6 @@ h5 {
   display: none !important;
 }
 
-
-
-
 .normal-input::-webkit-input-placeholder {
   /* WebKit browsers */
   color: white;
@@ -93,14 +90,15 @@ h5 {
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   /* transition: background-color 5000s ease-in-out 0s; */
 }
-.normal-
-input:-webkit-autofill:focus {
+.normal- input:-webkit-autofill:focus {
   -webkit-text-fill-color: black !important;
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   /* transition: background-color 5000s ease-in-out 0s; */
 }
 
-
+.ant-badge {
+  color: #009688 !important;
+}
 
 input::-webkit-input-placeholder {
   /* WebKit browsers */

@@ -37,8 +37,10 @@ import {
 import { generateNotification } from "../utilities/generateNotification";
 import moment from "moment";
 import { handleAddNotification } from "../services/handleAddNotification";
-import { upload } from "@testing-library/user-event/dist/upload";
+import { useCheckSignIn } from "../hooks/useCheckSignIn";
+
 export default function BatonsForm() {
+  // useCheckSignIn();
   const { batonsData, setBatonsData, teamMembers, isLogin } = useUser();
   const params = useParams();
   const navigate = useNavigate();
@@ -369,21 +371,24 @@ export default function BatonsForm() {
                 else navigate("/main");
               }}
             />
-            {!isDeleted && params.id && (
-              <Dropdown
-                overlay={menu}
-                placement="bottomRight"
-                arrow={{ pointAtCenter: true }}
-              >
-                <EllipsisOutlined
-                  style={{ fontSize: 20 }}
-                  onClick={() => {
-                    // navigate("/main");
-                  }}
-                  rotate={90}
-                />
-              </Dropdown>
-            )}
+
+            {!isDeleted &&
+              params.id &&
+              fetchedDataObject.authorId == isLogin.uid && (
+                <Dropdown
+                  overlay={menu}
+                  placement="bottomRight"
+                  arrow={{ pointAtCenter: true }}
+                >
+                  <EllipsisOutlined
+                    style={{ fontSize: 20 }}
+                    onClick={() => {
+                      // navigate("/main");
+                    }}
+                    rotate={90}
+                  />
+                </Dropdown>
+              )}
           </div>
           {/* -------------- */}
           {isDeleted && (

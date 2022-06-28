@@ -27,6 +27,7 @@ export default function MemberSelection({
   const [members, setMembers] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const { isLogin, teamMembers } = useUser();
 
@@ -45,6 +46,7 @@ export default function MemberSelection({
   const handleAddMemberByEmailSubmit = (values) => {
     console.log(values);
     // here we create user with email
+    setLoading(true);
     handleSignUp(values.email, null, true)
       .then((user) => {
         // console.log({
@@ -57,7 +59,7 @@ export default function MemberSelection({
           status: "pending",
           inviteBy: isLogin.uid,
           name: values.name,
-        });
+        }).finally(() => setLoading(false));
 
         generateNotification(
           "success",
@@ -70,8 +72,8 @@ export default function MemberSelection({
             inviteBy: isLogin.uid,
             name: values.name,
           });
-          clickOk();
         }
+        handleCancel();
       })
       .catch((ex) => {
         if (ex.message == "auth/email-already-in-use") {
@@ -79,13 +81,16 @@ export default function MemberSelection({
             email: values.email,
             inviteBy: isLogin.uid,
             name: values.name,
-          }).then(() =>
-            generateNotification(
-              "success",
-              "Member Added",
-              `${values.email} added`
-            )
-          );
+          })
+            .then(() => {
+              generateNotification(
+                "success",
+                "Member Added",
+                `${values.email} added`
+              );
+              handleCancel();
+            })
+            .finally(() => setLoading(false));
         } else {
           generateNotification("error", "Error", ex.message);
         }
@@ -111,6 +116,7 @@ export default function MemberSelection({
       setMembers(data);
     }
   }, [teamMembers, searchText]);
+
   const onClick = ({ key, label }) => {
     // alert(`Click on item ${key} ${label}`);
     handleUpdateTeamMemberStatus(key, "deleted")
@@ -253,6 +259,9 @@ export default function MemberSelection({
                     isItemActive={false}
                     status={e.status}
                     onItemPress={() => {}}
+                    statusColor={
+                      e.status == "pending" ? "yellow" : colors.teal100
+                    }
                   />
                 </div>
               </Dropdown>

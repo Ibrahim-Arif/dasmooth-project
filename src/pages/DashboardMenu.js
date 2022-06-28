@@ -19,10 +19,13 @@ import { menuItems } from "../utilities/MenuItems";
 
 import { logo } from "../assets";
 import { getAuth } from "firebase/auth";
+import { useCheckSignIn } from "../hooks/useCheckSignIn";
 
 const { Header, Sider } = Layout;
 
 export default function DashboardMenu() {
+  // useCheckSignIn();
+
   const [collapsed, setCollapsed] = useState(true);
   const [renderSearchBar, setRenderSearchBar] = useState(false);
   const [search, setSearch] = useState("");

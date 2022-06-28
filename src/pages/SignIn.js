@@ -12,6 +12,7 @@ import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
 import { useUser } from "../hooks/useContext";
 import { handleSignIn } from "../services/handleSignIn";
+import { useCheckSignIn } from "../hooks/useCheckSignIn";
 
 export default function SignIn() {
   const [mode, setMode] = useState(0);
@@ -20,6 +21,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const { setIsLogin } = useUser();
 
+  useCheckSignIn();
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -33,7 +35,7 @@ export default function SignIn() {
   const onFinish = (values) => {
     setLoading(true);
     if (mode) {
-      handleSignUp(values.email,values.password)
+      handleSignUp(values.email, values.password)
         .then((user) => {
           generateNotification(
             "success",
@@ -51,10 +53,14 @@ export default function SignIn() {
       handleSignIn(values.email, values.password)
         .then((user) => {
           setLoading(false);
-          if(!user.emailVerified) {
-            generateNotification("error","Verify Email","Kindly verify your email to continue");
+          if (!user.emailVerified) {
+            generateNotification(
+              "error",
+              "Verify Email",
+              "Kindly verify your email to continue"
+            );
             return;
-          }else{
+          } else {
             localStorage.setItem("uid", user.uid);
             setIsLogin(user);
             navigate("/");
@@ -68,6 +74,7 @@ export default function SignIn() {
   };
 
   const handleForgotPress = () => {
+    navigate("/forgotpassword");
     // handleForgotPassword("bilalnaeem166@gmail.com")
     //   .then(() => console.log("done"))
     //   .catch((ex) => console.log(ex));
@@ -124,34 +131,34 @@ export default function SignIn() {
               onBlur={() => setFocusedEmail(false)}
             />
           </Form.Item>
-          
-            <Form.Item
-              className="col-12"
-              name="password"
-              rules={[
-                {
-                  min: 6,
-                  message: "Password length should not be less than 6",
-                },
-                {
-                  required: true,
-                  message: "Please input your Password!",
-                },
-              ]}
-            >
-              <FormPassword
-                prefix={<LockOutlined className="site-form-item-icon" />}
-                style={{
-                  backgroundColor: focusedPassword ? "white" : "transparent",
-                  color: focusedPassword ? "black" : "white",
-                }}
-                type="password"
-                placeholder="Password"
-                onFocus={() => setFocusedPassword(true)}
-                onBlur={() => setFocusedPassword(false)}
-              />
-            </Form.Item>
-          
+
+          <Form.Item
+            className="col-12"
+            name="password"
+            rules={[
+              {
+                min: 6,
+                message: "Password length should not be less than 6",
+              },
+              {
+                required: true,
+                message: "Please input your Password!",
+              },
+            ]}
+          >
+            <FormPassword
+              prefix={<LockOutlined className="site-form-item-icon" />}
+              style={{
+                backgroundColor: focusedPassword ? "white" : "transparent",
+                color: focusedPassword ? "black" : "white",
+              }}
+              type="password"
+              placeholder="Password"
+              onFocus={() => setFocusedPassword(true)}
+              onBlur={() => setFocusedPassword(false)}
+            />
+          </Form.Item>
+
           <Form.Item className="mt-4">
             {loading ? (
               <Loading size="large" color={colors.teal100} />
