@@ -37,11 +37,12 @@ export default function SignIn() {
     if (mode) {
       handleSignUp(values.email, values.password)
         .then((user) => {
-          generateNotification(
-            "success",
-            "Registered",
-            `An email has been sent to ${values.email}. Kindly check your email! If you do not see any email, check your spam section`
-          );
+          navigate("/verifyEmail");
+          // generateNotification(
+          //   "success",
+          //   "Registered",
+          //   `An email has been sent to ${values.email}. Kindly check your email! If you do not see any email, check your spam section`
+          // );
           setLoading(false);
         })
         .catch((ex) => {

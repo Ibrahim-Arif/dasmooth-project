@@ -1,11 +1,12 @@
-import { getAuth, updateProfile } from "firebase/auth";
+import { getAuth, updateProfile, onAuthStateChanged } from "firebase/auth";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 export const handleUserInformationUpdate = async (
   email,
   displayName,
-  photoURL = ""
+  photoURL = "",
+  setUser
 ) => {
   try {
     const auth = getAuth();
@@ -19,6 +20,12 @@ export const handleUserInformationUpdate = async (
       email: email,
       displayName: displayName,
       photoURL: photoURL,
+    });
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+      }
     });
   } catch (ex) {
     console.log(ex);

@@ -27,6 +27,7 @@ export default function DashboardMenu() {
   // useCheckSignIn();
 
   const [collapsed, setCollapsed] = useState(true);
+  const [profileImage, setProfileImage] = useState();
   const [renderSearchBar, setRenderSearchBar] = useState(false);
   const [search, setSearch] = useState("");
   const {
@@ -41,6 +42,10 @@ export default function DashboardMenu() {
   const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    setProfileImage(isLogin.photoURL);
+  }, [isLogin]);
 
   useEffect(() => {
     document.getElementById("body").style.backgroundColor = "white";
@@ -197,6 +202,7 @@ export default function DashboardMenu() {
           width={siderW}
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
+            {console.log(isLogin.photoURL)}
             <Avatar src={isLogin.photoURL} size={70} />
             <label style={{ fontWeight: "bold" }} className="mt-3">
               {isLogin.displayName != null

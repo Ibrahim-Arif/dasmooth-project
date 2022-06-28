@@ -8,12 +8,11 @@ import { handleUserInformationUpdate } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 
 export default function Profile() {
-  // useCheckSignIn();
+  const { isLogin, setIsLogin } = useUser();
   const [profileImage, setProfileImage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const { isLogin } = useUser();
 
   useEffect(() => {
     setEmail(isLogin.email);
@@ -23,8 +22,9 @@ export default function Profile() {
 
   const handleSave = () => {
     setLoading(true);
-    handleUserInformationUpdate(email, name, profileImage)
+    handleUserInformationUpdate(email, name, profileImage, setIsLogin)
       .then(() => {
+        // console.log(isLogin);
         generateNotification("success", "Profile updated successfully");
       })
       .catch(() => {

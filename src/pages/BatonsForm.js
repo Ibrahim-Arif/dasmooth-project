@@ -33,6 +33,7 @@ import {
   handleAddBaton,
   handleDeleteBaton,
   handleGetBatonFiles,
+  handleUpdateBaton,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import moment from "moment";
@@ -124,7 +125,7 @@ export default function BatonsForm() {
         createdOn: Date.now(),
         deletedOn: 0,
       };
-
+      console.log("new Post");
       // console.log(post);
       // return;
       setLoading(true);
@@ -155,22 +156,30 @@ export default function BatonsForm() {
         });
     } else {
       console.log("Edit");
-      // temp = temp.map((e) => {
-      //   if (e.id == params.id)
-      //     return {
-      //       ...e,
-      //       dateData,
-      //       budgetData,
-      //       postUpdateData,
-      //       filesList,
-      //       title,
-      //     };
-      // });
+      let editedPost = {
+        ...fetchedDataObject,
+        deadline: dateData,
+        budget: budgetData,
+        title: title,
+        memberName: teamMemberData.text,
+        updateOn: Date.now(),
+      };
 
-      // console.log(temp);
-      // setBatonsData(temp);
+      // console.log(editedPost);
+      // return;
+      setLoading(true);
+      handleUpdateBaton(id, editedPost)
+        .then(() => {
+          setLoading(false);
+          navigate("/main");
+          generateNotification("success", "Baton Update", "Baton is updated");
+        })
+        .catch((ex) => {
+          setLoading(false);
+          generateNotification("error", "Error", "Failed to update baton");
+          console.log(ex);
+        });
     }
-    // navigate("/main");
   };
 
   const handleOk = () => {
@@ -421,7 +430,11 @@ export default function BatonsForm() {
                   onChange={(e) => setTitle(e.currentTarget.value)}
                   value={title}
                   status={title == "" && "error"}
-                  disabled={params.id != null}
+                  disabled={
+                    fetchedDataObject.authorPostStatus != "pending"
+                      ? true
+                      : false
+                  }
                   // prefix="Please input baton title!"
                 />
               </Form.Item>

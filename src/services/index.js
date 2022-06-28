@@ -13,12 +13,13 @@ import { handleGetNotifications } from "./handleGetNotifications";
 import { handleGetOtherBatons } from "./handleGetOtherBatons";
 import { handleGetTeamMembers } from "./handleGetTeamMembers";
 import { handleSignUp } from "./handleSignUp";
+import { handleUpdateBaton } from "./handleUpdateBaton";
 import { handleUpdateNotificationStatus } from "./handleUpdateNotificationStatus";
 import { handleUpdateTeamMemberStatus } from "./handleUpdateTeamMemberStatus";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
-
 export {
+  handleUpdateBaton,
   handleAddSystemUserToMember,
   handleUpdateTeamMemberStatus,
   handleUpdateNotificationStatus,

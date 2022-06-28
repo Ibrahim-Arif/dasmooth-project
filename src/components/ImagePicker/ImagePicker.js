@@ -1,14 +1,14 @@
 import { CloseCircleFilled, PlusCircleOutlined } from "@ant-design/icons";
 import React, { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
 import styled from "styled-components";
+import { generateNotification } from "../../utilities/generateNotification";
 
 export default function ImagePicker({
   setItems,
   item = false,
   index,
   items = [],
-  className
+  className,
 }) {
   const handleImageSelection = () =>
     document.getElementById(`imageInput${index}`).click();
@@ -20,7 +20,12 @@ export default function ImagePicker({
     const file = e.target.files;
     const fileSize = file[0].size / 1024 / 1024;
     if (fileSize > 1) {
-     
+      generateNotification(
+        "error",
+        "Error",
+        "Image size should be less than 1 MB"
+      );
+
       return;
     } else {
       let temp = URL.createObjectURL(file[0]);
@@ -35,7 +40,17 @@ export default function ImagePicker({
   };
 
   useEffect(() => {
-    if (item) setIsSelected(true);
+    if (item) {
+      if (item.includes("blob")) {
+        // let reader = new FileReader();
+        // reader.readAsDataURL(item); // converts the blob to base64 and calls onload
+        // reader.onload = function () {
+        //   let href = reader.result; // data url
+        //   setItems(href);
+        // };
+      }
+      setIsSelected(true);
+    }
   }, [item]);
 
   return (
@@ -63,43 +78,42 @@ export default function ImagePicker({
           />
           {isSelected && mouseHover && (
             <DeSelectButton>
-               <CloseCircleFilled/>
+              <CloseCircleFilled />
             </DeSelectButton>
           )}
         </>
       ) : (
-      <PlusCircleOutlined/>
+        <PlusCircleOutlined />
       )}
     </PickerContainer>
   );
 }
 
 const PickerContainer = styled.div`
-    min-height: 80px;
-    min-width: 80px;
-    max-width: 160px;
-    max-height: 160px;
-    // border-radius: 50%;
-    overflow: hidden;
-    margin: 5px;
-    border: ${({ bordered }) => bordered && "1px dashed grey"};
-    display: flex;
-    justify-content: center;
-    position: relative;
-    align-items: center;
-    :hover{
-        cursor: pointer;
-    }
-
+  min-height: 80px;
+  min-width: 80px;
+  max-width: 160px;
+  max-height: 160px;
+  // border-radius: 50%;
+  overflow: hidden;
+  margin: 5px;
+  border: ${({ bordered }) => bordered && "1px dashed grey"};
+  display: flex;
+  justify-content: center;
+  position: relative;
+  align-items: center;
+  :hover {
+    cursor: pointer;
+  }
 `;
 
 const DeSelectButton = styled.div`
-    height: 25px;
-    width: 25px;
-    border-radius: 50%;
-    background-color: tomato;
-    display: flex;
-    justify-content:center;
-    align-items:center;
-    position: absolute;
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
+  background-color: tomato;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
 `;
