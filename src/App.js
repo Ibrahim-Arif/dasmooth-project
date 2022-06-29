@@ -55,7 +55,9 @@ const App = () => {
 
   onAuthStateChanged(auth, (user) => {
     const uid = localStorage.getItem("uid");
-    if (uid != null && user.uid == uid && user.emailVerified) {
+    if (uid != null && user.uid == uid
+      //  && user.emailVerified
+       ) {
       setIsLogin(user);
     } else {
     }

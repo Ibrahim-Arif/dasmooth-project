@@ -12,7 +12,7 @@ export default function BudgetForm({ itemSelected, setItemSelected, clickOk }) {
     setValue(value);
   }
   return (
-    <Container className="mt-3">
+    <Container className="d-flex flex-column mt-3">
       <InputNumber
         defaultValue={0.0}
         formatter={(value) =>
@@ -28,6 +28,8 @@ export default function BudgetForm({ itemSelected, setItemSelected, clickOk }) {
       <Checkbox
         onChange={(e) => (e.target.checked ? setValue("N/A") : setValue("0"))}
         checked={value == "N/A" ? true : false}
+        style={{ transform: "scale(1.3)" }}
+        className="my-3 align-self-center"
       >
         N/A
       </Checkbox>

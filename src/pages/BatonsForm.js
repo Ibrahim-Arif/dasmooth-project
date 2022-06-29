@@ -423,6 +423,7 @@ export default function BatonsForm() {
                 validateStatus={title == "" && "error"}
                 help={title != "" ? null : "This field is required"}
               >
+                {console.log(fetchedDataObject.authorPostStatus)}
                 <Input
                   size="large"
                   placeholder="Add Text"
@@ -431,7 +432,8 @@ export default function BatonsForm() {
                   value={title}
                   status={title == "" && "error"}
                   disabled={
-                    fetchedDataObject.authorPostStatus != "pending"
+                    fetchedDataObject.authorPostStatus != "pending" &&
+                    fetchedDataObject.authorPostStatus != undefined
                       ? true
                       : false
                   }
