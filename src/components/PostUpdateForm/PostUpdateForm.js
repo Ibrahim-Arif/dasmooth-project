@@ -21,7 +21,7 @@ export default function PostUpdateForm({
   const { isLogin } = useUser();
 
   const onChange = (e) => {
-    console.log("changed", e.target.value);
+    // console.log("changed", e.target.value);
     setValue(e.target.value);
   };
 
@@ -67,8 +67,8 @@ export default function PostUpdateForm({
         POST UPDATE
       </TealButton>
       <div className="mt-3">
-        {postData.map((e) => (
-          <UpdatesContainer className="d-flex flex-row mt-2">
+        {postData.map((e, index) => (
+          <UpdatesContainer className="d-flex flex-row mt-2" key={index}>
             <div className="d-flex flex-column pt-2">
               {/* {console.log(e.photoURL)} */}
               {e.photoURL != "" && e.photoURL ? (

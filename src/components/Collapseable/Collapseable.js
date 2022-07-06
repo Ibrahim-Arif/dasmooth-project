@@ -71,7 +71,7 @@ export default function Collapseable({
             bordercolor={borderColor}
             onClick={() => {
               // console.log(e)
-              console.log(`/batonsForm/${e.docId}`);
+              // console.log(`/batonsForm/${e.docId}`);
               navigate(`/batonsForm/${e.docId}`);
             }}
           >

@@ -110,7 +110,7 @@ export default function BatonsForm() {
     // );
 
     if (isNewPost) {
-      console.log("New");
+      // console.log("New");
 
       let post = {
         deadline: dateData,
@@ -128,7 +128,7 @@ export default function BatonsForm() {
         deletedOn: 0,
         description: description,
       };
-      console.log("new Post");
+      // console.log("new Post");
       // console.log(post);
       // return;
       setLoading(true);
@@ -154,11 +154,11 @@ export default function BatonsForm() {
         })
         .catch((ex) => {
           generateNotification("error", "Error", "Failed to create you baton");
-          console.log(ex);
+          // console.log(ex);
           setLoading(false);
         });
     } else {
-      console.log("Edit");
+      // console.log("Edit");
       let editedPost = {
         ...fetchedDataObject,
         deadline: dateData,
@@ -181,7 +181,7 @@ export default function BatonsForm() {
         .catch((ex) => {
           setLoading(false);
           generateNotification("error", "Error", "Failed to update baton");
-          console.log(ex);
+          // console.log(ex);
         });
     }
   };
@@ -257,7 +257,7 @@ export default function BatonsForm() {
         filter.authorPostStatus == "received"
       )
         setIsDeleted(true);
-      console.log("editable:", isEditable);
+      // "editable:", isEditable;
       setFetchedDataObject(filter);
       setTitle(filter.title);
       setBudgetData(filter.budget);

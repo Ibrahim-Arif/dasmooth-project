@@ -74,7 +74,7 @@ const App = () => {
     // console.log("Login UID:", isLogin.uid);
     // console.log("Local UID", uid);
     //
-    console.log("App.js Line 73:", isLogin.photoURL);
+    // console.log("App.js Line 73:", isLogin.photoURL);
     if (isLogin) {
       setPhotoURL(isLogin.photoURL);
       handleGetTeamMembers(isLogin.uid, setTeamMembers);

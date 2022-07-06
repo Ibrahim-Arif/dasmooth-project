@@ -48,7 +48,7 @@ export default function ImageUpload({
       });
     },
     onDrop(e) {
-      console.log("Dropped files", e.dataTransfer.files);
+      // console.log("Dropped files", e.dataTransfer.files);
     },
   };
 
@@ -95,7 +95,7 @@ export default function ImageUpload({
   }
 
   useEffect(() => {
-    console.log(imageData);
+    // console.log(imageData);
     if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
       setItemSelected({
         filesList: imageData,

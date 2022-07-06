@@ -45,7 +45,7 @@ export default function MemberSelection({
   };
 
   const handleAddMemberByEmailSubmit = (values) => {
-    console.log(values);
+    // console.log(values);
     // here we create user with email
     setLoading(true);
     handleSignUp(values.email, null, true)
@@ -98,7 +98,7 @@ export default function MemberSelection({
       });
   };
   const handleChange = (values, allValues) => {
-    console.log(values, allValues);
+    // console.log(values, allValues);
   };
   useEffect(() => {
     let data = teamMembers;
@@ -233,13 +233,14 @@ export default function MemberSelection({
                     id: e.receiverId,
                     status: e.status,
                   });
-                  console.log(currentItem);
+                  // currentItem;
                 }}
                 status={e.status}
               />
             ))
           : members.map((e, index) => (
               <Dropdown
+                key={index}
                 overlay={() => (
                   <Menu
                     items={[

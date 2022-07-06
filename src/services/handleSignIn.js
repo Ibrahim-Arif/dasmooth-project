@@ -41,7 +41,7 @@ export const handleSignIn = async (email, password) => {
           );
 
           onSnapshot(q, (querySnapshot) => {
-            console.log("doc Size:", querySnapshot.size);
+            // console.log("doc Size:", querySnapshot.size);
             querySnapshot.forEach(async (batonDocument) => {
               // updating member status
               await handleUpdateBatonStatus(

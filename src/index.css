@@ -1,3 +1,17 @@
+@media screen and (max-width: 360px) {
+  h4,
+  h5 {
+    font-size: calc(14px + 1vw) !important;
+  }
+  .caret-icon,
+  .bars-icon {
+    font-size: calc(12px + 1vw) !important;
+  }
+  .baton-title-div {
+    padding-top: 3px;
+  }
+}
+
 body {
   margin: 0;
   font-family: "Heebo", sans-serif;
@@ -14,6 +28,7 @@ h5,
 h4 {
   font-family: "Heebo", sans-serif;
 }
+
 .ant-menu-light .ant-menu-item-active,
 .ant-menu-light .ant-menu-item:hover,
 .ant-menu-light .ant-menu-submenu-active,
@@ -30,6 +45,7 @@ h4 {
 .ant-menu-inline .ant-menu-item:after {
   border-right: none !important;
 }
+
 .ant-menu > .ant-menu-inline .ant-menu-item:after,
 .ant-menu > .ant-menu-vertical-left .ant-menu-item:after,
 .ant-menu > .ant-menu-vertical-right .ant-menu-item:after,
@@ -37,19 +53,6 @@ h4 {
   border-right: 3px solid #ffffff;
 }
 
-@media screen and (max-width: 360px) {
-  h4,
-  h5 {
-    font-size: calc(14px + 1vw) !important;
-  }
-  .caret-icon,
-  .bars-icon {
-    font-size: calc(12px + 1vw) !important;
-  }
-  .baton-title-div {
-    padding-top: 3px;
-  }
-}
 h4,
 h5 {
   color: #37474f !important;
@@ -86,11 +89,13 @@ h5 {
   color: white;
 }
 .normal-input:-webkit-autofill {
+  box-shadow: 0 0 0px 1000px white inset !important;
   -webkit-text-fill-color: black !important;
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   /* transition: background-color 5000s ease-in-out 0s; */
 }
 .normal- input:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px white inset !important;
   -webkit-text-fill-color: black !important;
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
   /* transition: background-color 5000s ease-in-out 0s; */
@@ -118,12 +123,14 @@ input:-ms-input-placeholder {
 }
 
 input:-webkit-autofill {
+  box-shadow: 0 0 0px 1000px #161c1f inset;
   -webkit-text-fill-color: white;
   -webkit-box-shadow: 0 0 0px 1000px #161c1f inset;
   /* transition: background-color 5000s ease-in-out 0s; */
 }
 
 input:-webkit-autofill:focus {
+  box-shadow: 0 0 0px 1000px #161c1f inset;
   -webkit-text-fill-color: black;
   -webkit-box-shadow: 0 0 0px 1000px #161c1f inset;
   /* transition: background-color 5000s ease-in-out 0s; */

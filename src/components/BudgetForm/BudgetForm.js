@@ -8,7 +8,7 @@ export default function BudgetForm({ itemSelected, setItemSelected, clickOk }) {
   const [value, setValue] = useState(itemSelected);
 
   function onChange(value) {
-    console.log("changed", value);
+    // console.log("changed", value);
     setValue(value);
   }
   return (

@@ -45,7 +45,7 @@ export default function DashboardView(props) {
   };
 
   useEffect(() => {
-    console.log("DashBoardView");
+    // console.log("DashBoardView");
     // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
     // console.log(batonsData);
     let pending = filterBatonsData(batonsData, "pending", isLogin.uid);

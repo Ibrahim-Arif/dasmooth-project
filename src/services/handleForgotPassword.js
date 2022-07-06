@@ -6,7 +6,7 @@ export const handleForgotPassword = async (email) => {
     await sendPasswordResetEmail(auth, email, {
       url: "https://dasmooth-project.web.app/signin",
     });
-    console.log("here");
+    // console.log("here");
   } catch (ex) {
     throw new Error(ex);
   }
