@@ -8,7 +8,7 @@ import { handleUserInformationUpdate } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 
 export default function Profile() {
-  const { isLogin, setIsLogin } = useUser();
+  const { isLogin,  setPhotoURL } = useUser();
   const [profileImage, setProfileImage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -20,11 +20,18 @@ export default function Profile() {
     setProfileImage(isLogin.photoURL);
   }, []);
 
+  // useEffect(() => {
+  //   let temp = isLogin;
+  //   temp.photoURL = profileImage;
+  //   setIsLogin(temp);
+  // }, [profileImage]);
+
   const handleSave = () => {
     setLoading(true);
-    handleUserInformationUpdate(email, name, profileImage, setIsLogin)
-      .then(() => {
+    handleUserInformationUpdate(email, name, profileImage)
+      .then((url) => {
         // console.log(isLogin);
+        setPhotoURL(url);
         generateNotification("success", "Profile updated successfully");
       })
       .catch(() => {

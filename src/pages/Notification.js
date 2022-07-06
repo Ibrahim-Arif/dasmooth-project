@@ -21,6 +21,7 @@ export default function Notification() {
         )}
         {notifications.map((e, index) => (
           <Alert
+            key={index}
             className="mt-3"
             message={`${e.message} on ${moment(e.date).format("MMM Do YYYY")}`}
             description={e.description}
@@ -29,7 +30,6 @@ export default function Notification() {
             action={
               <Button
                 size="small"
-                info
                 onClick={() => navigate(`/batonsForm/${e.batonId}`)}
               >
                 Detail

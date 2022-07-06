@@ -54,18 +54,18 @@ export default function SignIn() {
       handleSignIn(values.email, values.password)
         .then((user) => {
           setLoading(false);
-          localStorage.setItem("uid", user.uid);
-          setIsLogin(user);
-          navigate("/");
-          // if (!user.emailVerified) {
-          //   generateNotification(
-          //     "error",
-          //     "Verify Email",
-          //     "Kindly verify your email to continue"
-          //   );
-          //   return;
-          // } else {
-          // }
+          if (!user.emailVerified) {
+            generateNotification(
+              "error",
+              "Verify Email",
+              "Kindly verify your email to continue"
+              );
+              return;
+            } else {
+            localStorage.setItem("uid", user.uid);
+            setIsLogin(user);
+            navigate("/");
+          }
         })
         .catch((ex) => {
           generateNotification("error", "Error", ex.message);

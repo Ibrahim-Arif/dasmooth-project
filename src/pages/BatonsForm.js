@@ -60,6 +60,7 @@ export default function BatonsForm() {
   const [budgetData, setBudgetData] = useState("Set a budget");
   const [postUpdateData, setPostUpdateData] = useState("");
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [filesList, setFilesList] = useState({
     text: "Attach a file (Optional)",
     filesList: [],
@@ -76,6 +77,7 @@ export default function BatonsForm() {
   const [isEditable, setIsEditable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isNewPost, setIsNewPost] = useState(true);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
 
   const flushData = () => {
     setActiveComponent(null);
@@ -124,6 +126,7 @@ export default function BatonsForm() {
         memberPostStatus: "received",
         createdOn: Date.now(),
         deletedOn: 0,
+        description: description,
       };
       console.log("new Post");
       // console.log(post);
@@ -161,6 +164,7 @@ export default function BatonsForm() {
         deadline: dateData,
         budget: budgetData,
         title: title,
+        description: description,
         memberName: teamMemberData.text,
         updateOn: Date.now(),
       };
@@ -202,8 +206,23 @@ export default function BatonsForm() {
     }
   };
 
-  const [uploadedFiles, setUploadedFiles] = useState([]);
-
+  // This is to hide the form on fill
+  const resetFormView = () => {
+    setActiveTitle("");
+    setActiveComponent(null);
+  };
+  useEffect(() => {
+    resetFormView();
+    if (
+      dateData != "Set a deadline" &&
+      budgetData != "Set a budget" &&
+      teamMemberData != "Select a team member" &&
+      title != "" &&
+      description != ""
+    )
+      setDisabled(false);
+    else setDisabled(true);
+  }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
   // useEffect to update filesList if uploadfiles changes
   useEffect(
     () =>
@@ -252,6 +271,7 @@ export default function BatonsForm() {
       // console.log(imageList)
       // setFilesList({ filesList: filter.images });
       // ! here must deal b64 issue
+      setDescription(filter.description);
       setDateData(filter.deadline);
       setPostUpdateData(filter.post);
       setTeamMemberData({
@@ -271,23 +291,6 @@ export default function BatonsForm() {
       flushData();
     }
   }, [params]);
-
-  // This is to hide the form on fill
-  const resetFormView = () => {
-    setActiveTitle("");
-    setActiveComponent(null);
-  };
-  useEffect(() => {
-    resetFormView();
-    if (
-      dateData != "Set a deadline" &&
-      budgetData != "Set a budget" &&
-      teamMemberData != "Select a team member" &&
-      title != ""
-    )
-      setDisabled(false);
-    else setDisabled(true);
-  }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
 
   const handleDeleteClick = () => {
     let ret = window.confirm("Are you sure you want to delete this baton?");
@@ -414,23 +417,41 @@ export default function BatonsForm() {
               ).format("MMMM DD ,YYYY")}`}
             />
           )}
-          <h4 className="mt-4">{title == "" ? "Add Title" : title}</h4>
+          {/* <h4 className="mt-4">{title == "" ? "Add Title" : title}</h4> */}
+          <Input
+            size="large"
+            placeholder="Add Title"
+            className="me-3 mt-4 input-placeholder"
+            onChange={(e) => setTitle(e.currentTarget.value)}
+            style={{ border: "none", backgroundColor: "transparent" }}
+            value={title}
+            // required={true}
+            // status={title == "" && "error"}
+            disabled={
+              fetchedDataObject.authorPostStatus != "pending" &&
+              fetchedDataObject.authorPostStatus != undefined
+                ? true
+                : false
+            }
+            // prefix="Please input baton title!"
+          />
 
           {/* FormItems */}
           <div className="col-12">
             {!isDeleted && (
               <Form.Item
-                validateStatus={title == "" && "error"}
-                help={title != "" ? null : "This field is required"}
+                // validateStatus={title == "" && "error"}
+                // help={title != "" ? null : "This field is required"}
+                className="mt-3"
               >
-                {console.log(fetchedDataObject.authorPostStatus)}
+                {/* {console.log(fetchedDataObject.authorPostStatus)} */}
                 <Input
                   size="large"
-                  placeholder="Add Text"
-                  className="me-3"
-                  onChange={(e) => setTitle(e.currentTarget.value)}
-                  value={title}
-                  status={title == "" && "error"}
+                  placeholder="Add Description"
+                  className="me-3 input-placeholder"
+                  onChange={(e) => setDescription(e.currentTarget.value)}
+                  value={description}
+                  // status={title == "" && "error"}
                   disabled={
                     fetchedDataObject.authorPostStatus != "pending" &&
                     fetchedDataObject.authorPostStatus != undefined

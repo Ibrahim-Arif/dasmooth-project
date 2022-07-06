@@ -140,3 +140,25 @@ input:-webkit-autofill:focus {
   position: relative;
   overflow: hidden;
 }
+
+.input-placeholder::-webkit-input-placeholder {
+  /* WebKit browsers */
+  color: black !important;
+}
+.input-placeholder:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: black !important;
+}
+.input-placeholder::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: black !important;
+}
+.input-placeholder:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+  color: black !important;
+}
+
+.ant-input[disabled] {
+  color: black !important;
+  background-color: transparent !important;
+}

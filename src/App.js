@@ -15,6 +15,7 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/js/bootstrap";
 import "antd/dist/antd.min.css";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { initializeFirestore } from "firebase/firestore";
 import {
   handleGetMyBatons,
   handleGetNotifications,
@@ -22,10 +23,11 @@ import {
   handleGetTeamMembers,
 } from "./services";
 import { batonsList } from "./utilities/batonsList";
-import { generateNotification } from "./utilities/generateNotification";
 
-initializeApp(firebaseConfig);
-const auth = getAuth();
+const app = initializeApp(firebaseConfig);
+const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+});
 
 const App = () => {
   const [isLogin, setIsLogin] = useState(false);
@@ -33,10 +35,13 @@ const App = () => {
   const [permanentData, setPermanentData] = useState([]);
   const [batonsData, setBatonsData] = useState([]);
   const [teamMembers, setTeamMembers] = useState([]);
+  const [photoURL, setPhotoURL] = useState("");
   const [batons, setBatons] = useState({ ...batonsList });
   const [myBatons, setMyBatons] = useState([]);
   const [otherBatons, setOtherBatons] = useState([]);
   const [notifications, setNotifications] = useState([]);
+
+  const auth = getAuth(app);
 
   const userContextValues = {
     isLogin,
@@ -51,24 +56,27 @@ const App = () => {
     setTeamMembers,
     notifications,
     setNotifications,
+    photoURL,
+    setPhotoURL,
   };
 
   onAuthStateChanged(auth, (user) => {
     const uid = localStorage.getItem("uid");
-    if (uid != null && user.uid == uid
-      //  && user.emailVerified
-       ) {
+    if (uid != null && user.uid == uid && user.emailVerified) {
+      // console.log("App.js Line 63:", user.photoURL);
+
       setIsLogin(user);
-    } else {
     }
   });
 
   useEffect(() => {
     const uid = localStorage.getItem("uid");
-    console.log("Login UID:", isLogin.uid);
-    console.log("Local UID", uid);
-    console.log(isLogin);
+    // console.log("Login UID:", isLogin.uid);
+    // console.log("Local UID", uid);
+    //
+    console.log("App.js Line 73:", isLogin.photoURL);
     if (isLogin) {
+      setPhotoURL(isLogin.photoURL);
       handleGetTeamMembers(isLogin.uid, setTeamMembers);
       handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
       handleGetOtherBatons(isLogin.uid, otherBatons, setOtherBatons);
@@ -96,7 +104,7 @@ const App = () => {
       }
     }, []);
     setPermanentData(filteredArr);
-    console.log("Permanent:", permanentData);
+    // console.log("Permanent:", permanentData);
   }, [myBatons, otherBatons]);
 
   useEffect(() => {

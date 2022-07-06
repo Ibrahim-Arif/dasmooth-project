@@ -27,14 +27,14 @@ export default function DashboardMenu() {
   // useCheckSignIn();
 
   const [collapsed, setCollapsed] = useState(true);
-  const [profileImage, setProfileImage] = useState();
+
   const [renderSearchBar, setRenderSearchBar] = useState(false);
   const [search, setSearch] = useState("");
   const {
     setIsLogin,
     isLogin,
     setBatonsData,
-    batonsData,
+    photoURL,
     permanentData,
     notifications,
   } = useUser();
@@ -42,10 +42,6 @@ export default function DashboardMenu() {
   const [siderW, setSiderW] = useState("200px");
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    setProfileImage(isLogin.photoURL);
-  }, [isLogin]);
 
   useEffect(() => {
     document.getElementById("body").style.backgroundColor = "white";
@@ -202,8 +198,16 @@ export default function DashboardMenu() {
           width={siderW}
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
-            {console.log(isLogin.photoURL)}
-            <Avatar src={isLogin.photoURL} size={70} />
+            {/* {console.log(isLogin.photoURL)} */}
+            {photoURL == null || photoURL == "" ? (
+              <Avatar style={{ backgroundColor: colors.teal100 }} size={70}>
+                {isLogin.displayName != null
+                  ? isLogin.displayName.substring(0, 2).toUpperCase()
+                  : isLogin.email.substring(0, 2).toUpperCase()}
+              </Avatar>
+            ) : (
+              <Avatar src={photoURL} size={70} />
+            )}
             <label style={{ fontWeight: "bold" }} className="mt-3">
               {isLogin.displayName != null
                 ? isLogin.displayName
