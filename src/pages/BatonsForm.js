@@ -277,7 +277,9 @@ export default function BatonsForm() {
       setTeamMemberData({
         text: filter.memberName,
         icon: (
-          <Avatar>{teamMemberData.text.substring(0, 2).toUpperCase()}</Avatar>
+          <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+            {filter.memberName.substring(0, 2).toUpperCase()}
+          </Avatar>
         ),
         // image: ,
       });
@@ -421,7 +423,7 @@ export default function BatonsForm() {
           <Input
             size="large"
             placeholder="Add Title"
-            className="me-3 mt-4 input-placeholder"
+            className={`me-3 ${!isDeleted && "mt-4"} input-placeholder`}
             onChange={(e) => setTitle(e.currentTarget.value)}
             style={{ border: "none", backgroundColor: "transparent" }}
             value={title}
@@ -438,32 +440,29 @@ export default function BatonsForm() {
 
           {/* FormItems */}
           <div className="col-12">
-            {!isDeleted && (
-              <Form.Item
-                // validateStatus={title == "" && "error"}
-                // help={title != "" ? null : "This field is required"}
-                className="mt-3"
-              >
-                {/* {console.log(fetchedDataObject.authorPostStatus)} */}
-                <Input
-                  size="large"
-                  placeholder="Add Description"
-                  className="me-3 input-placeholder"
-                  onChange={(e) => setDescription(e.currentTarget.value)}
-                  value={description}
-                  // status={title == "" && "error"}
-                  disabled={
-                    fetchedDataObject.authorPostStatus != "pending" &&
-                    fetchedDataObject.authorPostStatus != undefined
-                      ? true
-                      : false
-                  }
-                  // prefix="Please input baton title!"
-                />
-              </Form.Item>
-
-              // <label>error</label>
-            )}
+            <Form.Item
+              // validateStatus={title == "" && "error"}
+              // help={title != "" ? null : "This field is required"}
+              className="mt-3"
+            >
+              {/* {console.log(fetchedDataObject.authorPostStatus)} */}
+              <Input
+                size="large"
+                placeholder="Add Description"
+                className="me-3 input-placeholder"
+                onChange={(e) => setDescription(e.currentTarget.value)}
+                value={description}
+                // status={title == "" && "error"}
+                disabled={
+                  fetchedDataObject.authorPostStatus != "pending" &&
+                  fetchedDataObject.authorPostStatus != undefined
+                    ? true
+                    : false
+                }
+                // prefix="Please input baton title!"
+              />
+            </Form.Item>
+            {/* // <label>error</label> */}
           </div>
           <Container>
             <Selectable

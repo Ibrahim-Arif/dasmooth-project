@@ -228,7 +228,9 @@ export default function MemberSelection({
                   setCurrentItem({
                     text: e.name,
                     image: (
-                      <Avatar>{e.name.substring(0, 2).toUpperCase()}</Avatar>
+                      <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                        {e.name.substring(0, 2).toUpperCase()}
+                      </Avatar>
                     ),
                     id: e.receiverId,
                     status: e.status,

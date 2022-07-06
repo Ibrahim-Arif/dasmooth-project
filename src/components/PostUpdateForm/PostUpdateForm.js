@@ -18,7 +18,7 @@ export default function PostUpdateForm({
 }) {
   const [value, setValue] = useState("");
   const [postData, setPostData] = useState([]);
-  const { isLogin } = useUser();
+  const { isLogin, photoURL } = useUser();
 
   const onChange = (e) => {
     // console.log("changed", e.target.value);
@@ -41,12 +41,18 @@ export default function PostUpdateForm({
         className="col-12"
         onClick={() => {
           if (batonId != null) {
+            let url =
+              photoURL == null ||
+              photoURL == undefined ||
+              photoURL.includes("blob")
+                ? ""
+                : photoURL;
             let data = {
               batonId,
               text: value,
               timestamp: Date.now(),
-              username,
-              photoURL: isLogin.photoURL,
+              username: isLogin.email,
+              photoURL: url,
             };
             handleAddPostUpdate(data)
               .then(() => {
