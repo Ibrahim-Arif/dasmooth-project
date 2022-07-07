@@ -199,6 +199,7 @@ export default function DashboardMenu() {
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
             {/* {console.log(isLogin.photoURL)} */}
+            {/* [2022-07-07] if we do not have a photoURL then we show the name initials */}
             {photoURL == null || photoURL == "" ? (
               <Avatar style={{ backgroundColor: colors.teal100 }} size={70}>
                 {isLogin.displayName != null
@@ -208,6 +209,8 @@ export default function DashboardMenu() {
             ) : (
               <Avatar src={photoURL} size={70} />
             )}
+
+            {/* [2022-07-07] if we do not have a username then we show the email else we show the username  */}
             <label style={{ fontWeight: "bold" }} className="mt-3">
               {isLogin.displayName != null
                 ? isLogin.displayName
