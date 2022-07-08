@@ -144,7 +144,8 @@ export default function DashboardMenu() {
 
         {/* Search Bar */}
         <Container className="d-flex justify-content-end justify-content-lg-start mx-0">
-          {renderSearchBar && location.pathname == "/main" && (
+          {renderSearchBar && (
+            // && location.pathname == "/main"
             <SearchBar
               size="large"
               placeholder="Search by name, email or team member"
@@ -155,27 +156,27 @@ export default function DashboardMenu() {
               }}
             />
           )}
-          {location.pathname == "/main" && (
-            <>
-              <Button
-                shape="circle"
-                className="d-inline-block d-lg-none ms-3 ms-lg-0"
-                icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
-                size="large"
-                color={colors.teal100}
-                onClick={handleSearchBarShow}
-              />
-              <SearchBar
-                className="normal-input d-none d-lg-flex w-50"
-                size="large"
-                placeholder="Search by name, email or team member"
-                prefix={<SearchOutlined />}
-                onChange={(e) => {
-                  setSearch(e.currentTarget.value);
-                }}
-              />
-            </>
-          )}
+          {/* {location.pathname == "/main" && ( */}
+          <>
+            <Button
+              shape="circle"
+              className="d-inline-block d-lg-none ms-3 ms-lg-0"
+              icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
+              size="large"
+              color={colors.teal100}
+              onClick={handleSearchBarShow}
+            />
+            <SearchBar
+              className="normal-input d-none d-lg-flex w-50"
+              size="large"
+              placeholder="Search by name, email or team member"
+              prefix={<SearchOutlined />}
+              onChange={(e) => {
+                setSearch(e.currentTarget.value);
+              }}
+            />
+          </>
+          {/* )} */}
         </Container>
       </DashboardHeader>
 

@@ -39,11 +39,11 @@ export default function Selectable({
         onItemPress();
       }}
     >
-      <div className="d-flex flex-row justify-content-between">
+      <div className="d-flex flex-row justify-content-between px-0">
         <Container
           className={`${
-            status ? "col-8" : "col-12"
-          } d-flex flex-row align-items-center`}
+            status ? "col-7" : "col-12"
+          } d-flex flex-row align-items-center px-1 px-md-3`}
         >
           {image ? image : icon}
           <div className="me-3"></div>
