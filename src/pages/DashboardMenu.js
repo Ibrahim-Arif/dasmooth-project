@@ -40,6 +40,7 @@ export default function DashboardMenu() {
   } = useUser();
 
   const [siderW, setSiderW] = useState("200px");
+  const [selectedKey, setSelectedKey] = useState("dashboard");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -74,9 +75,10 @@ export default function DashboardMenu() {
 
   const handleItemClick = ({ key }) => {
     // console.log(key);
-
+    setSelectedKey(key);
     switch (key) {
       case "logout":
+        // setSelectedKey("logout");
         setBatonsData([]);
         getAuth().signOut();
         window.localStorage.clear();
@@ -84,18 +86,23 @@ export default function DashboardMenu() {
         navigate("/");
         break;
       case "delete":
+        // setSelectedKey("delete");
         navigate("deleteBaton");
         break;
       case "dashboard":
+        // setSelectedKey("dasboard");
         navigate("main");
         break;
       case "notifications":
+        // setSelectedKey("notifications");
         navigate("notifications");
         break;
       case "profile":
+        // setSelectedKey("profile");
         navigate("profileSettings");
         break;
       case "team":
+        // setSelectedKey("team");
         navigate("teamMembers");
         break;
     }
@@ -154,6 +161,13 @@ export default function DashboardMenu() {
               onChange={(e) => {
                 setSearch(e.currentTarget.value);
               }}
+              onFocus={() => {
+                if (location.pathname != "/main") {
+                  setSelectedKey("dashboard");
+                  // console.log(selectedKey, location.pathname);
+                  navigate("/main");
+                }
+              }}
             />
           )}
           {/* {location.pathname == "/main" && ( */}
@@ -173,6 +187,13 @@ export default function DashboardMenu() {
               prefix={<SearchOutlined />}
               onChange={(e) => {
                 setSearch(e.currentTarget.value);
+              }}
+              onFocus={() => {
+                if (location.pathname != "/main") {
+                  setSelectedKey("dashboard");
+
+                  navigate("/main");
+                }
               }}
             />
           </>
@@ -227,10 +248,12 @@ export default function DashboardMenu() {
               fontWeight: "bold",
             }}
             defaultSelectedKeys={["dashboard"]}
+            selectedKeys={[selectedKey]}
             mode="inline"
             items={menuItems(notifications.length)}
             onClick={handleItemClick}
           ></Menu>
+          {/* {console.log(selectedKey)} */}
         </Sider>
         {/* {console.log(notifications.length)} */}
         {/* Nested Routing */}
