@@ -54,6 +54,7 @@ export default function MemberSelection({
         //   [user.uid]: values,
         //   ...teamMembers,
         // });
+        console.log("Adding member to team");
         handleAddTeamMemberByInvite({
           receiverId: user.uid,
           receiverEmail: user.email,
@@ -78,6 +79,7 @@ export default function MemberSelection({
       })
       .catch((ex) => {
         if (ex.message == "auth/email-already-in-use") {
+          console.log("email-already-in-us:Adding member to team");
           handleAddSystemUserToMember({
             email: values.email,
             inviteBy: isLogin.uid,
@@ -97,9 +99,7 @@ export default function MemberSelection({
         }
       });
   };
-  const handleChange = (values, allValues) => {
-    // console.log(values, allValues);
-  };
+
   useEffect(() => {
     let data = teamMembers;
 

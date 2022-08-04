@@ -16,7 +16,7 @@ export default function DeleteBaton() {
   }, [batonsData]);
 
   return (
-    <Container className="col-12 col-lg-8 mt-5 px-5">
+    <Container className="col-12 col-lg-8 m-0 mt-5">
       {/* <Container className="col-10 mt-5"> */}
       <Collapseable
         title={`Deleted Batons`}

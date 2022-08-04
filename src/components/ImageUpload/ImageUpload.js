@@ -99,14 +99,12 @@ export default function ImageUpload({
     if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
       setItemSelected({
         filesList: imageData,
-        text: "Attach a file (Optional)",
+        text: "Attach a file",
       });
     else
       setItemSelected({
         filesList: imageData,
-        text: `${
-          uploadedFiles.length + imageData.filesList.length
-        } files attached`,
+        text: `${uploadedFiles.length} files attached`,
       });
   }, [imageData, uploadedFiles]);
 
@@ -125,46 +123,43 @@ export default function ImageUpload({
         <p className="ant-upload-hint">BROWSE OR SELECT FILES</p>
       </Dragger>
 
-      <div className="mt-5">
-        <h6>
-          {imageData.filesList.length == undefined
-            ? uploadedFiles.length
-            : uploadedFiles.length + imageData.filesList.length}{" "}
-          files attached
-        </h6>
-      </div>
-      {uploadedFiles.length > 0 && (
-        <List
-          itemLayout="horizontal"
-          dataSource={uploadedFiles}
-          renderItem={(item) => (
-            <DownloadDiv
-              className="px-3"
-              style={{ backgroundColor: colors.cgLight95 }}
-              onClick={() => downloadBase64File(item.image, item.fileName)}
-            >
-              <List.Item>
-                <List.Item.Meta
-                  avatar={<FileOutlined />}
-                  title={<label>{item.fileName}</label>}
-                />
-                <DownloadOutlined />
-              </List.Item>
-            </DownloadDiv>
-          )}
-        />
-      )}
       {uploading == true && uploading != "b64Converted" ? (
         <Loading size="large" />
       ) : (
-        <TealButton
-          onClick={handleUpload}
-          disabled={imageData.length === 0 || uploading == "b64Converted"}
-          loading={uploading}
-          style={{ marginTop: 16 }}
-        >
-          {uploading == "b64Converted" ? "Uploaded " : "Upload"}
-        </TealButton>
+        <>
+          <div className="mt-5">
+            <h6>{uploadedFiles.length} files attached</h6>
+          </div>
+          {uploadedFiles.length > 0 && (
+            <List
+              itemLayout="horizontal"
+              dataSource={uploadedFiles}
+              renderItem={(item) => (
+                <DownloadDiv
+                  className="px-3"
+                  style={{ backgroundColor: colors.cgLight95 }}
+                  onClick={() => downloadBase64File(item.image, item.fileName)}
+                >
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<FileOutlined />}
+                      title={<label>{item.fileName}</label>}
+                    />
+                    <DownloadOutlined />
+                  </List.Item>
+                </DownloadDiv>
+              )}
+            />
+          )}
+          <TealButton
+            onClick={handleUpload}
+            disabled={imageData.length === 0 || uploading == "b64Converted"}
+            loading={uploading}
+            style={{ marginTop: 16 }}
+          >
+            {uploading == "b64Converted" ? "Uploaded " : "Upload"}
+          </TealButton>
+        </>
       )}
     </>
   );

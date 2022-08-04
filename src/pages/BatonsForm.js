@@ -62,7 +62,7 @@ export default function BatonsForm() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [filesList, setFilesList] = useState({
-    text: "Attach a file (Optional)",
+    text: "Attach a file",
     filesList: [],
   });
 
@@ -94,7 +94,7 @@ export default function BatonsForm() {
     setBudgetData("Set a budget");
     setPostUpdateData("");
     setFilesList({
-      text: "Attach a file (Optional)",
+      text: "Attach a file",
       filesList: [],
     });
     // setFilesListB64([]);
@@ -260,18 +260,9 @@ export default function BatonsForm() {
       // "editable:", isEditable;
       setFetchedDataObject(filter);
       setTitle(filter.title);
-      setBudgetData(filter.budget);
-      // let imageList = filter.images.map(async (e,index)=>{
-      //   const res = await dataUrlToFile(e,index)
-      //   return res
-
-      //   }
-      // )
-      // imageList  = imageList.map(e=>e.then(res=>res))
-      // console.log(imageList)
-      // setFilesList({ filesList: filter.images });
-      // ! here must deal b64 issue
       setDescription(filter.description);
+
+      setBudgetData(filter.budget);
       setDateData(filter.deadline);
       setPostUpdateData(filter.post);
       setTeamMemberData({
@@ -538,15 +529,14 @@ export default function BatonsForm() {
               icon={<FileAddOutlined />}
               text={filesList.text}
               isItemActive={
-                activeItemIndex == 4 ||
-                filesList.text != "Attach a file (Optional)"
+                activeItemIndex == 4 || filesList.text != "Attach a file"
                   ? true
                   : false
               }
               onItemPress={() =>
                 !isDeleted &&
                 handleFormItemRender(
-                  "Attach a file (Optional)",
+                  "Attach a file",
                   <ImageUpload
                     boxColor={colors.teal100}
                     itemSelected={filesList}
