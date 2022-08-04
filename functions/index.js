@@ -1,9 +1,9 @@
 const functions = require("firebase-functions");
-var request = require("request");
+const request = require("request");
 
 const SENDGRID_API_KEY = "Your API Key";
 
-exports.sendEmail = functions.https.onRequest((request, response) => {
+exports.sendEmail = functions.https.onRequest((req, res) => {
   var headers = {
     Authorization: `Bearer ${SENDGRID_API_KEY}`,
     "Content-Type": "application/json",
