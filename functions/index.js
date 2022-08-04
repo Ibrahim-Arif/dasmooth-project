@@ -31,10 +31,10 @@ exports.sendEmail = functions.https.onRequest((req, res) => {
   request(options, (error, response, body) => {
     if (!error && response.statusCode == 200) {
       console.log(body);
-      response.send({ message: "Email sent!", error: "none" });
+      res.send({ message: "Email sent!", error: "none" });
     } else {
       console.log(error);
-      response.send({ message: "Email not sent!", error: error });
+      res.send({ message: "Email not sent!", error: error });
     }
   });
 });
