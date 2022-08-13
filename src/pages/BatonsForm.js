@@ -83,7 +83,7 @@ export default function BatonsForm() {
     setActiveComponent(null);
     setActiveItemIndex(-1);
     // setID(null);
-    setTitle("");
+    // setTitle("");
     setActiveTitle("");
     setTeamMemberData({
       text: "Select a team member",
@@ -554,14 +554,14 @@ export default function BatonsForm() {
             />
             <Selectable
               icon={<FileTextOutlined />}
-              text="Post an Update (Optional)"
+              text="Post an Update"
               isItemActive={
                 activeItemIndex == 5 || postUpdateData != "" ? true : false
               }
               onItemPress={() =>
                 !isDeleted &&
                 handleFormItemRender(
-                  "Post an Update (Optional)",
+                  "Post an Update",
                   <PostUpdateForm
                     itemSelected={postUpdateData}
                     setItemSelected={setPostUpdateData}

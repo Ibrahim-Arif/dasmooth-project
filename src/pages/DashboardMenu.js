@@ -217,7 +217,7 @@ export default function DashboardMenu() {
           trigger={null}
           onCollapse={onCollapse}
           style={{ backgroundColor: colors.tealLight90 }}
-          width={siderW}
+          width={200}
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
             {/* {console.log(isLogin.photoURL)} */}
