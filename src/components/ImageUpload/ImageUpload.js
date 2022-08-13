@@ -13,8 +13,6 @@ import { colors } from "../../utilities/colors";
 import styled from "styled-components";
 
 const { Dragger } = Upload;
-// https://prismasoft.medium.com/multiple-files-upload-to-firebase-in-react-using-ant-design-65ba671d9af5
-// use above link to for firebase file uploads
 
 export default function ImageUpload({
   boxColor,
@@ -77,6 +75,7 @@ export default function ImageUpload({
             clickOk();
           })
           .catch((ex) => {
+            console.log(ex);
             generateNotification("error", "Failed to upload files!");
             setUploading(false);
           });
@@ -84,6 +83,8 @@ export default function ImageUpload({
 
       reader.readAsDataURL(imageData.filesList[i]);
     }
+
+    setImageData({ filesList: [] });
   };
 
   function downloadBase64File(base64Data, fileName) {
@@ -104,7 +105,9 @@ export default function ImageUpload({
     else
       setItemSelected({
         filesList: imageData,
-        text: `${uploadedFiles.length} files attached`,
+        text: `${
+          imageData.filesList.length + uploadedFiles.length
+        } files attached`,
       });
   }, [imageData, uploadedFiles]);
 
@@ -114,7 +117,7 @@ export default function ImageUpload({
 
   return (
     <>
-      <Dragger {...props} defaultFileList={imageData.filesList} value>
+      <Dragger {...props} defaultFileList={imageData.filesList}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined style={{ color: boxColor }} />
         </p>
@@ -128,7 +131,9 @@ export default function ImageUpload({
       ) : (
         <>
           <div className="mt-5">
-            <h6>{uploadedFiles.length} files attached</h6>
+            <h6>
+              {uploadedFiles.length + imageData.filesList.length} files attached
+            </h6>
           </div>
           {uploadedFiles.length > 0 && (
             <List
