@@ -22,4 +22,7 @@ export const colors = {
   cgLight95: "#F4F5F6",
   tealLight95: "#F2F9F8",
   htmlColor: "#161c1f",
+  mosque: "#00685E",
+  disabled: "#879095",
+  cyprus: "#0E4540",
 };

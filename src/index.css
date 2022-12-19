@@ -29,6 +29,17 @@ h4 {
   font-family: "Heebo", sans-serif;
 }
 
+.ant-menu-item {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 20px !important;
+  height: 60px !important;
+  background-color: #f2f9f8 !important;
+}
+.ant-menu-title-content {
+  color: #00685e !important;
+  font-size: 16px !important;
+}
 .ant-menu-light .ant-menu-item-active,
 .ant-menu-light .ant-menu-item:hover,
 .ant-menu-light .ant-menu-submenu-active,
@@ -38,6 +49,11 @@ h4 {
 .ant-menu-item-selected a:hover,
 .ant-menu-light .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open {
   color: #009688 !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  padding-left: 20px !important;
+  height: 60px !important;
+  /* background-color: #ffffff !important; */
 }
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
   background-color: #ffffff !important;
@@ -72,32 +88,39 @@ h5 {
   display: none !important;
 }
 
-.normal-input::-webkit-input-placeholder {
+#searchBar {
+  color: #37474f;
+  font-size: 16px;
+  font-family: heebo;
+}
+#searchBar::-webkit-input-placeholder {
   /* WebKit browsers */
-  color: white;
+  color: #37474f;
 }
-.normal-input:-moz-placeholder {
+#searchBar:-moz-placeholder {
   /* Mozilla Firefox 4 to 18 */
-  color: white;
+  color: #37474f;
 }
-.normal-input::-moz-placeholder {
+#searchBar::-moz-placeholder {
   /* Mozilla Firefox 19+ */
-  color: white;
+  color: #37474f;
 }
-.normal-input:-ms-input-placeholder {
+#searchBar:-ms-input-placeholder {
   /* Internet Explorer 10+ */
-  color: white;
+  color: #37474f;
 }
-.normal-input:-webkit-autofill {
+#searchBar:-webkit-autofill {
   box-shadow: 0 0 0px 1000px white inset !important;
   -webkit-text-fill-color: black !important;
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  color: #37474f;
   /* transition: background-color 5000s ease-in-out 0s; */
 }
 .normal- input:-webkit-autofill:focus {
   box-shadow: 0 0 0px 1000px white inset !important;
   -webkit-text-fill-color: black !important;
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  color: #37474f;
   /* transition: background-color 5000s ease-in-out 0s; */
 }
 
@@ -169,3 +192,14 @@ input:-webkit-autofill:focus {
   color: black !important;
   background-color: transparent !important;
 }
+
+/* .ant-btn[disabled],
+.ant-btn[disabled]:active,
+.ant-btn[disabled]:focus,
+.ant-btn[disabled]:hover {
+  color: white !important;
+  border-color: #666666 ;
+  background: #879095 !important;
+  text-shadow: none;
+  box-shadow: none;
+} */

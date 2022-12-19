@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Layout, Menu, Input, Button, Avatar } from "antd";
-import { SearchOutlined, RightOutlined, BarsOutlined } from "@ant-design/icons";
-
+import {
+  SearchOutlined,
+  RightOutlined,
+  BarsOutlined,
+  EditFilled,
+} from "@ant-design/icons";
+import { Badge } from "antd";
 import { Container } from "react-bootstrap";
 import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
 import styledComponents from "styled-components";
@@ -25,6 +30,7 @@ const { Header, Sider } = Layout;
 
 export default function DashboardMenu() {
   // useCheckSignIn();
+  const sideBarBgColor = "#f2f9f8";
 
   const [collapsed, setCollapsed] = useState(true);
 
@@ -124,13 +130,14 @@ export default function DashboardMenu() {
     >
       <DashboardHeader
         bgcolor={colors.teal100}
-        className="d-flex flex-row align-items-center"
+        className="d-flex flex-row"
+        style={{ height: "fit-content" }}
       >
         {/* Search bar mobile */}
         {!renderSearchBar && (
           <Container
-            className="d-flex align-self-center justify-content-center justify-content-lg-start mx-0"
-            style={{ width: 250 }}
+            className="col-2 d-flex justify-content-center justify-content-lg-start mx-0 px-0"
+            style={{ width: "fit-content" }}
           >
             <div className="d-flex flex-row align-items-center">
               <Button
@@ -138,25 +145,42 @@ export default function DashboardMenu() {
                 size="large"
                 shape="circle"
                 icon={<BarsOutlined />}
-                className="d-block d-lg-none"
+                className="d-block d-lg-none ms-3"
                 onClick={() => setCollapsed(!collapsed)}
               ></Button>
 
-              <div className="ms-3">
-                <img src={logo} height="40px" />
-              </div>
+              <img
+                src={logo}
+                height="40px"
+                style={{
+                  marginLeft: "40px",
+                  marginRight: "70px",
+                  marginTop: "22px",
+                  marginBottom: "22px",
+                }}
+              />
             </div>
           </Container>
         )}
 
         {/* Search Bar */}
-        <Container className="d-flex justify-content-end justify-content-lg-start mx-0">
+        <Container className="col-lg-9 d-flex align-items-center justify-content-end justify-content-lg-start mx-0 px-0 my-3">
           {renderSearchBar && (
             // && location.pathname == "/main"
             <SearchBar
               size="large"
+              id="searchBar"
               placeholder="Search by name, email or team member"
-              prefix={<SearchOutlined />}
+              prefix={
+                <SearchOutlined
+                  style={{
+                    fontSize: "24px",
+                    color: "#5f6b72",
+                    marginLeft: "12px",
+                    marginRight: "8px",
+                  }}
+                />
+              }
               className="normal-input"
               onChange={(e) => {
                 setSearch(e.currentTarget.value);
@@ -171,20 +195,32 @@ export default function DashboardMenu() {
             />
           )}
           {/* {location.pathname == "/main" && ( */}
+
           <>
             <Button
               shape="circle"
-              className="d-inline-block d-lg-none ms-3 ms-lg-0"
+              className="d-inline-block d-lg-none mx-3 ms-lg-0"
               icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
               size="large"
               color={colors.teal100}
               onClick={handleSearchBarShow}
             />
+
             <SearchBar
-              className="normal-input d-none d-lg-flex w-50"
+              className="d-none d-lg-flex w-50"
+              id="searchBar"
               size="large"
               placeholder="Search by name, email or team member"
-              prefix={<SearchOutlined />}
+              prefix={
+                <SearchOutlined
+                  style={{
+                    fontSize: "24px",
+                    color: "#5f6b72",
+                    marginLeft: "12px",
+                    marginRight: "8px",
+                  }}
+                />
+              }
               onChange={(e) => {
                 setSearch(e.currentTarget.value);
               }}
@@ -216,24 +252,58 @@ export default function DashboardMenu() {
           collapsedWidth="0"
           trigger={null}
           onCollapse={onCollapse}
-          style={{ backgroundColor: colors.tealLight90 }}
+          style={{
+            //  backgroundColor: colors.tealLight90
+            backgroundColor: sideBarBgColor,
+          }}
           width={200}
         >
           <Container className="d-flex flex-column justify-content-center align-items-center p-4">
             {/* {console.log(isLogin.photoURL)} */}
             {/* [2022-07-07] if we do not have a photoURL then we show the name initials */}
             {photoURL == null || photoURL == "" ? (
-              <Avatar style={{ backgroundColor: colors.teal100 }} size={70}>
+              <Avatar style={{ backgroundColor: colors.teal100 }} size={64}>
                 {isLogin.displayName != null
                   ? isLogin.displayName.substring(0, 2).toUpperCase()
                   : isLogin.email.substring(0, 2).toUpperCase()}
               </Avatar>
             ) : (
-              <Avatar src={photoURL} size={70} />
+              <div style={{ position: "relative" }}>
+                <Avatar src={photoURL} size={64} />
+
+                <Button
+                  type="default"
+                  size="small"
+                  shape="circle"
+                  icon={
+                    <EditFilled
+                      style={{
+                        color: colors.teal100,
+                      }}
+                    />
+                  }
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    backgroundColor: "white",
+                    border: "none",
+                  }}
+                  onClick={() => navigate("profileSettings")}
+                />
+              </div>
             )}
 
             {/* [2022-07-07] if we do not have a username then we show the email else we show the username  */}
-            <label style={{ fontWeight: "bold" }} className="mt-3">
+            <label
+              style={{
+                fontWeight: "normal",
+                color: "#37474f",
+                fontSize: "16px",
+                fontFamily: "heebo",
+              }}
+              className="mt-3"
+            >
               {isLogin.displayName != null
                 ? isLogin.displayName
                 : isLogin.email}
@@ -244,15 +314,51 @@ export default function DashboardMenu() {
             theme="light"
             style={{
               color: colors.teal100,
-              backgroundColor: colors.tealLight90,
+              // backgroundColor: colors.tealLight90,
+              backgroundColor: sideBarBgColor,
               fontWeight: "bold",
             }}
             defaultSelectedKeys={["dashboard"]}
             selectedKeys={[selectedKey]}
             mode="inline"
-            items={menuItems(notifications.length)}
+            // items={menuItems(notifications.length)}
             onClick={handleItemClick}
-          ></Menu>
+          >
+            {menuItems().map((item) => {
+              return (
+                <Menu.Item
+                  key={item.key}
+                  icon={item.icon}
+                  style={{
+                    color: colors.teal100,
+                    backgroundColor: sideBarBgColor,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {item.label}
+
+                  {item.key == "notifications" && notifications.length > 0 && (
+                    <Badge
+                      count={notifications.length}
+                      style={{
+                        backgroundColor: "#00685e",
+                        color: "white",
+                        fontWeight: "bold",
+                        marginLeft: "18px",
+                        width: "24px",
+                        height: "24px",
+                        borderRadius: "50%",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        display: "flex",
+                      }}
+                    />
+                  )}
+                </Menu.Item>
+              );
+            })}
+          </Menu>
+
           {/* {console.log(selectedKey)} */}
         </Sider>
         {/* {console.log(notifications.length)} */}

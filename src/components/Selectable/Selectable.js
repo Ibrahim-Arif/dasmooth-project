@@ -14,13 +14,35 @@ export default function Selectable({
   status = null,
   statusColor = colors.teal100,
 }) {
-  const passive = { color: colors.teal100, bgColor: colors.tealLight90 };
-  const active = { color: "white", bgColor: colors.tealDark30 };
+  const passive = {
+    // color: colors.teal100,
+    // bgColor: colors.tealLight90
+    color: "#00685e",
+    bgColor: "#f2f9f8",
+  };
+  const active = {
+    // color: "white",
+    //  bgColor: colors.tealDark30,
+    color: "#f2f9f8",
+    bgColor: "#00685e",
+  };
+
+  const disabled = {
+    color: "#99999",
+    bgColor: "#e2e2e2",
+  };
   const [activeColor, setActiveColor] = useState(passive);
   const [isActive, setIsActive] = useState(false);
 
   useEffect(() => setIsActive(isItemActive), [isItemActive]);
+
   useEffect(
+    // () =>
+    //   customColor
+    //     ? setActiveColor(customColor)
+    //     : isItemActive
+    //     ? setActiveColor(active)
+    //     : setActiveColor(passive),
     () =>
       customColor
         ? setActiveColor(customColor)
@@ -34,6 +56,9 @@ export default function Selectable({
       className={`row d-flex flex-row justify-content-center justify-content-md-start align-items-center py-2 mt-3`}
       color={activeColor.color}
       bgcolor={activeColor.bgColor}
+      bordercolor={active.bgColor}
+      hoverbgcolor={active.bgColor}
+      hovercolor={active.color}
       onClick={() => {
         setIsActive(!isActive);
         onItemPress();
@@ -64,12 +89,23 @@ export default function Selectable({
 const CustomButton = styledComponents.div`
     color: ${({ color }) => color};
     background-color:  ${({ bgcolor }) => bgcolor};
+    min-height: 44px;
+    min-width: 400px;
     border-radius: 5px;
-    border: 1px solid #d9d9d9;
-    box-shadow: 0 2px 0 rgb(0 0 0 / 2%);
+    border: 1px solid  ${({ bordercolor }) => bordercolor};
+    box-shadow: 0px 2px 3px 0px rgb(0 0 0 / 0.25);
     font-size: 18px;
+    transition: all 0.3s ease-in-out;
     :hover{
         cursor: pointer;
+        background-color: ${({ hoverbgcolor }) => hoverbgcolor};
+        color: ${({ hovercolor }) => hovercolor};
+    }
+    :active{
+        cursor: pointer;
+        background-color: ${({ hoverbgcolor }) => hoverbgcolor};
+        color: ${({ hovercolor }) => hovercolor};
+        box-shadow: inset 0px 4px 6px 0px rgb(0 0 0 / 0.4);
     }
     @media screen and (max-width: 360px) {
           font-size: calc(13px + 1vw) !important;

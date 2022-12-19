@@ -101,16 +101,28 @@ const CustomCollapse = styledComponents(Collapse)`
 `;
 const PanelItem = styledComponents.div`
     border-left: 5px solid ${({ bordercolor }) => bordercolor};
+    border-color: ${({ bordercolor }) => bordercolor};
     background-color: white;
-    border-radius: 5px;
+    // border-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    outline-color: ${({ bordercolor }) => bordercolor};
+
     min-height: 50px;
     font-weight: bold;
     transition: 0.4s;
-    box-shadow: 0px 4px 0px 0px rgba(122,122,122,0.86);
-    -webkit-box-shadow: 0px 4px 0px 0px rgba(122,122,122,0.86);
-    -moz-box-shadow: 0px 4px 0px 0px rgba(122,122,122,0.86);
+    box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.25);
+    -webkit-box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.25);
+    -moz-box-shadow: 0px 2px 0px 0px rgba(0,0,0,0.25);
     :hover{
         cursor: pointer;
+        box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.25);
+        -webkit-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.25);
+        -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.25);
+        outline: 1px solid ${({ bordercolor }) => bordercolor};
+        outline-offset: -1.5px;
+        border-color: ${({ bordercolor }) => bordercolor};
+        border-left: 5px solid ${({ bordercolor }) => bordercolor};
     }
     :active{
         box-shadow: none;
