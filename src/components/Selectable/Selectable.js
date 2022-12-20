@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
 import styledComponents from "styled-components";
-import { DeleteFilled } from "@ant-design/icons";
+import { DeleteFilled, EditFilled } from "@ant-design/icons";
 
 export default function Selectable({
   icon,
@@ -13,6 +13,7 @@ export default function Selectable({
   customColor = null,
   status = null,
   statusColor = colors.teal100,
+  isEditable = false,
 }) {
   const passive = {
     // color: colors.teal100,
@@ -67,7 +68,7 @@ export default function Selectable({
       <div className="d-flex flex-row justify-content-between px-0">
         <Container
           className={`${
-            status ? "col-7" : "col-12"
+            status ? "col-7" : isEditable && isItemActive ? "col-11" : "col-12"
           } d-flex flex-row align-items-center px-1 px-md-3`}
         >
           {image ? image : icon}
@@ -79,6 +80,11 @@ export default function Selectable({
             <label
               style={{ color: isActive ? activeColor.color : statusColor }}
             >{`${status.charAt(0).toUpperCase() + status.slice(1)}`}</label>
+          </Container>
+        )}
+        {isEditable && isItemActive && (
+          <Container className="col-1 d-flex justify-content-center align-items-center">
+            <EditFilled />
           </Container>
         )}
       </div>

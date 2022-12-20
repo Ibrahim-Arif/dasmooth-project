@@ -140,6 +140,7 @@ export default function BatonsForm() {
             message: "Baton Received",
             description: `You received a new Baton from ${post.authorName}`,
             type: "success",
+            batonType: "received",
             uid: post.memberId,
             date: Date.now(),
             batonId: docId,
@@ -258,6 +259,7 @@ export default function BatonsForm() {
       )
         setIsDeleted(true);
       // "editable:", isEditable;
+
       setFetchedDataObject(filter);
       setTitle(filter.title);
       setDescription(filter.description);
@@ -460,6 +462,7 @@ export default function BatonsForm() {
               icon={teamMemberData.icon}
               image={teamMemberData.image}
               text={teamMemberData.text}
+              isEditable={isEditable}
               onItemPress={() =>
                 isEditable &&
                 !isDeleted &&
@@ -484,6 +487,7 @@ export default function BatonsForm() {
             <Selectable
               icon={<CalendarOutlined />}
               text={dateData}
+              isEditable={isEditable}
               isItemActive={
                 activeItemIndex == 2 || dateData != "Set a deadline"
                   ? true
@@ -506,6 +510,7 @@ export default function BatonsForm() {
             <Selectable
               icon={<DollarOutlined />}
               text={budgetData}
+              isEditable={isEditable}
               isItemActive={
                 activeItemIndex == 3 || budgetData != "Set a budget"
                   ? true
@@ -527,6 +532,7 @@ export default function BatonsForm() {
             />
             <Selectable
               icon={<FileAddOutlined />}
+              isEditable={isEditable}
               text={filesList.text}
               isItemActive={
                 activeItemIndex == 4 || filesList.text != "Attach a file"
@@ -554,6 +560,7 @@ export default function BatonsForm() {
             />
             <Selectable
               icon={<FileTextOutlined />}
+              isEditable={isEditable}
               text="Post an Update"
               isItemActive={
                 activeItemIndex == 5 || postUpdateData != "" ? true : false

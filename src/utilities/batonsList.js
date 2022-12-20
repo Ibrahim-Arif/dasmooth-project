@@ -2,7 +2,7 @@ export const batonsList = {
   pending: {
     title: "Pending Batons",
     borderColor: "#5f6b72",
-    bgColor: null,
+    bgColor: "#fff",
     status: "pending",
   },
   passed: {

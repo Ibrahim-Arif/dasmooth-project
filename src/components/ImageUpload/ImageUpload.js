@@ -88,7 +88,8 @@ export default function ImageUpload({
   };
 
   function downloadBase64File(base64Data, fileName) {
-    const linkSource = `${base64Data}`;
+    const linkSource = `data:image/png;base64,${base64Data}`;
+
     const downloadLink = document.createElement("a");
     downloadLink.href = linkSource;
     downloadLink.download = fileName;
