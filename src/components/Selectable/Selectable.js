@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
 import styledComponents from "styled-components";
-import { DeleteFilled } from "@ant-design/icons";
+// import { DeleteFilled } from "@ant-design/icons";
 import { HiPencil } from "react-icons/hi";
 
 export default function Selectable({
@@ -55,7 +55,7 @@ export default function Selectable({
   );
   return (
     <CustomButton
-      className={`row d-flex flex-row justify-content-center justify-content-md-start align-items-center py-2 mt-3`}
+      className={`row d-flex flex-row justify-content-center justify-content-md-start align-items-center py-2 mt-3 px-2 px-sm-0`}
       color={activeColor.color}
       bgcolor={activeColor.bgColor}
       bordercolor={active.bgColor}
@@ -72,16 +72,18 @@ export default function Selectable({
             status ? "col-7" : isEditable && isItemActive ? "col-11" : "col-12"
           } d-flex flex-row align-items-center px-1 px-md-3 `}
         >
-          {image ? image : icon}
-          <div className="me-3"></div>
-          {text}
+          <AssetContainer>{image ? image : icon}</AssetContainer>
+          {/* <div></div> */}
+          <label className="ms-2" style={{ fontFamily: "heebo" }}>
+            {text}
+          </label>
         </Container>
 
         {status && (
           <Container>
-            <label
-              style={{ color: isActive ? activeColor.color : statusColor }}
-            >{`${status.charAt(0).toUpperCase() + status.slice(1)}`}</label>
+            <StatusText id="status-text" color={statusColor}>{`${
+              status.charAt(0).toUpperCase() + status.slice(1)
+            }`}</StatusText>
           </Container>
         )}
 
@@ -99,7 +101,8 @@ const CustomButton = styledComponents.div`
     color: ${({ color }) => color};
     background-color:  ${({ bgcolor }) => bgcolor};
     min-height: 44px;
-    min-width: 400px;
+    max-width: 100%;
+    margin: 0px;
     border-radius: 5px;
     border: 1px solid  ${({ bordercolor }) => bordercolor};
     box-shadow: 0px 2px 3px 0px rgb(0 0 0 / 0.25);
@@ -110,6 +113,7 @@ const CustomButton = styledComponents.div`
         background-color: ${({ hoverbgcolor }) => hoverbgcolor};
         color: ${({ hovercolor }) => hovercolor};
     }
+    :hover #status-text { color: #fff; }
     :active{
         cursor: pointer;
         background-color: ${({ hoverbgcolor }) => hoverbgcolor};
@@ -122,3 +126,19 @@ const CustomButton = styledComponents.div`
       }
         
 `;
+
+const StatusText = styledComponents.label`
+  color: ${({ color }) => color};
+  font-size: 14px;
+  font-family: heebo;
+  
+`;
+
+const AssetContainer = styledComponents.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  `;

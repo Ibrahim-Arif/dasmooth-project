@@ -457,7 +457,7 @@ export default function BatonsForm() {
             </Form.Item>
             {/* // <label>error</label> */}
           </div>
-          <Container>
+          <Container fluid className="px-0">
             <Selectable
               icon={teamMemberData.icon}
               image={teamMemberData.image}

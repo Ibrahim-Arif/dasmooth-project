@@ -204,7 +204,7 @@ export default function MemberSelection({
         onChange={(e) => setSearchText(e.currentTarget.value)}
         className="normal-input"
       />
-      <div className="px-3">
+      <div className="px-0">
         <Selectable
           icon={<PlusOutlined />}
           text="Invite team member by email or text message"

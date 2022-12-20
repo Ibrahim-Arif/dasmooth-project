@@ -50,7 +50,7 @@ export default function Alert({
 
       <BatonName>{batonName}</BatonName>
       <div className="d-flex flex-row align-items-center justify-content-between">
-        <div className="col-10">
+        <div className="col-7 col-xl-10">
           <BatonDescription>{batonDescription}</BatonDescription>
         </div>
         <div>

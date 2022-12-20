@@ -114,6 +114,7 @@ export default function DashboardMenu() {
     }
     window.innerWidth < 768 && setCollapsed(true);
   };
+
   useEffect(() => {
     if (window.innerWidth < 768) {
       setSiderW("100vw");
@@ -122,6 +123,13 @@ export default function DashboardMenu() {
       setRenderSearchBar(false);
     }
   }, [window.innerWidth]);
+
+  useEffect(() => {
+    if (location.pathname == "/profileSettings") {
+      setSelectedKey("profile");
+    }
+  }, [location.pathname]);
+
   return (
     <div
       style={{
@@ -164,48 +172,60 @@ export default function DashboardMenu() {
         )}
 
         {/* Search Bar */}
-        <Container className="col-lg-9 d-flex align-items-center justify-content-end justify-content-lg-start mx-0 px-0 my-3">
+        <Container
+          className={
+            renderSearchBar
+              ? `col-12 d-flex align-items-center justify-content-center mx-auto px-0 my-3`
+              : `col-lg-9 d-flex align-items-center justify-content-end justify-content-lg-start mx-0 px-0 my-3`
+          }
+          style={{ height: "84px" }}
+        >
+          {/* && location.pathname == "/main" */}
           {renderSearchBar && (
-            // && location.pathname == "/main"
-            <SearchBar
-              size="large"
-              id="searchBar"
-              placeholder="Search by name, email or team member"
-              prefix={
-                <SearchOutlined
-                  style={{
-                    fontSize: "24px",
-                    color: "#5f6b72",
-                    marginLeft: "12px",
-                    marginRight: "8px",
-                  }}
-                />
-              }
-              className="normal-input"
-              onChange={(e) => {
-                setSearch(e.currentTarget.value);
-              }}
-              onFocus={() => {
-                if (location.pathname != "/main") {
-                  setSelectedKey("dashboard");
-                  // console.log(selectedKey, location.pathname);
-                  navigate("/main");
+            <>
+              <SearchBar
+                size="large"
+                id="searchBar"
+                placeholder="Search by name, email or team member"
+                prefix={
+                  <SearchOutlined
+                    style={{
+                      fontSize: "24px",
+                      color: "#5f6b72",
+                      marginLeft: "12px",
+                      marginRight: "8px",
+                    }}
+                  />
                 }
-              }}
-            />
+                className="mx-1"
+                onChange={(e) => {
+                  setSearch(e.currentTarget.value);
+                }}
+                onFocus={() => {
+                  if (location.pathname != "/main") {
+                    setSelectedKey("dashboard");
+                    // console.log(selectedKey, location.pathname);
+                    navigate("/main");
+                  }
+                }}
+              />
+            </>
           )}
-          {/* {location.pathname == "/main" && ( */}
 
+          <Button
+            shape="circle"
+            className="d-inline-block d-lg-none mx-3 ms-lg-0"
+            icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
+            size="large"
+            color={colors.teal100}
+            onClick={handleSearchBarShow}
+          />
+
+          {/* {location.pathname == "/main" && (
+          )} */}
+
+          {/* Desktop Search Bar */}
           <>
-            <Button
-              shape="circle"
-              className="d-inline-block d-lg-none mx-3 ms-lg-0"
-              icon={!renderSearchBar ? <SearchOutlined /> : <RightOutlined />}
-              size="large"
-              color={colors.teal100}
-              onClick={handleSearchBarShow}
-            />
-
             <SearchBar
               className="d-none d-lg-flex w-50"
               id="searchBar"
@@ -233,7 +253,6 @@ export default function DashboardMenu() {
               }}
             />
           </>
-          {/* )} */}
         </Container>
       </DashboardHeader>
 
