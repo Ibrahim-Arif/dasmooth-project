@@ -377,7 +377,7 @@ export default function BatonsForm() {
       <Container fluid className="col">
         <Container className="col">
           {/* ArrowBack, DropDown menu div */}
-          <div className="d-flex flex-row justify-content-between">
+          <div className="col d-flex flex-row justify-content-between ">
             <ArrowLeftOutlined
               style={{ fontSize: 20 }}
               onClick={() => {

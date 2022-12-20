@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
 import styledComponents from "styled-components";
-import { DeleteFilled, EditFilled } from "@ant-design/icons";
+import { DeleteFilled } from "@ant-design/icons";
+import { HiPencil } from "react-icons/hi";
 
 export default function Selectable({
   icon,
@@ -69,12 +70,13 @@ export default function Selectable({
         <Container
           className={`${
             status ? "col-7" : isEditable && isItemActive ? "col-11" : "col-12"
-          } d-flex flex-row align-items-center px-1 px-md-3`}
+          } d-flex flex-row align-items-center px-1 px-md-3 `}
         >
           {image ? image : icon}
           <div className="me-3"></div>
           {text}
         </Container>
+
         {status && (
           <Container>
             <label
@@ -82,9 +84,10 @@ export default function Selectable({
             >{`${status.charAt(0).toUpperCase() + status.slice(1)}`}</label>
           </Container>
         )}
+
         {isEditable && isItemActive && (
-          <Container className="col-1 d-flex justify-content-center align-items-center">
-            <EditFilled />
+          <Container className="col-1 d-flex justify-content-center align-items-center px-0">
+            <HiPencil size={18} color="white" />
           </Container>
         )}
       </div>

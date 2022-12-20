@@ -62,12 +62,20 @@ export default function ImageUpload({
 
       reader.onloadend = function () {
         // b64.push(reader.result)
+
+        let image = "";
+        if (reader.result.includes("data:image/png;base64,"))
+          image = reader.result.replace("data:image/png;base64,", "");
+        else image = reader.result;
+
         let imagesData = {
-          image: reader.result,
+          image: image,
           batonId: batonId,
           fileName: imageData.filesList[i].name,
         };
 
+        console.log(imagesData);
+        // return;
         handleAddBatonFiles(imagesData)
           .then(() => {
             generateNotification("success", "Images uploaded successfully");
@@ -88,7 +96,11 @@ export default function ImageUpload({
   };
 
   function downloadBase64File(base64Data, fileName) {
-    const linkSource = `data:image/png;base64,${base64Data}`;
+    let linkSource = null;
+    if (base64Data == null) return;
+
+    if (base64Data.includes("data:image/png;base64")) linkSource = base64Data;
+    else linkSource = `data:image/png;base64,${base64Data}`;
 
     const downloadLink = document.createElement("a");
     downloadLink.href = linkSource;
@@ -118,7 +130,7 @@ export default function ImageUpload({
 
   return (
     <>
-      <Dragger {...props} defaultFileList={imageData.filesList}>
+      <Dragger {...props} fileList={imageData.filesList}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined style={{ color: boxColor }} />
         </p>

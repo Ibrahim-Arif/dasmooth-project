@@ -10,7 +10,7 @@ import { Badge } from "antd";
 import { Container } from "react-bootstrap";
 import { useNavigate, Routes, Route, useLocation } from "react-router-dom";
 import styledComponents from "styled-components";
-
+import { HiPencil } from "react-icons/hi";
 import Notification from "./Notification";
 import TeamMembers from "./TeamMembers";
 import DeleteBaton from "./DeleteBaton";
@@ -275,19 +275,16 @@ export default function DashboardMenu() {
                   type="default"
                   size="small"
                   shape="circle"
-                  icon={
-                    <EditFilled
-                      style={{
-                        color: colors.teal100,
-                      }}
-                    />
-                  }
+                  icon={<HiPencil size={18} color={colors.teal100} />}
                   style={{
                     position: "absolute",
                     bottom: 0,
                     right: 0,
                     backgroundColor: "white",
                     border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                   onClick={() => navigate("profileSettings")}
                 />

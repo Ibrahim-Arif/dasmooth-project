@@ -31,6 +31,7 @@
   "scripts": {
     "start": "set PORT=3000 && react-scripts start",
     "build": "set NODE_ENV='production' && react-scripts build",
+    "deploy": "firebase deploy --only hosting",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
