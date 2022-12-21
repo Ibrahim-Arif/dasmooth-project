@@ -35,6 +35,11 @@ h4 {
   padding-left: 20px !important;
   height: 60px !important;
   background-color: #f2f9f8 !important;
+  font-family: heebo;
+}
+
+.ant-menu-item:hover {
+  background-color: #ffffff !important;
 }
 .ant-menu-title-content {
   color: #00685e !important;
