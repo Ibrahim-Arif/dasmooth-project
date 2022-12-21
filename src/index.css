@@ -208,3 +208,10 @@ input:-webkit-autofill:focus {
   text-shadow: none;
   box-shadow: none;
 } */
+.ant-collapse-header {
+  padding-top: 16px !important;
+  padding-bottom: 16px !important;
+}
+.ant-collapse-content-box {
+  padding-bottom: 4px !important;
+}

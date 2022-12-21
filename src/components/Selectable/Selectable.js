@@ -15,6 +15,7 @@ export default function Selectable({
   status = null,
   statusColor = colors.teal100,
   isEditable = false,
+  animation = false,
 }) {
   const passive = {
     // color: colors.teal100,
@@ -61,6 +62,7 @@ export default function Selectable({
       bordercolor={active.bgColor}
       hoverbgcolor={active.bgColor}
       hovercolor={active.color}
+      transition={animation}
       onClick={() => {
         setIsActive(!isActive);
         onItemPress();
@@ -107,7 +109,8 @@ const CustomButton = styledComponents.div`
     border: 1px solid  ${({ bordercolor }) => bordercolor};
     box-shadow: 0px 2px 3px 0px rgb(0 0 0 / 0.25);
     font-size: 18px;
-    transition: all 0.3s ease-in-out;
+    transition: ${({ transition }) =>
+      transition ? "all 0.3s ease-in-out" : "none"};
     :hover{
         cursor: pointer;
         background-color: ${({ hoverbgcolor }) => hoverbgcolor};

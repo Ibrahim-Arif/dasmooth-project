@@ -44,7 +44,7 @@ export default function Collapseable({
       <Panel
         header={
           <div className="baton-title-div">
-            <h4 style={{ color: textColor }}>
+            <h4 style={{ color: textColor, marginBottom: 0 }}>
               {title} ({batonsData.length})
             </h4>
           </div>
@@ -67,7 +67,7 @@ export default function Collapseable({
         {batonsData.map((e, index) => (
           <PanelItem
             key={index}
-            className="row mx-2 align-items-center justify-content-between my-3"
+            className="row mx-0 align-items-center justify-content-between mb-3"
             bordercolor={borderColor}
             onClick={() => {
               // console.log(e)
@@ -76,12 +76,12 @@ export default function Collapseable({
             }}
           >
             <Container
-              className="col-8  col-md-10 pt-2"
+              className="col-8  col-md-11 pt-2"
               style={{ wordWrap: "break-word" }}
             >
               <h5 style={{ color: textColor }}>{e.title}</h5>
             </Container>
-            <Container className="col-4 col-md-2">
+            <Container className="col-4 col-md-1 d-flex justify-content-end px-0 pe-2">
               <RightOutlined style={{ fontWeight: "bold", fontSize: 24 }} />
             </Container>
           </PanelItem>

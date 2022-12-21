@@ -153,20 +153,11 @@ export default function DashboardMenu() {
                 size="large"
                 shape="circle"
                 icon={<BarsOutlined />}
-                className="d-block d-lg-none ms-3"
+                className="d-block d-lg-none mx-3"
                 onClick={() => setCollapsed(!collapsed)}
               ></Button>
 
-              <img
-                src={logo}
-                height="40px"
-                style={{
-                  marginLeft: "40px",
-                  marginRight: "70px",
-                  marginTop: "22px",
-                  marginBottom: "22px",
-                }}
-              />
+              <LogoImage src={logo} />
             </div>
           </Container>
         )}
@@ -178,7 +169,7 @@ export default function DashboardMenu() {
               ? `col-12 d-flex align-items-center justify-content-center mx-auto px-0 my-3`
               : `col-lg-9 d-flex align-items-center justify-content-end justify-content-lg-start mx-0 px-0 my-3`
           }
-          style={{ height: "84px" }}
+          style={{ height: "54px" }}
         >
           {/* && location.pathname == "/main" */}
           {renderSearchBar && (
@@ -400,4 +391,15 @@ const DashboardHeader = styledComponents(Header)`
 
 const SearchBar = styledComponents(Input)`
     border-radius: 50px;
+`;
+
+const LogoImage = styledComponents.img`
+  height:40px;
+  margin-left: 40px;
+  margin-right: 70px;
+  margin-top: 22px;
+  margin-bottom: 22px;
+  @media (max-width: 768px) {
+    margin-left: 0px;
+  }
 `;
