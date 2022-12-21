@@ -127,6 +127,14 @@ export default function DashboardMenu() {
   useEffect(() => {
     if (location.pathname == "/profileSettings") {
       setSelectedKey("profile");
+    } else if (location.pathname == "/main") {
+      setSelectedKey("dashboard");
+    } else if (location.pathname == "/notifications") {
+      setSelectedKey("notifications");
+    } else if (location.pathname == "/teamMembers") {
+      setSelectedKey("team");
+    } else if (location.pathname == "/deleteBaton") {
+      setSelectedKey("delete");
     }
   }, [location.pathname]);
 
