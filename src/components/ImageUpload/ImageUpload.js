@@ -51,6 +51,7 @@ export default function ImageUpload({
   };
 
   const handleUpload = () => {
+    if (imageData.filesList.length == 0) return;
     if (batonId == null) {
       generateNotification("error", "Error", "Baton Id is null");
       return;
@@ -140,7 +141,7 @@ export default function ImageUpload({
       </Dragger>
 
       {uploading == true && uploading != "b64Converted" ? (
-        <Loading size="large" />
+        <Loading size="large" className="mt-3" />
       ) : (
         <>
           <div className="mt-5">

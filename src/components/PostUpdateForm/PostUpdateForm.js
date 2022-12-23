@@ -40,34 +40,35 @@ export default function PostUpdateForm({
       <TealButton
         className="col-12"
         onClick={() => {
-          if (batonId != null) {
-            let url =
-              photoURL == null ||
-              photoURL == undefined ||
-              photoURL.includes("blob")
-                ? ""
-                : photoURL;
-            let data = {
-              batonId,
-              text: value,
-              timestamp: Date.now(),
-              username: isLogin.email,
-              photoURL: url,
-            };
-            handleAddPostUpdate(data)
-              .then(() => {
-                generateNotification(
-                  "success",
-                  "Post Update Successfully",
-                  "Post Update Successfully"
+          if (value != "")
+            if (batonId != null) {
+              let url =
+                photoURL == null ||
+                photoURL == undefined ||
+                photoURL.includes("blob")
+                  ? ""
+                  : photoURL;
+              let data = {
+                batonId,
+                text: value,
+                timestamp: Date.now(),
+                username: isLogin.email,
+                photoURL: url,
+              };
+              handleAddPostUpdate(data)
+                .then(() => {
+                  generateNotification(
+                    "success",
+                    "Post Update Successfully",
+                    "Post Update Successfully"
+                  );
+                  clickOk();
+                  setValue("");
+                })
+                .catch((ex) =>
+                  generateNotification("error", ex.message, ex.message)
                 );
-                clickOk();
-                setValue("");
-              })
-              .catch((ex) =>
-                generateNotification("error", ex.message, ex.message)
-              );
-          }
+            }
         }}
       >
         POST UPDATE

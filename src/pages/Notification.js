@@ -11,7 +11,80 @@ import Alert from "../components/Alert/Alert";
 
 export default function Notification() {
   // useCheckSignIn();
-  const { notifications } = useUser();
+  // const { notifications } = useUser();
+  const notifications = [
+    {
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      date: 1657214814766,
+      description: "You received a new Baton from Bilal",
+      docId: "21kimbynhexPDlZhzSMm",
+      message: "Baton Received",
+      seen: false,
+      type: "received",
+      uid: "iQZYFCmeTdUR3B8LTajDHiuyge72",
+    },
+    {
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      date: 1657214814766,
+      description: "You received a new Baton from Bilal",
+      docId: "21kimbynhexPDlZhzSMm",
+      message: "Baton Complete",
+      seen: false,
+      type: "complete",
+      uid: "iQZYFCmeTdUR3B8LTajDHiuyge72",
+    },
+    {
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      date: 1657214814766,
+      description: "You received a new Baton from Bilal",
+      docId: "21kimbynhexPDlZhzSMm",
+      message: "Baton Accepted",
+      seen: false,
+      type: "accepted",
+      uid: "iQZYFCmeTdUR3B8LTajDHiuyge72",
+    },
+    {
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      date: 1657214814766,
+      description: "You received a new Baton from Bilal",
+      docId: "21kimbynhexPDlZhzSMm",
+      message: "Baton Accepted",
+      seen: false,
+      type: "declined",
+      uid: "iQZYFCmeTdUR3B8LTajDHiuyge72",
+    },
+    {
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      date: 1651321231321,
+      description: "You received a new Baton from Bilal",
+      docId: "21kimbynhexPDlZhzSMm",
+      message: "Baton Received",
+      seen: false,
+      type: "received",
+      uid: "iQZYFCmeTdUR3B8LTajDHiuyge72",
+    },
+    {
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      date: 1651321231321,
+      description: "You received a new Baton from Bilal",
+      docId: "21kimbynhexPDlZhzSMm",
+      message: "Baton Complete",
+      seen: false,
+      type: "complete",
+      uid: "iQZYFCmeTdUR3B8LTajDHiuyge72",
+    },
+    {
+      batonId: "d69d2bd4-73d5-44a2-a1a0-30f25c610ee1",
+      date: 1651321231321,
+      description: "You received a new Baton from Bilal",
+      docId: "21kimbynhexPDlZhzSMm",
+      message: "Baton Accepted",
+      seen: false,
+      type: "accepted",
+      uid: "iQZYFCmeTdUR3B8LTajDHiuyge72",
+    },
+  ];
+  console.log(notifications);
   const navigate = useNavigate();
 
   const sectionSortedNotifications = useMemo(() => {
@@ -87,7 +160,7 @@ export default function Notification() {
                 batonTitle={notification.message}
                 batonName={notification.message}
                 batonDescription={notification.description}
-                batonType={notification.message.split(" ")[1].toLowerCase()}
+                batonType={notification.type}
                 onClose={() =>
                   handleUpdateNotificationStatus(notification.docId, true)
                 }
