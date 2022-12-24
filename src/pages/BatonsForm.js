@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Container } from "react-bootstrap";
 import { Modal, Input, Button, Dropdown, Menu, Avatar, Form } from "antd";
 import {
@@ -99,6 +99,58 @@ export default function BatonsForm() {
     });
     // setFilesListB64([]);
   };
+
+  const editableFields = useMemo(() => {
+    if (isNewPost) {
+      return {
+        title: true,
+        description: true,
+        teamMember: true,
+        date: true,
+        budget: true,
+        postUpdate: true,
+        files: true,
+      };
+    } else {
+      console.log(fetchedDataObject);
+      if (fetchedDataObject.authorId == isLogin.uid)
+        switch (fetchedDataObject.authorPostStatus) {
+          case "pending":
+            return {
+              title: true,
+              description: true,
+              teamMember: true,
+              date: true,
+              budget: true,
+              postUpdate: true,
+              files: true,
+            };
+          case "passed":
+            return {
+              title: false,
+              description: false,
+              teamMember: false,
+              date: false,
+              budget: false,
+              postUpdate: true,
+              files: true,
+            };
+        }
+      else
+        switch (fetchedDataObject.memberPostStatus) {
+          case "received":
+            return {
+              title: false,
+              description: false,
+              teamMember: false,
+              date: false,
+              budget: false,
+              postUpdate: true,
+              files: true,
+            };
+        }
+    }
+  }, [id]);
 
   const handlePass = () => {
     // console.log(
@@ -462,7 +514,7 @@ export default function BatonsForm() {
               icon={teamMemberData.icon}
               image={teamMemberData.image}
               text={teamMemberData.text}
-              isEditable={isEditable}
+              isEditable={editableFields?.teamMember}
               onItemPress={() =>
                 isEditable &&
                 !isDeleted &&
@@ -487,7 +539,7 @@ export default function BatonsForm() {
             <Selectable
               icon={<CalendarOutlined />}
               text={dateData}
-              isEditable={isEditable}
+              isEditable={editableFields?.date}
               isItemActive={
                 activeItemIndex == 2 || dateData != "Set a deadline"
                   ? true
@@ -510,7 +562,7 @@ export default function BatonsForm() {
             <Selectable
               icon={<DollarOutlined />}
               text={budgetData}
-              isEditable={isEditable}
+              isEditable={editableFields?.budget}
               isItemActive={
                 activeItemIndex == 3 || budgetData != "Set a budget"
                   ? true
@@ -532,7 +584,7 @@ export default function BatonsForm() {
             />
             <Selectable
               icon={<FileAddOutlined />}
-              isEditable={isEditable}
+              isEditable={editableFields?.files}
               text={filesList.text}
               isItemActive={
                 activeItemIndex == 4 || filesList.text != "Attach a file"
@@ -560,7 +612,7 @@ export default function BatonsForm() {
             />
             <Selectable
               icon={<FileTextOutlined />}
-              isEditable={isEditable}
+              isEditable={editableFields?.postUpdate}
               text="Post an Update"
               isItemActive={
                 activeItemIndex == 5 || postUpdateData != "" ? true : false
