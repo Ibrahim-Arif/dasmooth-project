@@ -90,36 +90,17 @@ export default function Notification() {
   const sectionSortedNotifications = useMemo(() => {
     if (notifications.length == 0) return [];
 
-    // let groupObj = {};
-    // notifications.map((item) => {
-    //   const date = item.date;
-    //   if (groupObj[date]) {
-    //     groupObj[date].push(item);
-    //   } else {
-    //     groupObj[date] = [item];
-    //   }
-    // });
-
-    // let arrayForm = [];
-
-    // arrayForm = Object.keys(groupObj).map((key) => {
-    //   return {
-    //     date: key,
-    //     notifications: notifications[key],
-    //   };
-    // });
-    // console.log(groupObj);
-    // console.log(arrayForm);
-
     let groupObj = {};
     let arrayForm = [];
 
     for (const item of notifications) {
-      const date = item.date;
-      if (groupObj[date]) {
-        groupObj[date].push(item);
+      const date = new Date(item.date);
+      const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+      // console.log(dateKey);
+      if (groupObj[dateKey]) {
+        groupObj[dateKey].push(item);
       } else {
-        groupObj[date] = [item];
+        groupObj[dateKey] = [item];
       }
     }
 
@@ -131,7 +112,7 @@ export default function Notification() {
     }
 
     console.log(groupObj);
-    console.log(arrayForm);
+    // console.log(arrayForm);
 
     return arrayForm;
   }, [notifications]);
@@ -150,7 +131,7 @@ export default function Notification() {
         {sectionSortedNotifications?.map((item, index) => (
           <div key={index} style={index > 0 ? { marginTop: "32px" } : {}}>
             <DateText>
-              {moment(new Date(parseInt(item.date))).format("MMM DD, YYYY")}
+              {moment(new Date(item.date)).format("MMM DD, YYYY")}
             </DateText>
 
             {item.notifications?.map((notification, index) => (
