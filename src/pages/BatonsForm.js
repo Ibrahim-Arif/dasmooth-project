@@ -275,7 +275,14 @@ export default function BatonsForm() {
     )
       setDisabled(false);
     else setDisabled(true);
-  }, [dateData, budgetData, postUpdateData, title, teamMemberData]);
+  }, [
+    dateData,
+    budgetData,
+    postUpdateData,
+    title,
+    teamMemberData,
+    description,
+  ]);
   // useEffect to update filesList if uploadfiles changes
   useEffect(
     () =>
