@@ -1,14 +1,14 @@
 import { Form, Input } from "antd";
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import { ImagePicker, Loading, TealButton } from "../components";
+import { FilePicker, Loading, TealButton } from "../components";
 import { useCheckSignIn } from "../hooks/useCheckSignIn";
 import { useUser } from "../hooks/useContext";
 import { handleUserInformationUpdate } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 
 export default function Profile() {
-  const { isLogin,  setPhotoURL } = useUser();
+  const { isLogin, setPhotoURL } = useUser();
   const [profileImage, setProfileImage] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -46,7 +46,7 @@ export default function Profile() {
     <Container className="p-3 justify-content-start ms-0 d-flex flex-column">
       <h5>Profile</h5>
       <Container className="d-flex flex-column justify-content-center">
-        <ImagePicker
+        <FilePicker
           setItems={setProfileImage}
           items={profileImage}
           item={profileImage}

@@ -3,16 +3,16 @@ import Collapseable from "./Collapseable/Collapseable";
 import DashboardView from "./DashboardView/DashboardView";
 import DateTimeSelection from "./DateTimeSelection/DateTimeSelection";
 import Selectable from "./Selectable/Selectable";
-import ImageUpload from "./ImageUpload/ImageUpload";
+import FileUpload from "./FileUpload/FileUpload";
 import MemberSelection from "./MemberSelection/MemberSelection";
 import PostUpdateForm from "./PostUpdateForm/PostUpdateForm";
 import { TealButton } from "./FormButton/FormButton";
 import ListSort from "./ListSort/ListSort";
 import Loading from "./Loading/Loading";
 import NotificationBox from "./NotificationBox/NotificationBox";
-import ImagePicker from "./ImagePicker/ImagePicker";
+import FilePicker from "./FilePicker/FilePicker";
 export {
-  ImagePicker,
+  FilePicker,
   NotificationBox,
   Loading,
   ListSort,
@@ -24,6 +24,6 @@ export {
   Collapseable,
   DashboardView,
   Selectable as FormItemSelect,
-  ImageUpload,
+  FileUpload,
   MemberSelection,
 };

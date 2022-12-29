@@ -19,7 +19,7 @@ import {
   BudgetForm,
   DateTimeSelection,
   Selectable,
-  ImageUpload,
+  FileUpload,
   MemberSelection,
   PostUpdateForm,
   TealButton,
@@ -420,6 +420,7 @@ export default function BatonsForm() {
       ]}
     />
   );
+
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
       {/* Invite by email modal */}
@@ -602,7 +603,7 @@ export default function BatonsForm() {
                 !isDeleted &&
                 handleFormItemRender(
                   "Attach a file",
-                  <ImageUpload
+                  <FileUpload
                     boxColor={colors.teal100}
                     itemSelected={filesList}
                     setItemSelected={setFilesList}

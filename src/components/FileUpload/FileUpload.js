@@ -7,21 +7,26 @@ import {
 } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Loading from "../Loading/Loading";
-import { handleAddBatonFiles, handleGetBatonFiles } from "../../services";
+import {
+  handleAddBatonFiles,
+  handleGetBatonFiles,
+  handleUploadFile,
+} from "../../services";
 import { generateNotification } from "../../utilities/generateNotification";
 import { colors } from "../../utilities/colors";
 import styled from "styled-components";
+import { handleDownloadFile } from "../../services/handleDownloadFile";
 
 const { Dragger } = Upload;
 
-export default function ImageUpload({
+export default function FileUpload({
   boxColor,
   itemSelected,
   setItemSelected,
   batonId,
   clickOk,
 }) {
-  const [imageData, setImageData] = useState({ filesList: [] });
+  const [fileData, setFileData] = useState({ filesList: [] });
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
 
@@ -29,16 +34,16 @@ export default function ImageUpload({
     name: "file",
     multiple: true,
     beforeUpload: (file) => {
-      setImageData((imageData) => ({
-        filesList: [...imageData.filesList, file],
+      setFileData((fileData) => ({
+        filesList: [...fileData.filesList, file],
       }));
 
       return false;
     },
     onRemove: (file) => {
-      setImageData((imageData) => {
-        const index = imageData.filesList.indexOf(file);
-        const newFileList = imageData.filesList.slice();
+      setFileData((fileData) => {
+        const index = fileData.filesList.indexOf(file);
+        const newFileList = fileData.filesList.slice();
         newFileList.splice(index, 1);
         return {
           filesList: newFileList,
@@ -51,57 +56,66 @@ export default function ImageUpload({
   };
 
   const handleUpload = () => {
-    if (imageData.filesList.length == 0) return;
+    if (fileData.filesList.length == 0) return;
     if (batonId == null) {
       generateNotification("error", "Error", "Baton Id is null");
       return;
     }
     setUploading(true);
 
-    for (let i = 0; i < imageData.filesList.length; i++) {
-      var reader = new FileReader();
+    for (let i = 0; i < fileData.filesList.length; i++) {
+      // var reader = new FileReader();
 
-      reader.onloadend = function () {
-        // b64.push(reader.result)
+      // reader.onloadend = function () {
+      // b64.push(reader.result)
+      // let file = reader.result;
 
-        let image = "";
-        if (reader.result.includes("data:image/png;base64,"))
-          image = reader.result.replace("data:image/png;base64,", "");
-        else image = reader.result;
+      // if (reader.result.includes("data:file/png;base64,"))
+      //   file = reader.result.replace("data:file/png;base64,", "");
+      // else file = reader.result;
 
-        let imagesData = {
-          image: image,
-          batonId: batonId,
-          fileName: imageData.filesList[i].name,
-        };
+      let file = fileData.filesList[i];
+      handleUploadFile(file, fileData.filesList[i].name, batonId)
+        .then((res) => {
+          let filesData = {
+            file: res,
+            batonId: batonId,
+            fileName: fileData.filesList[i].name,
+          };
 
-        console.log(imagesData);
-        // return;
-        handleAddBatonFiles(imagesData)
-          .then(() => {
-            generateNotification("success", "Images uploaded successfully");
-            setUploading(false);
-            clickOk();
-          })
-          .catch((ex) => {
-            console.log(ex);
-            generateNotification("error", "Failed to upload files!");
-            setUploading(false);
-          });
-      };
-
-      reader.readAsDataURL(imageData.filesList[i]);
+          console.log(filesData);
+          // return;
+          handleAddBatonFiles(filesData)
+            .then(() => {
+              generateNotification("success", "files uploaded successfully");
+              setUploading(false);
+              clickOk();
+            })
+            .catch((ex) => {
+              console.log(ex);
+              generateNotification("error", "Failed to upload files!");
+              setUploading(false);
+            });
+        })
+        .catch((ex) => {
+          console.log(ex);
+          generateNotification("error", "Failed to upload files!");
+          setUploading(false);
+        });
     }
 
-    setImageData({ filesList: [] });
+    // reader.readAsDataURL(fileData.filesList[i]);
+    // }
+
+    setFileData({ filesList: [] });
   };
 
   function downloadBase64File(base64Data, fileName) {
     let linkSource = null;
     if (base64Data == null) return;
 
-    if (base64Data.includes("data:image/png;base64")) linkSource = base64Data;
-    else linkSource = `data:image/png;base64,${base64Data}`;
+    if (base64Data.includes("data:file/png;base64")) linkSource = base64Data;
+    else linkSource = `data:file/png;base64,${base64Data}`;
 
     const downloadLink = document.createElement("a");
     downloadLink.href = linkSource;
@@ -109,21 +123,25 @@ export default function ImageUpload({
     downloadLink.click();
   }
 
+  function downloadURI(uri) {
+    window.open(uri);
+  }
+
   useEffect(() => {
-    // console.log(imageData);
-    if (imageData.filesList.length == 0 && uploadedFiles.length == 0)
+    // console.log(fileData);
+    if (fileData.filesList.length == 0 && uploadedFiles.length == 0)
       setItemSelected({
-        filesList: imageData,
+        filesList: fileData,
         text: "Attach a file",
       });
     else
       setItemSelected({
-        filesList: imageData,
+        filesList: fileData,
         text: `${
-          imageData.filesList.length + uploadedFiles.length
+          fileData.filesList.length + uploadedFiles.length
         } files attached`,
       });
-  }, [imageData, uploadedFiles]);
+  }, [fileData, uploadedFiles]);
 
   useEffect(() => {
     handleGetBatonFiles(batonId, setUploadedFiles);
@@ -131,7 +149,7 @@ export default function ImageUpload({
 
   return (
     <>
-      <Dragger {...props} fileList={imageData.filesList}>
+      <Dragger {...props} fileList={fileData.filesList}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined style={{ color: boxColor }} />
         </p>
@@ -146,7 +164,7 @@ export default function ImageUpload({
         <>
           <div className="mt-5">
             <h6>
-              {uploadedFiles.length + imageData.filesList.length} files attached
+              {uploadedFiles.length + fileData.filesList.length} files attached
             </h6>
           </div>
           {uploadedFiles.length > 0 && (
@@ -157,7 +175,7 @@ export default function ImageUpload({
                 <DownloadDiv
                   className="px-3"
                   style={{ backgroundColor: colors.cgLight95 }}
-                  onClick={() => downloadBase64File(item.image, item.fileName)}
+                  onClick={() => downloadURI(item.file, item.fileName)}
                 >
                   <List.Item>
                     <List.Item.Meta
@@ -172,7 +190,7 @@ export default function ImageUpload({
           )}
           <TealButton
             onClick={handleUpload}
-            disabled={imageData.length === 0 || uploading == "b64Converted"}
+            disabled={fileData.length === 0 || uploading == "b64Converted"}
             loading={uploading}
             style={{ marginTop: 16 }}
           >

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { generateNotification } from "../../utilities/generateNotification";
 
-export default function ImagePicker({
+export default function FilePicker({
   setItems,
   item = false,
   index,
@@ -41,14 +41,6 @@ export default function ImagePicker({
 
   useEffect(() => {
     if (item) {
-      if (item.includes("blob")) {
-        // let reader = new FileReader();
-        // reader.readAsDataURL(item); // converts the blob to base64 and calls onload
-        // reader.onload = function () {
-        //   let href = reader.result; // data url
-        //   setItems(href);
-        // };
-      }
       setIsSelected(true);
     }
   }, [item]);
@@ -64,9 +56,8 @@ export default function ImagePicker({
       <input
         type="file"
         onChange={handleChange}
-        accept="image/*"
         style={{ display: "none" }}
-        id={`imageInput${index}`}
+        id={`fileInput${index}`}
       />
       {item ? (
         <>
