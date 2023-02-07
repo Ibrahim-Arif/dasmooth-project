@@ -1,6 +1,15 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Container } from "react-bootstrap";
-import { Modal, Input, Button, Dropdown, Menu, Avatar, Form } from "antd";
+import {
+  Modal,
+  Input,
+  Button,
+  Dropdown,
+  Menu,
+  Avatar,
+  Form,
+  Typography,
+} from "antd";
 import {
   UserOutlined,
   CalendarOutlined,
@@ -40,6 +49,8 @@ import moment from "moment";
 import { handleAddNotification } from "../services/handleAddNotification";
 import { useCheckSignIn } from "../hooks/useCheckSignIn";
 
+const { Title, Text, Link } = Typography;
+
 export default function BatonsForm() {
   // useCheckSignIn();
   const { batonsData, setBatonsData, teamMembers, isLogin } = useUser();
@@ -47,6 +58,7 @@ export default function BatonsForm() {
   const navigate = useNavigate();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDraftModalVisible, setIsDraftModalVisible] = useState(false);
 
   const [activeTitle, setActiveTitle] = useState("");
   const [activeComponent, setActiveComponent] = useState(null);
@@ -264,6 +276,7 @@ export default function BatonsForm() {
     setActiveTitle("");
     setActiveComponent(null);
   };
+
   useEffect(() => {
     resetFormView();
     if (
@@ -421,6 +434,20 @@ export default function BatonsForm() {
     />
   );
 
+  if (
+    teamMemberData.text != "Select a team member" ||
+    dateData != "Set a deadline" ||
+    budgetData != "Set a budget" ||
+    postUpdateData != "" ||
+    filesList.filesList.length != 0 ||
+    title != "" ||
+    description != ""
+  ) {
+    console.log("not empty");
+  } else {
+    console.log("empty");
+  }
+
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
       {/* Invite by email modal */}
@@ -434,6 +461,37 @@ export default function BatonsForm() {
         {activeComponent}
       </Modal>
 
+      <Modal
+        title="Confirm"
+        visible={isDraftModalVisible}
+        onCancel={() => setIsDraftModalVisible(false)}
+        footer={null}
+        mask={false}
+      >
+        <Text strong>
+          You have unsaved changes to your Baton. Do you want to save your
+          changes?
+        </Text>
+
+        <div className="col-12">
+          <TealButton htmlType="button" className="col-12">
+            SAVE BATON
+          </TealButton>
+
+          <TealButton
+            htmlType="button"
+            className="col-12"
+            mode="outlined"
+            onClick={() => {
+              setIsDraftModalVisible(false);
+              navigate("/main");
+            }}
+          >
+            DISCARD
+          </TealButton>
+        </div>
+      </Modal>
+
       <Container fluid className="col">
         <Container className="col">
           {/* ArrowBack, DropDown menu div */}
@@ -441,8 +499,22 @@ export default function BatonsForm() {
             <ArrowLeftOutlined
               style={{ fontSize: 20 }}
               onClick={() => {
-                if (isDeleted) navigate("/deleteBaton");
-                else navigate("/main");
+                const isNotEmpty =
+                  teamMemberData.text != "Select a team member" ||
+                  dateData != "Set a deadline" ||
+                  budgetData != "Set a budget" ||
+                  postUpdateData != "" ||
+                  filesList.filesList.length != 0 ||
+                  title != "" ||
+                  description != "";
+
+                if (isNotEmpty) {
+                  setIsDraftModalVisible(true);
+                } else {
+                  setIsDraftModalVisible(false);
+                  if (isDeleted) navigate("/deleteBaton");
+                  else navigate("/main");
+                }
               }}
             />
 

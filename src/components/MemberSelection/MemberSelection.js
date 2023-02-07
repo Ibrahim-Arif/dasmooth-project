@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Input, Avatar, Modal, Form, Dropdown, Menu } from "antd";
+import {
+  Input,
+  Avatar,
+  Modal,
+  Form,
+  Dropdown,
+  Menu,
+  Typography,
+  Tabs,
+  Col,
+  Row,
+} from "antd";
 import { colors } from "../../utilities/colors";
-import { PlusOutlined, UserOutlined, DeleteFilled } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  UserOutlined,
+  DeleteFilled,
+  LinkOutlined,
+  CloseCircleFilled,
+  CheckOutlined,
+} from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Selectable from "../Selectable/Selectable";
 import {
@@ -13,6 +31,9 @@ import { useUser } from "../../hooks/useContext";
 import { generateNotification } from "../../utilities/generateNotification";
 import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
 import Loading from "../Loading/Loading";
+import styled from "styled-components";
+
+const { Title, Text, Link } = Typography;
 
 export default function MemberSelection({
   itemSelected,
@@ -29,11 +50,14 @@ export default function MemberSelection({
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isInviteSent, setIsInviteSent] = useState(false);
+  const [inviteSentTo, setInviteSentTo] = useState("");
   const [form] = Form.useForm();
   const { isLogin, teamMembers } = useUser();
 
   const handleOk = () => {
     setIsModalVisible(false);
+    setIsInviteSent(false);
   };
 
   const showModal = () => {
@@ -41,12 +65,18 @@ export default function MemberSelection({
   };
   const handleCancel = () => {
     setIsModalVisible(false);
+    setIsInviteSent(false);
     form.resetFields();
+  };
+
+  const onChange = (key) => {
+    console.log(key);
   };
 
   const handleAddMemberByEmailSubmit = (values) => {
     // console.log(values);
     // here we create user with email
+    setInviteSentTo("");
     setLoading(true);
     handleSignUp(values.email, null, true)
       .then((user) => {
@@ -60,22 +90,32 @@ export default function MemberSelection({
           receiverEmail: user.email,
           status: "pending",
           inviteBy: isLogin.uid,
-          name: values.name,
-        }).finally(() => setLoading(false));
-
-        generateNotification(
-          "success",
-          "Invite Sent",
-          `An invite has been sent to ${values.email}`
-        );
-        if (formMode) {
-          setItemSelected({
-            text: values.name,
-            inviteBy: isLogin.uid,
-            name: values.name,
+          name: values.firstName + " " + values.lastName,
+        })
+          .then(() => {
+            console.log("Invite sent");
+            setIsInviteSent(true);
+            generateNotification(
+              "success",
+              "Invite Sent",
+              `An invite has been sent to ${values.email}`
+            );
+            setInviteSentTo(values.email);
+            form.resetFields();
+            if (formMode) {
+              setItemSelected({
+                text: values.name,
+                inviteBy: isLogin.uid,
+                name: values.name,
+              });
+            }
+          })
+          .finally(() => setLoading(false))
+          .catch((ex) => {
+            throw new Error(ex.message);
           });
-        }
-        handleCancel();
+
+        // handleCancel();
       })
       .catch((ex) => {
         if (ex.message == "auth/email-already-in-use") {
@@ -91,14 +131,182 @@ export default function MemberSelection({
                 "Member Added",
                 `${values.email} added`
               );
-              handleCancel();
+              console.log("Invite sent");
+              setIsInviteSent(true);
+              setInviteSentTo(values.email);
+              form.resetFields();
+              // handleCancel();
             })
-            .finally(() => setLoading(false));
+            .finally(() => setLoading(false))
+            .catch((ex) => {
+              generateNotification("error", "Error", ex.message);
+            });
         } else {
           generateNotification("error", "Error", ex.message);
         }
       });
   };
+
+  const renderInviteForm = () => {
+    return (
+      <Form
+        name="normal_login"
+        className="login-form d-flex col-12 flex-column align-items-center"
+        layout="vertical"
+        onFinish={handleAddMemberByEmailSubmit}
+        form={form}
+        requiredMark={false}
+      >
+        {isInviteSent == true && (
+          <IniteNotificationContaianer className="mb-3">
+            <CheckOutlined style={{ color: "white" }} />
+            <Text className="ms-2" style={{ color: "white" }}>
+              Invite sent to {inviteSentTo}
+            </Text>
+          </IniteNotificationContaianer>
+        )}
+
+        <Row className="col-12 d-flex justify-content-between">
+          <Col span={11}>
+            <Form.Item
+              className="col-12"
+              name="firstName"
+              label="First name (required)"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input the First Name!",
+                },
+              ]}
+            >
+              <FormInput type="text" className="normal-input" />
+            </Form.Item>
+          </Col>
+          <Col span={11}>
+            <Form.Item
+              className="col-12"
+              name="lastName"
+              label="Last name (required)"
+              rules={[
+                {
+                  required: true,
+                  message: "Please input the Last Name!",
+                },
+              ]}
+            >
+              <FormInput type="text" className="normal-input" />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item
+          className="col-12"
+          name="email"
+          label="Email address (required)"
+          rules={[
+            {
+              type: "email",
+              message: "The input is not valid E-mail!",
+            },
+            {
+              required: true,
+              message: "Please input your E-mail!",
+            },
+          ]}
+        >
+          <FormInput
+            type="text"
+            // placeholder="Email"
+            className="normal-input"
+            autoComplete="off"
+          />
+        </Form.Item>
+        <Form.Item
+          className="col-12"
+          name="confirmemail"
+          label="Confirm email (required)"
+          rules={[
+            {
+              type: "email",
+              message: "The input is not valid E-mail!",
+            },
+            {
+              required: true,
+              message: "Please input your E-mail!",
+            },
+          ]}
+        >
+          <FormInput
+            type="text"
+            // placeholder="Email"
+            // className="normal-input"
+            autoComplete="off"
+          />
+        </Form.Item>
+        {/* <Form.Item className="mt-4 col-12 d-flex"> */}
+        {loading ? (
+          <div className="d-flex justify-content-center">
+            <Loading />
+          </div>
+        ) : (
+          <div className="col-12">
+            <Form.Item className="mb-0">
+              <TealButton htmlType="submit" className="col-12 ">
+                SEND INVITE
+              </TealButton>
+            </Form.Item>
+
+            <TealButton
+              htmlType="button"
+              className="col-12"
+              mode="outlined"
+              onClick={handleOk}
+            >
+              CANCEL
+            </TealButton>
+          </div>
+        )}
+        {/* </Form.Item> */}
+      </Form>
+    );
+  };
+
+  const renderShareLink = () => {
+    return (
+      <Form
+        name="normal_share"
+        className="share-form d-flex col-12 flex-column align-items-center"
+        layout="vertical"
+        aria-readonly="true"
+        form={form}
+      >
+        <Form.Item
+          className="col-12"
+          name="shareLink"
+          label="Share link with anyone"
+          initialValue={"https://www.google.com/"}
+        >
+          <FormInput
+            type="text"
+            prefix={<LinkOutlined className="site-form-item-icon" />}
+            // disabled={true}
+          />
+        </Form.Item>
+      </Form>
+    );
+  };
+
+  const items = [
+    {
+      key: "1",
+      label: `Invite by email`,
+      children: renderInviteForm(),
+    },
+    {
+      key: "2",
+      label: `Invite by share link`,
+      children: renderShareLink(),
+    },
+  ];
 
   useEffect(() => {
     let data = teamMembers;
@@ -131,69 +339,24 @@ export default function MemberSelection({
     <>
       {/* Invite Member Modal Section */}
       <Modal
-        title="Invite New User"
+        title="Invite a new team member"
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
         mask={false}
       >
-        <Form
-          name="normal_login"
-          className="login-form d-flex col-12 flex-column align-items-center"
-          initialValues={{}}
-          layout="vertical"
-          onFinish={handleAddMemberByEmailSubmit}
-          form={form}
-        >
-          <Form.Item
-            className="col-12"
-            name="email"
-            label="Email"
-            rules={[
-              {
-                type: "email",
-                message: "The input is not valid E-mail!",
-              },
-              {
-                required: true,
-                message: "Please input your E-mail!",
-              },
-            ]}
-          >
-            <Input
-              type="text"
-              placeholder="Email"
-              className="normal-input"
-              autoComplete="off"
-            />
-          </Form.Item>
+        <Text strong>
+          Start collabrating with your team member by sending an invite to your
+          Baton.
+        </Text>
 
-          <Form.Item
-            className="col-12"
-            name="name"
-            label="Name"
-            rules={[
-              {
-                required: true,
-                message: "Please input the Name!",
-              },
-            ]}
-          >
-            <Input type="text" placeholder="Name" className="normal-input" />
-          </Form.Item>
-
-          <Form.Item className="mt-4 col-12 d-flex">
-            {loading ? (
-              <div className="d-flex justify-content-center">
-                <Loading />
-              </div>
-            ) : (
-              <TealButton htmlType="submit" className="col-12">
-                Submit
-              </TealButton>
-            )}
-          </Form.Item>
-        </Form>
+        <TabNav
+          defaultActiveKey="1"
+          items={items}
+          onChange={onChange}
+          tabBarGutter={15}
+          className="mt-2"
+        />
       </Modal>
 
       {/* -----------------Memebers View and Search Section----------------------- */}
@@ -215,30 +378,60 @@ export default function MemberSelection({
 
         {formMode
           ? members.map((e, index) => (
-              <Selectable
-                key={index}
-                image={
-                  <Avatar style={{ backgroundColor: colors.teal100 }}>
-                    {e.name.substring(0, 2).toUpperCase()}
-                  </Avatar>
-                }
-                text={e.name}
-                isItemActive={currentItem.text === e.name ? true : false}
-                onItemPress={() => {
-                  setCurrentItem({
-                    text: e.name,
-                    image: (
-                      <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+              <Row className="d-flex align-items-center">
+                <Col
+                  xl={{ span: 20 }}
+                  lg={{ span: 18 }}
+                  md={{ span: 19 }}
+                  xs={{ span: 17 }}
+                >
+                  <Selectable
+                    key={index}
+                    image={
+                      <Avatar style={{ backgroundColor: colors.teal100 }}>
                         {e.name.substring(0, 2).toUpperCase()}
                       </Avatar>
-                    ),
-                    id: e.receiverId,
-                    status: e.status,
-                  });
-                  // currentItem;
-                }}
-                status={e.status}
-              />
+                    }
+                    text={e.name}
+                    isItemActive={currentItem.text === e.name ? true : false}
+                    onItemPress={() => {
+                      setCurrentItem({
+                        text: e.name,
+                        image: (
+                          <Avatar
+                            style={{ backgroundColor: colors.tealLight20 }}
+                          >
+                            {e.name.substring(0, 2).toUpperCase()}
+                          </Avatar>
+                        ),
+                        id: e.receiverId,
+                        status: e.status,
+                      });
+                      // currentItem;
+                    }}
+                    status={e.status}
+                  />
+                </Col>
+                <Col
+                  xl={{ span: 4 }}
+                  lg={{ span: 6 }}
+                  md={{ span: 5 }}
+                  xs={{ span: 7 }}
+                >
+                  <div className="d-flex align-items-center mt-3 justify-content-center">
+                    <CloseCircleFilled style={{ color: colors.mosque }} />
+                    <Text
+                      className="ms-1"
+                      style={{
+                        color: colors.mosque,
+                        textDecoration: "underline",
+                      }}
+                    >
+                      Remove
+                    </Text>
+                  </div>
+                </Col>
+              </Row>
             ))
           : members.map((e, index) => (
               <Dropdown
@@ -299,3 +492,47 @@ export default function MemberSelection({
     </>
   );
 }
+
+const TabNav = styled(Tabs)`
+  font-weight: 500;
+  .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: ${colors.mosque} !important;
+  }
+  .ant-tabs-tab:hover {
+    color: ${colors.mosque} !important;
+  }
+  .ant-tabs-ink-bar {
+    background: ${colors.mosque} !important;
+  }
+`;
+
+const FormInput = styled(Input)`
+  height: 40px;
+  border-color: #c0c0c0 !important;
+  &.ant-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: black !important;
+    -webkit-box-shadow: 0 0 0px 1000px #fffff inset !important;
+    transition: background-color 5000s ease-in-out 0s !important;
+  }
+  &.ant-input:hover {
+    border-color: ${colors.mosque} !important;
+  }
+  &.ant-input:focus {
+    border-color: ${colors.mosque} !important;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
+  }
+
+  &.ant-form-item-label {
+    font-weight: bold !important;
+  }
+`;
+
+const IniteNotificationContaianer = styled.div`
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  background-color: ${colors.mosque};
+  padding: 10px;
+  width: 100%;
+`;
