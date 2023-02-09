@@ -41,11 +41,7 @@ export default function MemberSelection({
   clickOk,
   formMode,
 }) {
-  const [currentItem, setCurrentItem] = useState({
-    text: "Select a team member",
-    icon: <UserOutlined />,
-    image: null,
-  });
+  const [currentItem, setCurrentItem] = useState(null);
   const [members, setMembers] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -56,6 +52,7 @@ export default function MemberSelection({
   const { isLogin, teamMembers } = useUser();
 
   const handleOk = () => {
+    console.log("handleOk");
     setIsModalVisible(false);
     setIsInviteSent(false);
   };
@@ -64,6 +61,7 @@ export default function MemberSelection({
     setIsModalVisible(true);
   };
   const handleCancel = () => {
+    console.log("handleCancel");
     setIsModalVisible(false);
     setIsInviteSent(false);
     form.resetFields();
@@ -73,10 +71,12 @@ export default function MemberSelection({
     console.log(key);
   };
 
+  // ! No need for this now
   const handleAddMemberByEmailSubmit = (values) => {
     // console.log(values);
     // here we create user with email
     setInviteSentTo("");
+    setIsInviteSent(false);
     setLoading(true);
     handleSignUp(values.email, null, true)
       .then((user) => {
@@ -85,56 +85,85 @@ export default function MemberSelection({
         //   ...teamMembers,
         // });
         console.log("Adding member to team");
-        handleAddTeamMemberByInvite({
+        let payload = {
           receiverId: user.uid,
           receiverEmail: user.email,
           status: "pending",
           inviteBy: isLogin.uid,
           name: values.firstName + " " + values.lastName,
-        })
+        };
+
+        console.log("payload", payload);
+        handleAddTeamMemberByInvite(payload)
           .then(() => {
             console.log("Invite sent");
+            // generateNotification(
+            //   "success",
+            //   "Invite Sent",
+            //   `An invite has been sent to ${values.email}`
+            // );
             setIsInviteSent(true);
-            generateNotification(
-              "success",
-              "Invite Sent",
-              `An invite has been sent to ${values.email}`
-            );
             setInviteSentTo(values.email);
-            form.resetFields();
+            // form.resetFields();
+            setCurrentItem({
+              name: payload.name,
+              inviteBy: isLogin.uid,
+              name: payload.name,
+              image: (
+                <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                  {payload.name.substring(0, 2).toUpperCase()}
+                </Avatar>
+              ),
+            });
             if (formMode) {
               setItemSelected({
-                text: values.name,
+                name: payload.name,
                 inviteBy: isLogin.uid,
-                name: values.name,
+                name: payload.name,
+                image: (
+                  <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                    {payload.name.substring(0, 2).toUpperCase()}
+                  </Avatar>
+                ),
               });
             }
           })
           .finally(() => setLoading(false))
           .catch((ex) => {
-            throw new Error(ex.message);
+            generateNotification("error", "Error", ex.message);
           });
 
         // handleCancel();
       })
       .catch((ex) => {
         if (ex.message == "auth/email-already-in-use") {
-          console.log("email-already-in-us:Adding member to team");
-          handleAddSystemUserToMember({
+          console.log("email-already-in-us: Adding member to team");
+          let payload = {
             email: values.email,
             inviteBy: isLogin.uid,
-            name: values.name,
-          })
+            name: values.firstName + " " + values.lastName,
+          };
+          handleAddSystemUserToMember(payload)
             .then(() => {
-              generateNotification(
-                "success",
-                "Member Added",
-                `${values.email} added`
-              );
+              // generateNotification(
+              //   "success",
+              //   "Member Added",
+              //   `${values.email} added`
+              // );
               console.log("Invite sent");
               setIsInviteSent(true);
               setInviteSentTo(values.email);
-              form.resetFields();
+              setItemSelected({
+                name: payload.name,
+                inviteBy: isLogin.uid,
+                name: payload.name,
+                image: (
+                  <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                    {payload.name.substring(0, 2).toUpperCase()}
+                  </Avatar>
+                ),
+              });
+              // form.resetFields();
               // handleCancel();
             })
             .finally(() => setLoading(false))
@@ -335,6 +364,9 @@ export default function MemberSelection({
       );
   };
 
+  // useEffect(() => {
+  //   console.log("isModalVisible", isModalVisible);
+  // }, [isModalVisible]);
   return (
     <>
       {/* Invite Member Modal Section */}
@@ -360,22 +392,22 @@ export default function MemberSelection({
       </Modal>
 
       {/* -----------------Memebers View and Search Section----------------------- */}
+      <Selectable
+        icon={<PlusOutlined />}
+        text="Invite team member by email or text message"
+        isItemActive={false}
+        customColor={{ color: colors.teal100, bgColor: colors.cgLight95 }}
+        onItemPress={showModal}
+      />
+
       <Input
         placeholder="Search by name or email"
         size="large"
-        style={{ borderRadius: 5, width: "100%" }}
+        style={{ borderRadius: 5, width: "100%", height: 50 }}
         onChange={(e) => setSearchText(e.currentTarget.value)}
-        className="normal-input"
+        className="normal-input mt-3"
       />
       <div className="px-0">
-        <Selectable
-          icon={<PlusOutlined />}
-          text="Invite team member by email or text message"
-          isItemActive={false}
-          customColor={{ color: colors.teal100, bgColor: colors.cgLight95 }}
-          onItemPress={showModal}
-        />
-
         {formMode
           ? members.map((e, index) => (
               <Row className="d-flex align-items-center">
@@ -383,7 +415,7 @@ export default function MemberSelection({
                   xl={{ span: 20 }}
                   lg={{ span: 18 }}
                   md={{ span: 19 }}
-                  xs={{ span: 17 }}
+                  xs={{ span: 21 }}
                 >
                   <Selectable
                     key={index}
@@ -393,17 +425,11 @@ export default function MemberSelection({
                       </Avatar>
                     }
                     text={e.name}
-                    isItemActive={currentItem.text === e.name ? true : false}
+                    isItemActive={currentItem?.name === e.name ? true : false}
                     onItemPress={() => {
+                      // console.log("selected Item", e);
                       setCurrentItem({
-                        text: e.name,
-                        image: (
-                          <Avatar
-                            style={{ backgroundColor: colors.tealLight20 }}
-                          >
-                            {e.name.substring(0, 2).toUpperCase()}
-                          </Avatar>
-                        ),
+                        name: e.name,
                         id: e.receiverId,
                         status: e.status,
                       });
@@ -416,12 +442,12 @@ export default function MemberSelection({
                   xl={{ span: 4 }}
                   lg={{ span: 6 }}
                   md={{ span: 5 }}
-                  xs={{ span: 7 }}
+                  xs={{ span: 3 }}
                 >
-                  <div className="d-flex align-items-center mt-3 justify-content-center">
+                  <PressableText onClick={() => alert("Remove Pressed")}>
                     <CloseCircleFilled style={{ color: colors.mosque }} />
                     <Text
-                      className="ms-1"
+                      className="ms-1 d-none d-md-block"
                       style={{
                         color: colors.mosque,
                         textDecoration: "underline",
@@ -429,7 +455,7 @@ export default function MemberSelection({
                     >
                       Remove
                     </Text>
-                  </div>
+                  </PressableText>
                 </Col>
               </Row>
             ))
@@ -453,7 +479,7 @@ export default function MemberSelection({
                 <div>
                   <Selectable
                     key={e.docId}
-                    image={
+                    icon={
                       <Avatar style={{ backgroundColor: colors.teal100 }}>
                         {e.name.substring(0, 2).toUpperCase()}
                       </Avatar>
@@ -474,14 +500,14 @@ export default function MemberSelection({
       {formMode && (
         <TealButton
           onClick={() => {
-            setItemSelected({
-              text: currentItem.text,
-              image: currentItem.image,
-              icon: currentItem.icon,
-              id: currentItem.id ? currentItem.id : "",
-              status: currentItem.status,
-            });
-            console.log(itemSelected);
+            // console.log("currentItem", currentItem);
+            if (currentItem)
+              setItemSelected({
+                name: currentItem.name,
+                id: currentItem.id ? currentItem.id : "",
+                status: currentItem.status,
+              });
+            // console.log(itemSelected);
             clickOk();
           }}
           className="col-12"
@@ -489,6 +515,8 @@ export default function MemberSelection({
           SELECT TEAM MEMBER
         </TealButton>
       )}
+
+      <div style={{ height: "50px" }} />
     </>
   );
 }
@@ -535,4 +563,16 @@ const IniteNotificationContaianer = styled.div`
   background-color: ${colors.mosque};
   padding: 10px;
   width: 100%;
+`;
+
+const PressableText = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: 15px;
+  &:hover {
+    color: ${colors.cyprus};
+    user-select: none;
+  }
 `;

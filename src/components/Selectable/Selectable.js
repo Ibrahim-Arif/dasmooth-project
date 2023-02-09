@@ -4,6 +4,7 @@ import { colors } from "../../utilities/colors";
 import styledComponents from "styled-components";
 // import { DeleteFilled } from "@ant-design/icons";
 import { HiPencil } from "react-icons/hi";
+import { ClockCircleOutlined, CheckCircleOutlined } from "@ant-design/icons";
 
 export default function Selectable({
   icon,
@@ -76,16 +77,19 @@ export default function Selectable({
         >
           <AssetContainer>{image ? image : icon}</AssetContainer>
           {/* <div></div> */}
-          <label className="ms-2" style={{ fontFamily: "heebo" }}>
+          <SelectableLabel
+            className="ms-2"
+            color={isItemActive ? "white" : colors.mosque}
+          >
             {text}
-          </label>
+          </SelectableLabel>
         </Container>
 
         {status && (
           <Container>
-            <StatusText id="status-text" color={statusColor}>{`${
-              status.charAt(0).toUpperCase() + status.slice(1)
-            }`}</StatusText>
+            <StatusText id="status-text" color={statusColor}>
+              {`${status.charAt(0).toUpperCase() + status.slice(1)}`}
+            </StatusText>
           </Container>
         )}
 
@@ -134,7 +138,6 @@ const StatusText = styledComponents.label`
   color: ${({ color }) => color};
   font-size: 14px;
   font-family: heebo;
-  
 `;
 
 const AssetContainer = styledComponents.div`
@@ -144,4 +147,9 @@ const AssetContainer = styledComponents.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  `;
+
+const SelectableLabel = styledComponents.label`
+  fontFamily: "heebo",
+  color: ${({ color }) => color};
   `;

@@ -7,11 +7,9 @@ import { useNavigate, useParams } from "react-router";
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
 import { logo } from "../assets";
-import { handleForgotPassword, handleSignUp } from "../services";
+import { handleForgotPassword } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
-import { useUser } from "../hooks/useContext";
-import { handleSignIn } from "../services/handleSignIn";
 
 export default function ForgotPassword() {
   const [focusedEmail, setFocusedEmail] = useState(false);

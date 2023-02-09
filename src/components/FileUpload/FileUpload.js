@@ -7,15 +7,10 @@ import {
 } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Loading from "../Loading/Loading";
-import {
-  handleAddBatonFiles,
-  handleGetBatonFiles,
-  handleUploadFile,
-} from "../../services";
+import { handleAddBatonFiles, handleUploadFile } from "../../services";
 import { generateNotification } from "../../utilities/generateNotification";
 import { colors } from "../../utilities/colors";
 import styled from "styled-components";
-import { handleDownloadFile } from "../../services/handleDownloadFile";
 
 const { Dragger } = Upload;
 
@@ -26,7 +21,7 @@ export default function FileUpload({
   batonId,
   clickOk,
 }) {
-  const [fileData, setFileData] = useState({ filesList: [] });
+  const [uploadableFiles, setUploadableFiles] = useState([]);
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
 
@@ -34,20 +29,15 @@ export default function FileUpload({
     name: "file",
     multiple: true,
     beforeUpload: (file) => {
-      setFileData((fileData) => ({
-        filesList: [...fileData.filesList, file],
-      }));
-
+      setUploadableFiles((fileData) => [...fileData, file]);
       return false;
     },
     onRemove: (file) => {
-      setFileData((fileData) => {
-        const index = fileData.filesList.indexOf(file);
-        const newFileList = fileData.filesList.slice();
+      setUploadableFiles((fileData) => {
+        const index = fileData.indexOf(file);
+        const newFileList = fileData.slice();
         newFileList.splice(index, 1);
-        return {
-          filesList: newFileList,
-        };
+        return [...newFileList];
       });
     },
     onDrop(e) {
@@ -56,14 +46,14 @@ export default function FileUpload({
   };
 
   const handleUpload = () => {
-    if (fileData.filesList.length == 0) return;
+    if (uploadableFiles?.length == 0) return;
     if (batonId == null) {
       generateNotification("error", "Error", "Baton Id is null");
       return;
     }
     setUploading(true);
 
-    for (let i = 0; i < fileData.filesList.length; i++) {
+    for (let i = 0; i < uploadableFiles.length; i++) {
       // var reader = new FileReader();
 
       // reader.onloadend = function () {
@@ -74,21 +64,24 @@ export default function FileUpload({
       //   file = reader.result.replace("data:file/png;base64,", "");
       // else file = reader.result;
 
-      let file = fileData.filesList[i];
-      handleUploadFile(file, fileData.filesList[i].name, batonId)
-        .then((res) => {
+      let file = uploadableFiles[i];
+      handleUploadFile(file, uploadableFiles[i].name, batonId)
+        .then((imageFileUploadResponse) => {
           let filesData = {
-            file: res,
+            file: imageFileUploadResponse,
             batonId: batonId,
-            fileName: fileData.filesList[i].name,
+            fileName: uploadableFiles[i].name,
           };
 
           console.log(filesData);
           // return;
           handleAddBatonFiles(filesData)
             .then(() => {
-              generateNotification("success", "files uploaded successfully");
+              generateNotification("success", "Files uploaded successfully");
+              if (itemSelected == null) setItemSelected([filesData]);
+              else setItemSelected((prev) => [...prev, filesData]);
               setUploading(false);
+              setUploadableFiles([]);
               clickOk();
             })
             .catch((ex) => {
@@ -106,8 +99,6 @@ export default function FileUpload({
 
     // reader.readAsDataURL(fileData.filesList[i]);
     // }
-
-    setFileData({ filesList: [] });
   };
 
   function downloadBase64File(base64Data, fileName) {
@@ -128,28 +119,16 @@ export default function FileUpload({
   }
 
   useEffect(() => {
-    // console.log(fileData);
-    if (fileData.filesList.length == 0 && uploadedFiles.length == 0)
-      setItemSelected({
-        filesList: fileData,
-        text: "Attach a file",
-      });
-    else
-      setItemSelected({
-        filesList: fileData,
-        text: `${
-          fileData.filesList.length + uploadedFiles.length
-        } files attached`,
-      });
-  }, [fileData, uploadedFiles]);
-
-  useEffect(() => {
-    handleGetBatonFiles(batonId, setUploadedFiles);
-  }, []);
+    // handleGetBatonFilesSnapshotSnapshot(batonId, setUploadedFiles);
+    if (itemSelected != null && batonId != null) {
+      setUploadedFiles(itemSelected);
+    }
+    console.log("batonFiles useEffect", itemSelected?.length);
+  }, [itemSelected?.length]);
 
   return (
     <>
-      <Dragger {...props} fileList={fileData.filesList}>
+      <Dragger {...props} fileList={uploadableFiles}>
         <p className="ant-upload-drag-icon">
           <InboxOutlined style={{ color: boxColor }} />
         </p>
@@ -159,12 +138,12 @@ export default function FileUpload({
       </Dragger>
 
       {uploading == true && uploading != "b64Converted" ? (
-        <Loading size="large" className="mt-3" />
+        <CustomLoading size="large" className="mt-3" color={colors.mosque} />
       ) : (
         <>
           <div className="mt-5">
             <h6>
-              {uploadedFiles.length + fileData.filesList.length} files attached
+              {uploadedFiles.length + uploadableFiles.length} files attached
             </h6>
           </div>
           {uploadedFiles.length > 0 && (
@@ -190,7 +169,7 @@ export default function FileUpload({
           )}
           <TealButton
             onClick={handleUpload}
-            disabled={fileData.length === 0 || uploading == "b64Converted"}
+            disabled={itemSelected?.length === 0 || uploading == "b64Converted"}
             loading={uploading}
             style={{ marginTop: 16 }}
           >
@@ -205,5 +184,11 @@ export default function FileUpload({
 const DownloadDiv = styled.div`
   :hover {
     cursor: pointer;
+  }
+`;
+
+const CustomLoading = styled(Loading)`
+  &.ant-spin {
+    color: ${(props) => props.color};
   }
 `;

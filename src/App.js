@@ -41,6 +41,18 @@ const App = () => {
   const [otherBatons, setOtherBatons] = useState([]);
   const [notifications, setNotifications] = useState([]);
 
+  const flushStates = () => {
+    setPermanentData([]);
+    setBatonsData([]);
+    setMyBatons([]);
+    setOtherBatons([]);
+    setTeamMembers([]);
+    setNotifications([]);
+    setIsLogin(false);
+    setLoading(false);
+    setPhotoURL("");
+  };
+
   const auth = getAuth(app);
 
   const userContextValues = {
@@ -61,39 +73,27 @@ const App = () => {
   };
 
   onAuthStateChanged(auth, (user) => {
-    const uid = localStorage.getItem("uid");
-    if (uid != null && user.uid == uid && user.emailVerified) {
-      // console.log("App.js Line 63:", user.photoURL);
-
+    if (user && user.emailVerified) {
       setIsLogin(user);
     }
   });
 
   useEffect(() => {
-    const uid = localStorage.getItem("uid");
-    // console.log("Login UID:", isLogin.uid);
-    // console.log("Local UID", uid);
-    //
-    // console.log("App.js Line 73:", isLogin.photoURL);
     if (isLogin) {
       setPhotoURL(isLogin.photoURL);
       handleGetTeamMembers(isLogin.uid, setTeamMembers);
       handleGetMyBatons(isLogin.uid, myBatons, setMyBatons);
       handleGetOtherBatons(isLogin.uid, otherBatons, setOtherBatons);
-      handleGetNotifications(uid, setNotifications);
+      handleGetNotifications(isLogin.uid, setNotifications);
     } else {
-      setPermanentData([]);
-      setBatonsData([]);
-      setMyBatons([]);
-      setOtherBatons([]);
-      setTeamMembers([]);
-      setNotifications([]);
+      flushStates();
     }
   }, [isLogin]);
 
   useEffect(() => {
     // console.log("batonsData useEffect, App.js", batonsData);
     let temp = [...myBatons, ...otherBatons];
+    console.log(myBatons, otherBatons);
     // temp = [...new Set(temp)]
     const filteredArr = temp.reduce((acc, current) => {
       const x = acc.find((item) => item.docId === current.docId);
@@ -105,11 +105,12 @@ const App = () => {
     }, []);
     setPermanentData(filteredArr);
     // console.log("Permanent:", permanentData);
-  }, [myBatons, otherBatons]);
+  }, [myBatons.length, otherBatons.length]);
 
   useEffect(() => {
     setBatonsData([...permanentData]);
-  }, [permanentData]);
+  }, [permanentData.length]);
+
   return (
     <StateProvider values={userContextValues}>
       <BrowserRouter>

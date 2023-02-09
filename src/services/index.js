@@ -6,7 +6,10 @@ import { handleAddTeamMember } from "./handleAddTeamMember";
 import { handleDeleteBaton } from "./handleDeleteBaton";
 import { handleDeleteTeamMember } from "./handleDeleteTeamMember";
 import { handleForgotPassword } from "./handleForgotPassword";
-import { handleGetBatonFiles } from "./handleGetBatonFiles";
+import {
+  handleGetBatonFilesSnapshot,
+  handleGetBatonFiles,
+} from "./handleGetBatonFiles";
 import { handleGetBatonPostUpdates } from "./handleGetBatonPostUpdates";
 import { handleGetMyBatons } from "./handleGetMyBatons";
 import { handleGetNotifications } from "./handleGetNotifications";
@@ -26,9 +29,10 @@ export {
   handleAddSystemUserToMember,
   handleUpdateTeamMemberStatus,
   handleUpdateNotificationStatus,
+  handleGetBatonFiles,
   handleGetNotifications,
   handleDeleteTeamMember,
-  handleGetBatonFiles,
+  handleGetBatonFilesSnapshot,
   handleUserInformationUpdate,
   handleAddBatonFiles,
   handleSignUp,

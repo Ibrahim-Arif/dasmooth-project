@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Input, Avatar } from "antd";
 import { Container } from "react-bootstrap";
 import { TealButton } from "../FormButton/FormButton";
-import { handleAddPostUpdate, handleGetBatonPostUpdates } from "../../services";
+import { handleAddPostUpdate } from "../../services";
 import { generateNotification } from "../../utilities/generateNotification";
 import styled from "styled-components";
 import moment from "moment";
@@ -10,14 +10,13 @@ import { colors } from "../../utilities/colors";
 import { useUser } from "../../hooks/useContext";
 
 export default function PostUpdateForm({
-  // itemSelected,
-  // setItemSelected,
+  itemSelected,
+  setItemSelected,
   batonId,
   username,
   clickOk,
 }) {
   const [value, setValue] = useState("");
-  const [postData, setPostData] = useState([]);
   const { isLogin, photoURL } = useUser();
 
   const onChange = (e) => {
@@ -25,9 +24,7 @@ export default function PostUpdateForm({
     setValue(e.target.value);
   };
 
-  useEffect(() => {
-    if (batonId != null) handleGetBatonPostUpdates(batonId, setPostData);
-  }, []);
+  console.log(itemSelected);
 
   return (
     <Container className="mt-3">
@@ -64,6 +61,11 @@ export default function PostUpdateForm({
                   );
                   clickOk();
                   setValue("");
+                  if (itemSelected == null) setItemSelected([data]);
+                  else {
+                    let uniqueItems = [...new Set([...itemSelected, data])];
+                    setItemSelected(uniqueItems);
+                  }
                 })
                 .catch((ex) =>
                   generateNotification("error", ex.message, ex.message)
@@ -74,27 +76,28 @@ export default function PostUpdateForm({
         POST UPDATE
       </TealButton>
       <div className="mt-3">
-        {postData.map((e, index) => (
-          <UpdatesContainer className="d-flex flex-row mt-2" key={index}>
-            <div className="d-flex flex-column pt-2">
-              {/* {console.log(e.photoURL)} */}
-              {e.photoURL != "" && e.photoURL ? (
-                <Avatar src={e.photoURL} />
-              ) : (
-                <Avatar style={{ backgroundColor: colors.teal100 }}>
-                  {e.username.substring(0, 2).toUpperCase()}
-                </Avatar>
-              )}
-            </div>
-            <div className="d-flex flex-column justify-content-center ms-3">
-              <label style={{ fontSize: 13 }}>{e.username}</label>
-              <label style={{ fontSize: 13 }}>
-                {moment(e.timestamp).format("MMMM DD, YYYY - hh:mm:ss A ")}
-              </label>
-              <label style={{ fontWeight: "600" }}>{e.text}</label>
-            </div>
-          </UpdatesContainer>
-        ))}
+        {itemSelected &&
+          itemSelected.map((e, index) => (
+            <UpdatesContainer className="d-flex flex-row mt-2" key={index}>
+              <div className="d-flex flex-column pt-2">
+                {/* {console.log(e.photoURL)} */}
+                {e.photoURL != "" && e.photoURL ? (
+                  <Avatar src={e.photoURL} />
+                ) : (
+                  <Avatar style={{ backgroundColor: colors.teal100 }}>
+                    {e.username.substring(0, 2).toUpperCase()}
+                  </Avatar>
+                )}
+              </div>
+              <div className="d-flex flex-column justify-content-center ms-3">
+                <label style={{ fontSize: 13 }}>{e.username}</label>
+                <label style={{ fontSize: 13 }}>
+                  {moment(e.timestamp).format("MMMM DD, YYYY - hh:mm:ss A ")}
+                </label>
+                <label style={{ fontWeight: "600" }}>{e.text}</label>
+              </div>
+            </UpdatesContainer>
+          ))}
       </div>
     </Container>
   );
