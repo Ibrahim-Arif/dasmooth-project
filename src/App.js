@@ -7,6 +7,8 @@ import {
   Welcome,
   ForgotPassword,
   VerifyEmail,
+  Invite,
+  SignUp,
 } from "./pages";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./config/firebaseConfig";
@@ -119,15 +121,18 @@ const App = () => {
             <Routes>
               {isLogin == false ? (
                 <>
-                  <Route path="/" element={<Welcome />} />
-                  <Route path="signIn/" element={<SignIn />} />
+                  <Route path="" element={<Welcome />} />
+                  {/* <Route path="invite/:inviteId" element={<Invite />} /> */}
                   <Route path="signIn/:id" element={<SignIn />} />
+                  <Route path="signUp/:id" element={<SignUp />} />
+                  <Route path="signIn" element={<SignIn />} />
+                  <Route path="signUp" element={<SignUp />} />
                   <Route path="verifyEmail" element={<VerifyEmail />} />
                   <Route path="forgotpassword" element={<ForgotPassword />} />
-                  <Route path="/*" element={<SignIn />} />
+                  <Route path="*" element={<SignIn />} />
                 </>
               ) : (
-                <Route path="/*" element={<DashboardMenu />} />
+                <Route path="*" element={<DashboardMenu />} />
               )}
               {/*  <Route path="*" element={<NotFound />} /> */}
             </Routes>

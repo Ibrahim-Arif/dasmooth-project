@@ -8,30 +8,29 @@ import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
 import { logo } from "../assets";
 import {
-  handleForgotPassword,
+  handleAddTeamMember,
   handleSignUp,
+  handleUpdateBaton,
   handleGetInvite,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
 import { useUser } from "../hooks/useContext";
-import { handleSignIn } from "../services/handleSignIn";
-import { useCheckSignIn } from "../hooks/useCheckSignIn";
 
-export default function SignIn() {
+export default function SignUp() {
   const [focusedEmail, setFocusedEmail] = useState(false);
   const [focusedPassword, setFocusedPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inviteData, setInviteData] = useState(null);
+  const [inviteId, setInviteId] = useState(null);
   const { setIsLogin, isLogin } = useUser();
 
-  // useCheckSignIn();
   const navigate = useNavigate();
   const { id } = useParams();
 
-  console.log(id);
   useEffect(() => {
-    if (id)
+    if (id) {
+      setInviteId(id);
       handleGetInvite(id)
         .then((data) => {
           if (data) {
@@ -46,40 +45,72 @@ export default function SignIn() {
           generateNotification("error", "Error", "Invalid Invitation");
           // navigate("/");
         });
+    }
     document.getElementById("body").style.backgroundColor = colors.htmlColor;
   }, []);
 
-  const [form] = Form.useForm();
-
   const onFinish = (values) => {
     setLoading(true);
-    handleSignIn(values.email, values.password)
-      .then((user) => {
-        setLoading(false);
-        if (!user.emailVerified) {
-          generateNotification(
-            "error",
-            "Verify Email",
-            "Kindly verify your email to continue"
-          );
-          return;
-        } else {
-          localStorage.setItem("uid", user.uid);
-          setIsLogin(user);
-          navigate("/");
-        }
-      })
-      .catch((ex) => {
-        generateNotification("error", "Error", ex.message);
-        setLoading(false);
-      });
-  };
+    // if there is an id, then it means the user is signing up from an invite
+    if (inviteId) {
+      // first create the user
+      handleSignUp(values.email, values.password)
+        .then((user) => {
+          console.log("Signed Up", user);
+          let payload = {
+            receiverId: user.uid,
+            receiverEmail: user.email,
+            status: "accepted",
+            inviteBy: inviteData?.inviteBy,
+            name: user.email,
+          };
 
-  const handleForgotPress = () => {
-    navigate("/forgotpassword");
-    // handleForgotPassword("bilalnaeem166@gmail.com")
-    //   .then(() => console.log("done"))
-    //   .catch((ex) => console.log(ex));
+          // then add the user to the team
+          handleAddTeamMember(inviteId, payload)
+            .then((res) => {
+              console.log("Added Team Member", res);
+
+              // then update the baton
+              handleUpdateBaton(inviteData?.batonId, {
+                memberName: payload.receiverEmail,
+                memberId: payload.receiverId,
+                memberPostStatus: "received",
+                authorPostStatus: "passed",
+              }).then((res) => {
+                console.log("Updated Baton", res);
+                setLoading(false);
+                navigate("/verifyEmail");
+              });
+            })
+            .catch((ex) => {
+              generateNotification("error", "Error", ex.message);
+              setLoading(false);
+            });
+          // generateNotification(
+          //   "success",
+          //   "Registered",
+          //   `An email has been sent to ${values.email}. Kindly check your email! If you do not see any email, check your spam section`
+          // );
+        })
+        .catch((ex) => {
+          generateNotification("error", "Error", ex.message);
+          setLoading(false);
+        });
+    } else
+      handleSignUp(values.email, values.password)
+        .then((user) => {
+          navigate("/verifyEmail");
+          // generateNotification(
+          //   "success",
+          //   "Registered",
+          //   `An email has been sent to ${values.email}. Kindly check your email! If you do not see any email, check your spam section`
+          // );
+          setLoading(false);
+        })
+        .catch((ex) => {
+          generateNotification("error", "Error", ex.message);
+          setLoading(false);
+        });
   };
 
   const { Title } = Typography;
@@ -162,38 +193,30 @@ export default function SignIn() {
             {loading ? (
               <Loading size="large" color={colors.teal100} />
             ) : (
-              <LoginButton
+              <SignUpButton
                 htmlType="submit"
                 bgcolor={colors.teal100}
                 className="login-form-button px-5"
               >
-                Log in
-              </LoginButton>
+                Sign up
+              </SignUpButton>
             )}
             {/* Or <a href="">register now!</a> */}
           </Form.Item>
 
           <Form.Item>
-            <ColoredTitle
-              color={colors.teal100}
-              textStyle="underline"
-              onClick={handleForgotPress}
-            >
-              Forgot your password?
-            </ColoredTitle>
-          </Form.Item>
-
-          <Form.Item>
-            <ColoredTitle color="white">Don't have an Account?</ColoredTitle>
+            <ColoredTitle color="white">Already have an account?</ColoredTitle>
             {"    "}
             <ColoredTitle
               color={colors.teal100}
               textStyle="underline"
               onClick={() => {
-                navigate("/signup");
+                console.log(inviteId);
+                if (inviteId) navigate("/signin/" + inviteId);
+                else navigate("/signin");
               }}
             >
-              Sign Up
+              Log In
             </ColoredTitle>
           </Form.Item>
         </Form>
@@ -203,7 +226,7 @@ export default function SignIn() {
 }
 
 // Componenets
-const LoginButton = styledComponents(Button)`
+const SignUpButton = styledComponents(Button)`
         width: 300px;
         height: 50px;
         border-radius: 5px;

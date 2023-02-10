@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Form, Input, Button, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
 import { logo } from "../assets";
 import {
   handleForgotPassword,
-  handleSignUp,
   handleGetInvite,
+  handleGetTeamMember,
+  handleSignUp,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -18,34 +19,40 @@ import { useUser } from "../hooks/useContext";
 import { handleSignIn } from "../services/handleSignIn";
 import { useCheckSignIn } from "../hooks/useCheckSignIn";
 
-export default function SignIn() {
+export default function Invite() {
   const [focusedEmail, setFocusedEmail] = useState(false);
   const [focusedPassword, setFocusedPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [inviteData, setInviteData] = useState(null);
-  const { setIsLogin, isLogin } = useUser();
+  const [inviteData, setInviteData] = useState();
+  const { setIsLogin } = useUser();
 
-  // useCheckSignIn();
+  useCheckSignIn();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const location = useLocation();
+  const { inviteId } = useParams();
 
-  console.log(id);
   useEffect(() => {
-    if (id)
-      handleGetInvite(id)
-        .then((data) => {
-          if (data) {
-            // console.log(data);
-            setInviteData(data);
-          } else {
-            generateNotification("error", "Error", "Invalid Invitation");
-            // navigate("/");
-          }
-        })
-        .catch((ex) => {
+    if (!inviteId) {
+      navigate("/");
+    }
+    // console.log(location.pathname);
+    // console.log(inviteId);
+    // return;
+    handleGetInvite(inviteId)
+      .then((data) => {
+        console.log(data);
+        if (data) {
+          console.log(data);
+          setInviteData(data);
+        } else {
           generateNotification("error", "Error", "Invalid Invitation");
           // navigate("/");
-        });
+        }
+      })
+      .catch((ex) => {
+        generateNotification("error", "Error", "Invalid Invitation");
+        // navigate("/");
+      });
     document.getElementById("body").style.backgroundColor = colors.htmlColor;
   }, []);
 
@@ -53,33 +60,44 @@ export default function SignIn() {
 
   const onFinish = (values) => {
     setLoading(true);
-    handleSignIn(values.email, values.password)
-      .then((user) => {
-        setLoading(false);
-        if (!user.emailVerified) {
-          generateNotification(
-            "error",
-            "Verify Email",
-            "Kindly verify your email to continue"
-          );
-          return;
-        } else {
-          localStorage.setItem("uid", user.uid);
-          setIsLogin(user);
-          navigate("/");
-        }
-      })
-      .catch((ex) => {
-        generateNotification("error", "Error", ex.message);
-        setLoading(false);
-      });
-  };
-
-  const handleForgotPress = () => {
-    navigate("/forgotpassword");
-    // handleForgotPassword("bilalnaeem166@gmail.com")
-    //   .then(() => console.log("done"))
-    //   .catch((ex) => console.log(ex));
+    // if (mode) {
+    //   handleSignUp(values.email, values.password)
+    //     .then((user) => {
+    //       navigate("/verifyEmail");
+    //       // generateNotification(
+    //       //   "success",
+    //       //   "Registered",
+    //       //   `An email has been sent to ${values.email}. Kindly check your email! If you do not see any email, check your spam section`
+    //       // );
+    //       setLoading(false);
+    //     })
+    //     .catch((ex) => {
+    //       generateNotification("error", "Error", ex.message);
+    //       setLoading(false);
+    //     });
+    // } else {
+    //   setLoading(true);
+    //   handleSignIn(values.email, values.password)
+    //     .then((user) => {
+    //       setLoading(false);
+    //       if (!user.emailVerified) {
+    //         generateNotification(
+    //           "error",
+    //           "Verify Email",
+    //           "Kindly verify your email to continue"
+    //         );
+    //         return;
+    //       } else {
+    //         localStorage.setItem("uid", user.uid);
+    //         setIsLogin(user);
+    //         navigate("/");
+    //       }
+    //     })
+    //     .catch((ex) => {
+    //       generateNotification("error", "Error", ex.message);
+    //       setLoading(false);
+    //     });
+    // }
   };
 
   const { Title } = Typography;
@@ -93,7 +111,7 @@ export default function SignIn() {
       </Container>
       <Container className="d-flex flex-column col-12 col-lg-7 mt-5 justify-content-center align-items-center">
         <Title level={1} className="mb-5">
-          <ColoredTitle color="white">Welcome Back</ColoredTitle>
+          <ColoredTitle color="white">Invitation to Join</ColoredTitle>
         </Title>
         <Form
           name="normal_login"
@@ -167,33 +185,25 @@ export default function SignIn() {
                 bgcolor={colors.teal100}
                 className="login-form-button px-5"
               >
-                Log in
+                Join
               </LoginButton>
             )}
             {/* Or <a href="">register now!</a> */}
           </Form.Item>
 
           <Form.Item>
-            <ColoredTitle
-              color={colors.teal100}
-              textStyle="underline"
-              onClick={handleForgotPress}
-            >
-              Forgot your password?
-            </ColoredTitle>
-          </Form.Item>
+            <ColoredTitle color="white">Already have an account?</ColoredTitle>
 
-          <Form.Item>
-            <ColoredTitle color="white">Don't have an Account?</ColoredTitle>
-            {"    "}
             <ColoredTitle
               color={colors.teal100}
               textStyle="underline"
               onClick={() => {
-                navigate("/signup");
+                form.resetFields();
+                navigate("/signIn");
               }}
+              className="ms-2"
             >
-              Sign Up
+              Log In
             </ColoredTitle>
           </Form.Item>
         </Form>

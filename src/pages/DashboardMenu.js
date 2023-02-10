@@ -29,7 +29,7 @@ import { useCheckSignIn } from "../hooks/useCheckSignIn";
 const { Header, Sider } = Layout;
 
 export default function DashboardMenu() {
-  // useCheckSignIn();
+  useCheckSignIn();
   const sideBarBgColor = "#f2f9f8";
 
   const [collapsed, setCollapsed] = useState(true);

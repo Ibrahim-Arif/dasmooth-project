@@ -370,6 +370,7 @@ export default function BatonsForm() {
       setPostUpdateData(filter.post);
       setTeamMemberData({
         name: filter.memberName,
+        id: filter.memberId,
       });
       setID(params.id);
       // console.log("filter", filter);
@@ -657,6 +658,7 @@ export default function BatonsForm() {
               setItemSelected={setTeamMemberData}
               clickOk={handleResetPageView}
               formMode={true}
+              batonId={id}
             />
           </>
         )}
@@ -729,6 +731,7 @@ export default function BatonsForm() {
               setItemSelected={setTeamMemberData}
               clickOk={handleResetPageView}
               formMode={true}
+              batonId={id}
             />
           </>
         )}

@@ -10,6 +10,7 @@ import {
   Tabs,
   Col,
   Row,
+  Button,
 } from "antd";
 import { colors } from "../../utilities/colors";
 import {
@@ -19,11 +20,15 @@ import {
   LinkOutlined,
   CloseCircleFilled,
   CheckOutlined,
+  CopyOutlined,
 } from "@ant-design/icons";
 import { TealButton } from "../FormButton/FormButton";
 import Selectable from "../Selectable/Selectable";
 import {
   handleAddSystemUserToMember,
+  handleCheckUserExsistInSystem,
+  handleDeleteTeamMember,
+  handleSendInviteToMember,
   handleSignUp,
   handleUpdateTeamMemberStatus,
 } from "../../services";
@@ -32,6 +37,7 @@ import { generateNotification } from "../../utilities/generateNotification";
 import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
 import Loading from "../Loading/Loading";
 import styled from "styled-components";
+import { v4 } from "uuid";
 
 const { Title, Text, Link } = Typography;
 
@@ -40,6 +46,7 @@ export default function MemberSelection({
   setItemSelected,
   clickOk,
   formMode,
+  batonId,
 }) {
   const [currentItem, setCurrentItem] = useState(null);
   const [members, setMembers] = useState([]);
@@ -48,6 +55,7 @@ export default function MemberSelection({
   const [loading, setLoading] = useState(false);
   const [isInviteSent, setIsInviteSent] = useState(false);
   const [inviteSentTo, setInviteSentTo] = useState("");
+  const [inviteId, setInviteId] = useState("");
   const [form] = Form.useForm();
   const { isLogin, teamMembers } = useUser();
 
@@ -78,82 +86,36 @@ export default function MemberSelection({
     setInviteSentTo("");
     setIsInviteSent(false);
     setLoading(true);
-    handleSignUp(values.email, null, true)
-      .then((user) => {
-        // console.log({
-        //   [user.uid]: values,
-        //   ...teamMembers,
-        // });
-        console.log("Adding member to team");
-        let payload = {
-          receiverId: user.uid,
-          receiverEmail: user.email,
-          status: "pending",
-          inviteBy: isLogin.uid,
-          name: values.firstName + " " + values.lastName,
-        };
 
-        console.log("payload", payload);
-        handleAddTeamMemberByInvite(payload)
-          .then(() => {
-            console.log("Invite sent");
-            // generateNotification(
-            //   "success",
-            //   "Invite Sent",
-            //   `An invite has been sent to ${values.email}`
-            // );
-            setIsInviteSent(true);
-            setInviteSentTo(values.email);
-            // form.resetFields();
-            setCurrentItem({
-              name: payload.name,
-              inviteBy: isLogin.uid,
-              name: payload.name,
-              image: (
-                <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                  {payload.name.substring(0, 2).toUpperCase()}
-                </Avatar>
-              ),
-            });
-            if (formMode) {
-              setItemSelected({
-                name: payload.name,
-                inviteBy: isLogin.uid,
-                name: payload.name,
-                image: (
-                  <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                    {payload.name.substring(0, 2).toUpperCase()}
-                  </Avatar>
-                ),
-              });
-            }
-          })
-          .finally(() => setLoading(false))
-          .catch((ex) => {
-            generateNotification("error", "Error", ex.message);
-          });
-
-        // handleCancel();
-      })
-      .catch((ex) => {
-        if (ex.message == "auth/email-already-in-use") {
-          console.log("email-already-in-us: Adding member to team");
-          let payload = {
-            email: values.email,
+    handleCheckUserExsistInSystem(values.email)
+      .then((uid) => {
+        let payload = {};
+        if (uid) {
+          console.log("User exsist in system, Adding member to team");
+          payload = {
+            receiverId: uid,
+            receiverEmail: values.email,
+            status: "pending",
             inviteBy: isLogin.uid,
             name: values.firstName + " " + values.lastName,
           };
-          handleAddSystemUserToMember(payload)
+
+          // sent email to the user and then add to database
+        } else {
+          console.log("User don't exsist in system, Adding member to team");
+          payload = {
+            receiverId: "",
+            receiverEmail: values.email,
+            status: "pending",
+            inviteBy: isLogin.uid,
+            name: values.firstName + " " + values.lastName,
+          };
+          handleAddTeamMemberByInvite(payload)
             .then(() => {
-              // generateNotification(
-              //   "success",
-              //   "Member Added",
-              //   `${values.email} added`
-              // );
               console.log("Invite sent");
               setIsInviteSent(true);
               setInviteSentTo(values.email);
-              setItemSelected({
+              setCurrentItem({
                 name: payload.name,
                 inviteBy: isLogin.uid,
                 name: payload.name,
@@ -163,16 +125,28 @@ export default function MemberSelection({
                   </Avatar>
                 ),
               });
-              // form.resetFields();
-              // handleCancel();
+              if (formMode) {
+                setItemSelected({
+                  name: payload.name,
+                  inviteBy: isLogin.uid,
+                  name: payload.name,
+                  image: (
+                    <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                      {payload.name.substring(0, 2).toUpperCase()}
+                    </Avatar>
+                  ),
+                });
+              }
             })
             .finally(() => setLoading(false))
             .catch((ex) => {
               generateNotification("error", "Error", ex.message);
             });
-        } else {
-          generateNotification("error", "Error", ex.message);
         }
+      })
+
+      .catch((ex) => {
+        generateNotification("error", "Error", ex.message);
       });
   };
 
@@ -312,11 +286,26 @@ export default function MemberSelection({
           className="col-12"
           name="shareLink"
           label="Share link with anyone"
-          initialValue={"https://www.google.com/"}
+          initialValue={
+            // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
+            `http://localhost:3000/signup/${inviteId}`
+          }
         >
           <FormInput
             type="text"
             prefix={<LinkOutlined className="site-form-item-icon" />}
+            suffix={
+              <Button
+                icon={<CopyOutlined />}
+                style={{ margin: 0 }}
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
+                    `http://localhost:3000/signup/${inviteId}`
+                  );
+                }}
+              />
+            }
             // disabled={true}
           />
         </Form.Item>
@@ -337,6 +326,66 @@ export default function MemberSelection({
     },
   ];
 
+  const onClick = ({ key, label }) => {
+    // alert(`Click on item ${key} ${label}`);
+    handleUpdateTeamMemberStatus(key, "deleted")
+      .then(() => generateNotification("success", "Success", "Member deleted"))
+      .catch((ex) =>
+        generateNotification("error", "Error", "Error deleting member")
+      );
+  };
+
+  const onTabItemClick = (key) => {
+    // console.log(key);
+
+    if (key == "2" && itemSelected == null) {
+      console.log("formMode", formMode);
+      setInviteId(v4());
+      if (itemSelected?.name === "Waiting for member to join") return;
+      let payload = {
+        receiverId: "temp",
+        receiverEmail: "temp@temp.com",
+        status: "pending",
+        inviteBy: isLogin.uid,
+        batonId: batonId,
+        name: "Waiting for member to join",
+        inviteId: inviteId,
+      };
+      handleSendInviteToMember(payload)
+        .then(() => {
+          setCurrentItem({
+            name: payload.name,
+            id: inviteId,
+            image: (
+              <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                {payload.name.substring(0, 2).toUpperCase()}
+              </Avatar>
+            ),
+            status: "pending",
+          });
+          if (formMode) {
+            setItemSelected({
+              name: payload.name,
+              id: payload.inviteId,
+              image: (
+                <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                  {payload.name.substring(0, 2).toUpperCase()}
+                </Avatar>
+              ),
+              status: "pending",
+            });
+          }
+        })
+        .catch((ex) => {
+          // generateNotification("error", "Error", ex.message);
+        });
+    } else {
+      console.log("formMode Not", itemSelected);
+      setInviteId(itemSelected?.id);
+      console.log(inviteId);
+    }
+  };
+
   useEffect(() => {
     let data = teamMembers;
 
@@ -355,18 +404,6 @@ export default function MemberSelection({
     }
   }, [teamMembers, searchText]);
 
-  const onClick = ({ key, label }) => {
-    // alert(`Click on item ${key} ${label}`);
-    handleUpdateTeamMemberStatus(key, "deleted")
-      .then(() => generateNotification("success", "Success", "Member deleted"))
-      .catch((ex) =>
-        generateNotification("error", "Error", "Error deleting member")
-      );
-  };
-
-  // useEffect(() => {
-  //   console.log("isModalVisible", isModalVisible);
-  // }, [isModalVisible]);
   return (
     <>
       {/* Invite Member Modal Section */}
@@ -388,6 +425,7 @@ export default function MemberSelection({
           onChange={onChange}
           tabBarGutter={15}
           className="mt-2"
+          onTabClick={onTabItemClick}
         />
       </Modal>
 
@@ -444,7 +482,25 @@ export default function MemberSelection({
                   md={{ span: 5 }}
                   xs={{ span: 3 }}
                 >
-                  <PressableText onClick={() => alert("Remove Pressed")}>
+                  <PressableText
+                    onClick={() => {
+                      handleDeleteTeamMember(e.docId)
+                        .then(() => {
+                          generateNotification(
+                            "success",
+                            "Success",
+                            "Member deleted"
+                          );
+                        })
+                        .catch((ex) => {
+                          generateNotification(
+                            "error",
+                            "Error",
+                            "Error deleting member"
+                          );
+                        });
+                    }}
+                  >
                     <CloseCircleFilled style={{ color: colors.mosque }} />
                     <Text
                       className="ms-1 d-none d-md-block"
