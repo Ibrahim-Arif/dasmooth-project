@@ -27,7 +27,10 @@ import { handleUpdateTeamMemberStatus } from "./handleUpdateTeamMemberStatus";
 import { handleUploadFile } from "./handleUploadFile";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
+import { handleUpdateInviteStatus } from "./handleUpdateInviteStatus";
+
 export {
+  handleUpdateInviteStatus,
   handleSendEmailToMember,
   handleGetInvite,
   handleSendInviteToMember,

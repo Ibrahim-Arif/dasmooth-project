@@ -46,7 +46,7 @@ export default function Welcome() {
           htmlType="submit"
           bgcolor={colors.teal100}
           className="login-form-button px-5 mt-3"
-          onClick={() => navigate("/signIn/1")}
+          onClick={() => navigate("/signUp")}
         >
           SIGNUP TODAY!
         </LoginButton>

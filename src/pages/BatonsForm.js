@@ -78,6 +78,7 @@ export default function BatonsForm() {
   const [id, setID] = useState();
 
   const [loading, setLoading] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
   const [fetchedDataObject, setFetchedDataObject] = useState({
     status: "pending",
     deletedOn: 0,
@@ -158,6 +159,7 @@ export default function BatonsForm() {
       // console.log("new Post");
       // console.log(post);
       // return;
+
       setLoading(true);
       // console.log("Adding new post");
       handleAddBaton(post, id)
@@ -178,6 +180,7 @@ export default function BatonsForm() {
             "You baton is created"
           );
           setLoading(false);
+
           navigate("/main");
         })
         .catch((ex) => {
@@ -193,10 +196,10 @@ export default function BatonsForm() {
         budget: budgetData,
         title: title,
         description: description,
-        memberName: teamMemberData.text,
+        memberName: teamMemberData.name,
         updateOn: Date.now(),
       };
-
+      console.log("editedPost", editedPost);
       // console.log(editedPost);
       // return;
       setLoading(true);
@@ -209,9 +212,45 @@ export default function BatonsForm() {
         .catch((ex) => {
           setLoading(false);
           generateNotification("error", "Error", "Failed to update baton");
-          // console.log(ex);
+          console.log(ex);
         });
     }
+  };
+
+  const handleAddToDrafts = () => {
+    let post = {
+      deadline: dateData,
+      budget: budgetData,
+      title,
+      authorId: isLogin.uid,
+      memberId: teamMemberData.id,
+      authorName:
+        isLogin.displayName != null ? isLogin.displayName : isLogin.email,
+      memberName: teamMemberData.name,
+      authorPostStatus: "pending",
+      memberPostStatus: "received",
+      createdOn: Date.now(),
+      deletedOn: 0,
+      description: description,
+    };
+    // console.log("new Post");
+    // console.log(post);
+    // return;
+
+    setModalLoading(true);
+    // console.log("Adding new post");
+    handleAddBaton(post, id)
+      .then((docId) => {
+        generateNotification("success", "Baton Saved", "You baton is saved");
+        setModalLoading(false);
+
+        navigate("/main");
+      })
+      .catch((ex) => {
+        generateNotification("error", "Error", "Failed to save your baton");
+        // console.log(ex);
+        setModalLoading(false);
+      });
   };
 
   const handleResetPageView = () => {
@@ -418,28 +457,41 @@ export default function BatonsForm() {
         footer={null}
         mask={false}
       >
-        <Text strong>
-          You have unsaved changes to your Baton. Do you want to save your
-          changes?
-        </Text>
+        {!modalLoading ? (
+          <>
+            <Text strong>
+              You have unsaved changes to your Baton. Do you want to save your
+              changes?
+            </Text>
 
-        <div className="col-12">
-          <TealButton htmlType="button" className="col-12">
-            SAVE BATON
-          </TealButton>
+            <div className="col-12">
+              <TealButton
+                htmlType="button"
+                className="col-12"
+                onClick={handleAddToDrafts}
+              >
+                SAVE BATON
+              </TealButton>
 
-          <TealButton
-            htmlType="button"
-            className="col-12"
-            mode="outlined"
-            onClick={() => {
-              setIsDraftModalVisible(false);
-              navigate("/main");
-            }}
-          >
-            DISCARD
-          </TealButton>
-        </div>
+              <TealButton
+                htmlType="button"
+                className="col-12"
+                mode="outlined"
+                onClick={() => {
+                  setIsDraftModalVisible(false);
+                  navigate("/main");
+                }}
+              >
+                DISCARD
+              </TealButton>
+            </div>
+          </>
+        ) : (
+          <div className="col-12 d-flex flex-column justify-content-center">
+            <Text strong>Saving your baton...</Text>
+            <Loading />
+          </div>
+        )}
       </Modal>
 
       <Container fluid className="col">

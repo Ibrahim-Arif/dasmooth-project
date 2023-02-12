@@ -12,6 +12,7 @@ import {
   handleUpdateBaton,
   handleSignUp,
   handleGetInvite,
+  handleUpdateInviteStatus,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -23,6 +24,9 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [inviteData, setInviteData] = useState(null);
   const [inviteId, setInviteId] = useState(null);
+  const [inviteDataLoading, setInviteDataLoading] = useState(false);
+  const [form] = Form.useForm();
+
   const { setIsLogin, isLogin } = useUser();
 
   const navigate = useNavigate();
@@ -30,19 +34,25 @@ export default function SignUp() {
 
   useEffect(() => {
     if (id) {
+      setInviteDataLoading(true);
       setInviteId(id);
       handleGetInvite(id)
         .then((data) => {
           if (data) {
             // console.log(data);
+            form.setFieldValue("email", data?.receiverEmail);
+
             setInviteData(data);
+            setInviteDataLoading(false);
           } else {
             generateNotification("error", "Error", "Invalid Invitation");
             // navigate("/");
+            setInviteDataLoading(false);
           }
         })
         .catch((ex) => {
           generateNotification("error", "Error", "Invalid Invitation");
+          setInviteDataLoading(false);
           // navigate("/");
         });
     }
@@ -54,6 +64,15 @@ export default function SignUp() {
     // if there is an id, then it means the user is signing up from an invite
     if (inviteId) {
       // first create the user
+      if (values.email != inviteData?.receiverEmail) {
+        setLoading(false);
+        return generateNotification(
+          "error",
+          "Error",
+          "Email does not match the one in invitation"
+        );
+      }
+
       handleSignUp(values.email, values.password)
         .then((user) => {
           console.log("Signed Up", user);
@@ -62,24 +81,30 @@ export default function SignUp() {
             receiverEmail: user.email,
             status: "accepted",
             inviteBy: inviteData?.inviteBy,
-            name: user.email,
+            name: user.email?.split("@")[0],
           };
 
           // then add the user to the team
           handleAddTeamMember(inviteId, payload)
             .then((res) => {
               console.log("Added Team Member", res);
-
-              // then update the baton
-              handleUpdateBaton(inviteData?.batonId, {
-                memberName: payload.receiverEmail,
-                memberId: payload.receiverId,
-                memberPostStatus: "received",
-                authorPostStatus: "passed",
-              }).then((res) => {
-                console.log("Updated Baton", res);
-                setLoading(false);
-                navigate("/verifyEmail");
+              handleUpdateInviteStatus(inviteId, "accepted").then(() => {
+                // then update the baton
+                handleUpdateBaton(inviteData?.batonId, {
+                  memberName: payload.receiverEmail,
+                  memberId: payload.receiverId,
+                  memberPostStatus: "received",
+                  authorPostStatus: "passed",
+                })
+                  .then((res) => {
+                    console.log("Updated Baton", res);
+                    setLoading(false);
+                    navigate("/verifyEmail");
+                  })
+                  .catch((ex) => {
+                    generateNotification("error", "Error", ex.message);
+                    setLoading(false);
+                  });
               });
             })
             .catch((ex) => {
@@ -117,110 +142,120 @@ export default function SignUp() {
 
   return (
     <Container className="d-flex flex-column" style={{ height: "100vh" }}>
-      <Container className="d-flex col-12 col-lg-7 mt-5 justify-content-center align-items-center">
-        <div className="col-5 col-md-3">
-          <img src={logo} style={{ width: "100%" }} />
-        </div>
-      </Container>
-      <Container className="d-flex flex-column col-12 col-lg-7 mt-5 justify-content-center align-items-center">
-        <Title level={1} className="mb-5">
-          <ColoredTitle color="white">Welcome Back</ColoredTitle>
-        </Title>
-        <Form
-          name="normal_login"
-          className="login-form d-flex col-12 flex-column align-items-center"
-          initialValues={{
-            remember: true,
-          }}
-          onFinish={onFinish}
-        >
-          <Form.Item
-            className="col-12"
-            name="email"
-            rules={[
-              {
-                type: "email",
-                message: "The input is not valid E-mail!",
-              },
-              {
-                required: true,
-                message: "Please input your E-mail!",
-              },
-            ]}
+      {/* {inviteDataLoading ? (
+        () => <Loading />
+      ) : ( */}
+      <>
+        <Container className="d-flex col-12 col-lg-7 mt-5 justify-content-center align-items-center">
+          <div className="col-5 col-md-3">
+            <img src={logo} style={{ width: "100%" }} />
+          </div>
+        </Container>
+        <Container className="d-flex flex-column col-12 col-lg-7 mt-5 justify-content-center align-items-center">
+          <Title level={1} className="mb-5">
+            <ColoredTitle color="white">Welcome Back</ColoredTitle>
+          </Title>
+          <Form
+            name="normal_login"
+            className="login-form d-flex col-12 flex-column align-items-center"
+            initialValues={{
+              remember: true,
+            }}
+            form={form}
+            onFinish={onFinish}
           >
-            <FormInput
-              type="email"
-              prefix={<UserOutlined className="site-form-item-icon" />}
-              placeholder="Email"
-              autoComplete="off"
-              style={{
-                backgroundColor: focusedEmail ? "white" : "transparent",
-                color: focusedEmail ? "black" : "white",
-              }}
-              onFocus={() => setFocusedEmail(true)}
-              onBlur={() => setFocusedEmail(false)}
-            />
-          </Form.Item>
-
-          <Form.Item
-            className="col-12"
-            name="password"
-            rules={[
-              {
-                min: 6,
-                message: "Password length should not be less than 6",
-              },
-              {
-                required: true,
-                message: "Please input your Password!",
-              },
-            ]}
-          >
-            <FormPassword
-              prefix={<LockOutlined className="site-form-item-icon" />}
-              style={{
-                backgroundColor: focusedPassword ? "white" : "transparent",
-                color: focusedPassword ? "black" : "white",
-              }}
-              type="password"
-              placeholder="Password"
-              onFocus={() => setFocusedPassword(true)}
-              onBlur={() => setFocusedPassword(false)}
-            />
-          </Form.Item>
-
-          <Form.Item className="mt-4">
-            {loading ? (
-              <Loading size="large" color={colors.teal100} />
-            ) : (
-              <SignUpButton
-                htmlType="submit"
-                bgcolor={colors.teal100}
-                className="login-form-button px-5"
-              >
-                Sign up
-              </SignUpButton>
-            )}
-            {/* Or <a href="">register now!</a> */}
-          </Form.Item>
-
-          <Form.Item>
-            <ColoredTitle color="white">Already have an account?</ColoredTitle>
-            {"    "}
-            <ColoredTitle
-              color={colors.teal100}
-              textStyle="underline"
-              onClick={() => {
-                console.log(inviteId);
-                if (inviteId) navigate("/signin/" + inviteId);
-                else navigate("/signin");
-              }}
+            <Form.Item
+              className="col-12"
+              name="email"
+              rules={[
+                {
+                  type: "email",
+                  message: "The input is not valid E-mail!",
+                },
+                {
+                  required: true,
+                  message: "Please input your E-mail!",
+                },
+              ]}
             >
-              Log In
-            </ColoredTitle>
-          </Form.Item>
-        </Form>
-      </Container>
+              <FormInput
+                type="email"
+                prefix={<UserOutlined className="site-form-item-icon" />}
+                placeholder="Email"
+                autoComplete="off"
+                style={{
+                  backgroundColor: focusedEmail ? "white" : "transparent",
+                  color: focusedEmail ? "black" : "white",
+                }}
+                onFocus={() => setFocusedEmail(true)}
+                onBlur={() => setFocusedEmail(false)}
+                disabled={inviteData ? true : false}
+              />
+            </Form.Item>
+
+            <Form.Item
+              className="col-12"
+              name="password"
+              rules={[
+                {
+                  min: 6,
+                  message: "Password length should not be less than 6",
+                },
+                {
+                  required: true,
+                  message: "Please input your Password!",
+                },
+              ]}
+            >
+              <FormPassword
+                prefix={<LockOutlined className="site-form-item-icon" />}
+                style={{
+                  backgroundColor: focusedPassword ? "white" : "transparent",
+                  color: focusedPassword ? "black" : "white",
+                }}
+                type="password"
+                placeholder="Password"
+                onFocus={() => setFocusedPassword(true)}
+                onBlur={() => setFocusedPassword(false)}
+              />
+            </Form.Item>
+
+            <Form.Item className="mt-4">
+              {loading ? (
+                <Loading size="large" color={colors.teal100} />
+              ) : (
+                <SignUpButton
+                  htmlType="submit"
+                  bgcolor={colors.teal100}
+                  className="login-form-button px-5"
+                >
+                  Sign up
+                </SignUpButton>
+              )}
+              {/* Or <a href="">register now!</a> */}
+            </Form.Item>
+
+            <Form.Item>
+              <ColoredTitle color="white">
+                Already have an account?
+              </ColoredTitle>
+              {"    "}
+              <ColoredTitle
+                color={colors.teal100}
+                textStyle="underline"
+                onClick={() => {
+                  console.log(inviteId);
+                  if (inviteId) navigate("/signin/" + inviteId);
+                  else navigate("/signin");
+                }}
+              >
+                Log In
+              </ColoredTitle>
+            </Form.Item>
+          </Form>
+        </Container>
+      </>
+      {/* )} */}
     </Container>
   );
 }
@@ -249,6 +284,10 @@ const FormInput = styledComponents(Input)`
     input[type=email]:focus {
       background-color: white;
       color: black;
+    }   
+    .ant-input[disabled] {
+      background-color: transparent;
+      color: white !important;
     }
    
 `;

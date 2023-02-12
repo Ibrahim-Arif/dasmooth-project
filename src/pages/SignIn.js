@@ -11,6 +11,7 @@ import {
   handleGetInvite,
   handleAddTeamMember,
   handleUpdateBaton,
+  handleUpdateInviteStatus,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -37,8 +38,9 @@ export default function SignIn() {
       handleGetInvite(id)
         .then((data) => {
           if (data) {
-            // console.log(data);
             setInviteData(data);
+            form.setFieldValue("email", data?.receiverEmail);
+            console.log(data);
           } else {
             generateNotification("error", "Error", "Invalid Invitation");
             // navigate("/");
@@ -60,6 +62,14 @@ export default function SignIn() {
     // if there is an id, then it means the user is signing ip from an invite
     if (inviteId) {
       // first signIn the user
+      if (values.email != inviteData?.receiverEmail) {
+        setLoading(false);
+        return generateNotification(
+          "error",
+          "Error",
+          "Email does not match the one in invitation"
+        );
+      }
       handleSignIn(values.email, values.password)
         .then((user) => {
           console.log("Signed Up", user);
@@ -68,7 +78,7 @@ export default function SignIn() {
             receiverEmail: user.email,
             status: "accepted",
             inviteBy: inviteData?.inviteBy,
-            name: user.email,
+            name: user.email?.split("@")[0],
           };
 
           // then add the user to the team
@@ -76,26 +86,40 @@ export default function SignIn() {
             .then((res) => {
               console.log("Added Team Member", res);
 
-              // then update the baton
-              handleUpdateBaton(inviteData?.batonId, {
-                memberName: payload.receiverEmail,
-                memberId: payload.receiverId,
-                memberPostStatus: "received",
-                authorPostStatus: "passed",
-              }).then((res) => {
-                setLoading(false);
-                if (!user.emailVerified) {
-                  generateNotification(
-                    "error",
-                    "Verify Email",
-                    "Kindly verify your email to continue"
-                  );
-                  return;
-                } else {
-                  setIsLogin(user);
-                  navigate("/");
-                }
+              handleUpdateInviteStatus(inviteId, "accepted").then((res) => {
+                handleUpdateBaton(inviteData?.batonId, {
+                  memberName: payload.receiverEmail,
+                  memberId: payload.receiverId,
+                  memberPostStatus: "received",
+                  authorPostStatus: "passed",
+                })
+                  .then((res) => {
+                    setLoading(false);
+                    if (!user.emailVerified) {
+                      generateNotification(
+                        "error",
+                        "Verify Email",
+                        "Kindly verify your email to continue"
+                      );
+                      return;
+                    } else {
+                      setIsLogin(user);
+                      navigate("/");
+                    }
+                  })
+                  .catch((ex) => {
+                    generateNotification(
+                      "error",
+                      "Error",
+                      "The Baton you are invited to is no created yet."
+                    );
+                    setIsLogin(user);
+                    navigate("/");
+                    setLoading(false);
+                  });
               });
+
+              // then update the baton
             })
             .catch((ex) => {
               generateNotification("error", "Error", ex.message);
@@ -154,6 +178,7 @@ export default function SignIn() {
           initialValues={{
             remember: true,
           }}
+          form={form}
           onFinish={onFinish}
         >
           <Form.Item
@@ -181,6 +206,7 @@ export default function SignIn() {
               }}
               onFocus={() => setFocusedEmail(true)}
               onBlur={() => setFocusedEmail(false)}
+              disabled={inviteId ? true : false}
             />
           </Form.Item>
 
@@ -243,7 +269,8 @@ export default function SignIn() {
               color={colors.teal100}
               textStyle="underline"
               onClick={() => {
-                navigate("/signup");
+                if (inviteId) navigate("/signup/" + inviteId);
+                else navigate("/signup");
               }}
             >
               Sign Up
@@ -279,6 +306,10 @@ const FormInput = styledComponents(Input)`
     input[type=email]:focus {
       background-color: white;
       color: black;
+    }
+    .ant-input[disabled] {
+      background-color: transparent;
+      color: white !important;
     }
    
 `;

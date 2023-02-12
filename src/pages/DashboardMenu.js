@@ -280,11 +280,30 @@ export default function DashboardMenu() {
             {/* {console.log(isLogin.photoURL)} */}
             {/* [2022-07-07] if we do not have a photoURL then we show the name initials */}
             {photoURL == null || photoURL == "" ? (
-              <Avatar style={{ backgroundColor: colors.teal100 }} size={64}>
-                {isLogin.displayName != null
-                  ? isLogin.displayName.substring(0, 2).toUpperCase()
-                  : isLogin.email.substring(0, 2).toUpperCase()}
-              </Avatar>
+              <div style={{ position: "relative" }}>
+                <Avatar style={{ backgroundColor: colors.teal100 }} size={64}>
+                  {isLogin.displayName != null
+                    ? isLogin.displayName.substring(0, 2).toUpperCase()
+                    : isLogin.email.substring(0, 2).toUpperCase()}
+                </Avatar>
+                <Button
+                  type="default"
+                  size="small"
+                  shape="circle"
+                  icon={<HiPencil size={18} color={colors.teal100} />}
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    backgroundColor: "white",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                  onClick={() => navigate("profileSettings")}
+                />
+              </div>
             ) : (
               <div style={{ position: "relative" }}>
                 <Avatar src={photoURL} size={64} />
@@ -321,7 +340,7 @@ export default function DashboardMenu() {
             >
               {isLogin.displayName != null
                 ? isLogin.displayName
-                : isLogin.email}
+                : isLogin.email?.split("@")[0]}
             </label>
           </Container>
 

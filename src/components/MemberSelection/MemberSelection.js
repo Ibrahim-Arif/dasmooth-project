@@ -60,6 +60,7 @@ export default function MemberSelection({
   const [isInviteSent, setIsInviteSent] = useState(false);
   const [inviteSentTo, setInviteSentTo] = useState("");
   const [inviteId, setInviteId] = useState("");
+  const [linkCopied, setLinkCopied] = useState(false);
   const [form] = Form.useForm();
   const { isLogin, teamMembers } = useUser();
 
@@ -83,12 +84,11 @@ export default function MemberSelection({
     console.log(key);
   };
 
-  // ! No need for this now, update it
   const handleAddMemberByEmailSubmit = (values) => {
     // 1. Check if user is already a member of the team, then show error
     // 2. if user is not a member of the team, then send mail
 
-    console.log(members);
+    // console.log(members);
     // handleCheckUserExsistInSystem(values.email)
     //   .then((uid) => {
     //     let payload = {};
@@ -147,6 +147,7 @@ export default function MemberSelection({
     //     }
     //   })
 
+    if (values.email === isLogin.email) return;
     if (
       members?.filter((item) => item.receiverEmail == values.email).length > 0
     ) {
@@ -173,62 +174,54 @@ export default function MemberSelection({
         to_email: payload.receiverEmail,
         url: `${new URL(window.location).origin}/signup/${invId}`,
       };
-      emailjs.init("XfuoIqu_5KB37PoAW");
-      emailjs.send("service_es7mh2u", "template_p180c7t", templateParams).then(
+      emailjs.init("l-LW9FV7je0GRpUsN");
+      emailjs.send("service_sqizzqr", "template_7rhfybc", templateParams).then(
         function (response) {
           console.log("SUCCESS!", response.status, response.text);
+
+          setInviteSentTo("");
+          setIsInviteSent(false);
+          setLoading(true);
+
+          // sent email to the user and then add to database
+          handleSendInviteToMember(payload)
+            .then(() => {
+              console.log("Invite sent");
+              setIsInviteSent(true);
+              setInviteSentTo(values.email);
+              setCurrentItem({
+                name: payload.name,
+                id: inviteId,
+                image: (
+                  <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                    {payload.name.substring(0, 2).toUpperCase()}
+                  </Avatar>
+                ),
+                status: "pending",
+              });
+              if (formMode) {
+                setItemSelected({
+                  name: payload.name,
+                  id: payload.inviteId,
+                  image: (
+                    <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                      {payload.name.substring(0, 2).toUpperCase()}
+                    </Avatar>
+                  ),
+                  status: "pending",
+                });
+              }
+            })
+            .finally(() => setLoading(false))
+            .catch((ex) => {
+              // console.log(ex.message);
+              generateNotification("error", "Error", ex.message);
+            });
         },
-        function (error) {
-          console.log("FAILED...", error);
+        function (ex) {
+          generateNotification("error", "Error", ex.message);
         }
       );
-      return;
-      setInviteSentTo("");
-      setIsInviteSent(false);
-      setLoading(true);
-
-      // sent email to the user and then add to database
-      // handleSendEmailToMember(emailPayload)
-      // .then(() => {
-      //   handleSendInviteToMember(payload)
-      //     .then(() => {
-      //       console.log("Invite sent");
-      //       setIsInviteSent(true);
-      //       setInviteSentTo(values.email);
-      //       setCurrentItem({
-      //         name: payload.name,
-      //         id: inviteId,
-      //         image: (
-      //           <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-      //             {payload.name.substring(0, 2).toUpperCase()}
-      //           </Avatar>
-      //         ),
-      //         status: "pending",
-      //       });
-      //       if (formMode) {
-      //         setItemSelected({
-      //           name: payload.name,
-      //           id: payload.inviteId,
-      //           image: (
-      //             <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-      //               {payload.name.substring(0, 2).toUpperCase()}
-      //             </Avatar>
-      //           ),
-      //           status: "pending",
-      //         });
-      //       }
-      //     })
-      //     .finally(() => setLoading(false))
-      //     .catch((ex) => {
-      //       // console.log(ex.message);
-      //       generateNotification("error", "Error", ex.message);
-      //     });
-      // })
-      // .catch((ex) => {
-      //   // console.log(ex.message);
-      //   generateNotification("error", "Error", ex.message);
-      // })
-      // .finally(() => setLoading(false));
     }
   };
 
@@ -335,7 +328,11 @@ export default function MemberSelection({
         ) : (
           <div className="col-12">
             <Form.Item className="mb-0">
-              <TealButton htmlType="submit" className="col-12 ">
+              <TealButton
+                htmlType="submit"
+                className="col-12 "
+                disabled={isInviteSent}
+              >
                 SEND INVITE
               </TealButton>
             </Form.Item>
@@ -378,15 +375,20 @@ export default function MemberSelection({
             prefix={<LinkOutlined className="site-form-item-icon" />}
             suffix={
               <Button
-                icon={<CopyOutlined />}
+                icon={!linkCopied && <CopyOutlined size={15} />}
+                type="text"
                 style={{ margin: 0 }}
+                size="small"
                 onClick={() => {
+                  setLinkCopied(true);
                   navigator.clipboard.writeText(
                     // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
                     `${new URL(window.location).origin}/signup/${inviteId}`
                   );
                 }}
-              />
+              >
+                {linkCopied && "Copied"}
+              </Button>
             }
             // disabled={true}
           />
@@ -410,6 +412,10 @@ export default function MemberSelection({
 
   const onClick = ({ key, label }) => {
     // alert(`Click on item ${key} ${label}`);
+    const response = window.confirm(
+      "Are you sure you want to delete this member?"
+    );
+    if (!response) return;
     handleUpdateTeamMemberStatus(key, "deleted")
       .then(() => generateNotification("success", "Success", "Member deleted"))
       .catch((ex) =>
@@ -568,8 +574,13 @@ export default function MemberSelection({
                 >
                   <PressableText
                     onClick={() => {
+                      const response = window.confirm(
+                        "Are you sure you want to delete this member?"
+                      );
+                      if (!response) return;
                       handleDeleteTeamMember(e.docId)
                         .then(() => {
+                          setItemSelected(null);
                           generateNotification(
                             "success",
                             "Success",
