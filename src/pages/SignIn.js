@@ -8,9 +8,9 @@ import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
 import { logo } from "../assets";
 import {
-  handleForgotPassword,
-  handleSignUp,
   handleGetInvite,
+  handleAddTeamMember,
+  handleUpdateBaton,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -23,6 +23,7 @@ export default function SignIn() {
   const [focusedPassword, setFocusedPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inviteData, setInviteData] = useState(null);
+  const [inviteId, setInviteId] = useState(null);
   const { setIsLogin, isLogin } = useUser();
 
   // useCheckSignIn();
@@ -31,7 +32,8 @@ export default function SignIn() {
 
   console.log(id);
   useEffect(() => {
-    if (id)
+    if (id) {
+      setInviteId(id);
       handleGetInvite(id)
         .then((data) => {
           if (data) {
@@ -46,6 +48,7 @@ export default function SignIn() {
           generateNotification("error", "Error", "Invalid Invitation");
           // navigate("/");
         });
+    }
     document.getElementById("body").style.backgroundColor = colors.htmlColor;
   }, []);
 
@@ -53,26 +56,76 @@ export default function SignIn() {
 
   const onFinish = (values) => {
     setLoading(true);
-    handleSignIn(values.email, values.password)
-      .then((user) => {
-        setLoading(false);
-        if (!user.emailVerified) {
-          generateNotification(
-            "error",
-            "Verify Email",
-            "Kindly verify your email to continue"
-          );
-          return;
-        } else {
-          localStorage.setItem("uid", user.uid);
-          setIsLogin(user);
-          navigate("/");
-        }
-      })
-      .catch((ex) => {
-        generateNotification("error", "Error", ex.message);
-        setLoading(false);
-      });
+
+    // if there is an id, then it means the user is signing ip from an invite
+    if (inviteId) {
+      // first signIn the user
+      handleSignIn(values.email, values.password)
+        .then((user) => {
+          console.log("Signed Up", user);
+          let payload = {
+            receiverId: user.uid,
+            receiverEmail: user.email,
+            status: "accepted",
+            inviteBy: inviteData?.inviteBy,
+            name: user.email,
+          };
+
+          // then add the user to the team
+          handleAddTeamMember(inviteId, payload)
+            .then((res) => {
+              console.log("Added Team Member", res);
+
+              // then update the baton
+              handleUpdateBaton(inviteData?.batonId, {
+                memberName: payload.receiverEmail,
+                memberId: payload.receiverId,
+                memberPostStatus: "received",
+                authorPostStatus: "passed",
+              }).then((res) => {
+                setLoading(false);
+                if (!user.emailVerified) {
+                  generateNotification(
+                    "error",
+                    "Verify Email",
+                    "Kindly verify your email to continue"
+                  );
+                  return;
+                } else {
+                  setIsLogin(user);
+                  navigate("/");
+                }
+              });
+            })
+            .catch((ex) => {
+              generateNotification("error", "Error", ex.message);
+              setLoading(false);
+            });
+        })
+        .catch((ex) => {
+          generateNotification("error", "Error", ex.message);
+          setLoading(false);
+        });
+    } else
+      handleSignIn(values.email, values.password)
+        .then((user) => {
+          setLoading(false);
+          if (!user.emailVerified) {
+            generateNotification(
+              "error",
+              "Verify Email",
+              "Kindly verify your email to continue"
+            );
+            return;
+          } else {
+            setIsLogin(user);
+            navigate("/");
+          }
+        })
+        .catch((ex) => {
+          generateNotification("error", "Error", ex.message);
+          setLoading(false);
+        });
   };
 
   const handleForgotPress = () => {

@@ -74,7 +74,7 @@ export default function DashboardView(props) {
     setCompleteBatons(complete);
 
     // console.log(batons);
-  }, [batonsData]);
+  }, [JSON.stringify(batonsData)]);
 
   const getBaton = {
     PendingBatons,

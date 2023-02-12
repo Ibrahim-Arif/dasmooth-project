@@ -9,8 +9,8 @@ import { colors } from "../utilities/colors";
 import { logo } from "../assets";
 import {
   handleAddTeamMember,
-  handleSignUp,
   handleUpdateBaton,
+  handleSignUp,
   handleGetInvite,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";

@@ -18,6 +18,7 @@ import { handleGetNotifications } from "./handleGetNotifications";
 import { handleGetOtherBatons } from "./handleGetOtherBatons";
 import { handleGetTeamMember } from "./handleGetTeamMember";
 import { handleGetTeamMembers } from "./handleGetTeamMembers";
+import { handleSendEmailToMember } from "./handleSendEmailToMember";
 import { handleSendInviteToMember } from "./handleSendInviteToMember";
 import { handleSignUp } from "./handleSignUp";
 import { handleUpdateBaton } from "./handleUpdateBaton";
@@ -26,8 +27,8 @@ import { handleUpdateTeamMemberStatus } from "./handleUpdateTeamMemberStatus";
 import { handleUploadFile } from "./handleUploadFile";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
-
 export {
+  handleSendEmailToMember,
   handleGetInvite,
   handleSendInviteToMember,
   handleGetTeamMember,

@@ -107,11 +107,11 @@ const App = () => {
     }, []);
     setPermanentData(filteredArr);
     // console.log("Permanent:", permanentData);
-  }, [myBatons.length, otherBatons.length]);
+  }, [JSON.stringify(myBatons), JSON.stringify(otherBatons.length)]);
 
   useEffect(() => {
     setBatonsData([...permanentData]);
-  }, [permanentData.length]);
+  }, [JSON.stringify(permanentData)]);
 
   return (
     <StateProvider values={userContextValues}>

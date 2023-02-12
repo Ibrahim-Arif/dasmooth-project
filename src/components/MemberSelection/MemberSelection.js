@@ -12,6 +12,7 @@ import {
   Row,
   Button,
 } from "antd";
+
 import { colors } from "../../utilities/colors";
 import {
   PlusOutlined,
@@ -28,6 +29,8 @@ import {
   handleAddSystemUserToMember,
   handleCheckUserExsistInSystem,
   handleDeleteTeamMember,
+  handleGetTeamMember,
+  handleSendEmailToMember,
   handleSendInviteToMember,
   handleSignUp,
   handleUpdateTeamMemberStatus,
@@ -37,6 +40,7 @@ import { generateNotification } from "../../utilities/generateNotification";
 import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
 import Loading from "../Loading/Loading";
 import styled from "styled-components";
+import emailjs from "@emailjs/browser";
 import { v4 } from "uuid";
 
 const { Title, Text, Link } = Typography;
@@ -79,75 +83,153 @@ export default function MemberSelection({
     console.log(key);
   };
 
-  // ! No need for this now
+  // ! No need for this now, update it
   const handleAddMemberByEmailSubmit = (values) => {
-    // console.log(values);
-    // here we create user with email
-    setInviteSentTo("");
-    setIsInviteSent(false);
-    setLoading(true);
+    // 1. Check if user is already a member of the team, then show error
+    // 2. if user is not a member of the team, then send mail
 
-    handleCheckUserExsistInSystem(values.email)
-      .then((uid) => {
-        let payload = {};
-        if (uid) {
-          console.log("User exsist in system, Adding member to team");
-          payload = {
-            receiverId: uid,
-            receiverEmail: values.email,
-            status: "pending",
-            inviteBy: isLogin.uid,
-            name: values.firstName + " " + values.lastName,
-          };
+    console.log(members);
+    // handleCheckUserExsistInSystem(values.email)
+    //   .then((uid) => {
+    //     let payload = {};
+    //     if (uid) {
+    //       console.log("User exsist in system, Adding member to team");
+    //       payload = {
+    //         receiverId: uid,
+    //         receiverEmail: values.email,
+    //         status: "pending",
+    //         inviteBy: isLogin.uid,
+    //         name: values.firstName + " " + values.lastName,
+    //       };
 
-          // sent email to the user and then add to database
-        } else {
-          console.log("User don't exsist in system, Adding member to team");
-          payload = {
-            receiverId: "",
-            receiverEmail: values.email,
-            status: "pending",
-            inviteBy: isLogin.uid,
-            name: values.firstName + " " + values.lastName,
-          };
-          handleAddTeamMemberByInvite(payload)
-            .then(() => {
-              console.log("Invite sent");
-              setIsInviteSent(true);
-              setInviteSentTo(values.email);
-              setCurrentItem({
-                name: payload.name,
-                inviteBy: isLogin.uid,
-                name: payload.name,
-                image: (
-                  <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                    {payload.name.substring(0, 2).toUpperCase()}
-                  </Avatar>
-                ),
-              });
-              if (formMode) {
-                setItemSelected({
-                  name: payload.name,
-                  inviteBy: isLogin.uid,
-                  name: payload.name,
-                  image: (
-                    <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                      {payload.name.substring(0, 2).toUpperCase()}
-                    </Avatar>
-                  ),
-                });
-              }
-            })
-            .finally(() => setLoading(false))
-            .catch((ex) => {
-              generateNotification("error", "Error", ex.message);
-            });
+    //       // sent email to the user and then add to database
+    //     } else {
+    //       console.log("User don't exsist in system, Adding member to team");
+    //       payload = {
+    //         receiverId: "",
+    //         receiverEmail: values.email,
+    //         status: "pending",
+    //         inviteBy: isLogin.uid,
+    //         name: values.firstName + " " + values.lastName,
+    //       };
+    //       handleAddTeamMemberByInvite(payload)
+    //         .then(() => {
+    //           console.log("Invite sent");
+    //           setIsInviteSent(true);
+    //           setInviteSentTo(values.email);
+    //           setCurrentItem({
+    //             name: payload.name,
+    //             inviteBy: isLogin.uid,
+    //             name: payload.name,
+    //             image: (
+    //               <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+    //                 {payload.name.substring(0, 2).toUpperCase()}
+    //               </Avatar>
+    //             ),
+    //           });
+    //           if (formMode) {
+    //             setItemSelected({
+    //               name: payload.name,
+    //               inviteBy: isLogin.uid,
+    //               name: payload.name,
+    //               image: (
+    //                 <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+    //                   {payload.name.substring(0, 2).toUpperCase()}
+    //                 </Avatar>
+    //               ),
+    //             });
+    //           }
+    //         })
+    //         .finally(() => setLoading(false))
+    //         .catch((ex) => {
+    //           generateNotification("error", "Error", ex.message);
+    //         });
+    //     }
+    //   })
+
+    if (
+      members?.filter((item) => item.receiverEmail == values.email).length > 0
+    ) {
+      generateNotification(
+        "error",
+        "Error",
+        "User already a member of the team"
+      );
+    } else {
+      let invId = v4();
+      setInviteId(invId);
+      let payload = {
+        receiverId: "temp",
+        receiverEmail: values.email,
+        status: "pending",
+        inviteBy: isLogin.uid,
+        batonId: batonId,
+        name: values.firstName + " " + values.lastName,
+        inviteId: invId,
+      };
+
+      var templateParams = {
+        to_name: payload.name,
+        to_email: payload.receiverEmail,
+        url: `${new URL(window.location).origin}/signup/${invId}`,
+      };
+      emailjs.init("XfuoIqu_5KB37PoAW");
+      emailjs.send("service_es7mh2u", "template_p180c7t", templateParams).then(
+        function (response) {
+          console.log("SUCCESS!", response.status, response.text);
+        },
+        function (error) {
+          console.log("FAILED...", error);
         }
-      })
+      );
+      return;
+      setInviteSentTo("");
+      setIsInviteSent(false);
+      setLoading(true);
 
-      .catch((ex) => {
-        generateNotification("error", "Error", ex.message);
-      });
+      // sent email to the user and then add to database
+      // handleSendEmailToMember(emailPayload)
+      // .then(() => {
+      //   handleSendInviteToMember(payload)
+      //     .then(() => {
+      //       console.log("Invite sent");
+      //       setIsInviteSent(true);
+      //       setInviteSentTo(values.email);
+      //       setCurrentItem({
+      //         name: payload.name,
+      //         id: inviteId,
+      //         image: (
+      //           <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+      //             {payload.name.substring(0, 2).toUpperCase()}
+      //           </Avatar>
+      //         ),
+      //         status: "pending",
+      //       });
+      //       if (formMode) {
+      //         setItemSelected({
+      //           name: payload.name,
+      //           id: payload.inviteId,
+      //           image: (
+      //             <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+      //               {payload.name.substring(0, 2).toUpperCase()}
+      //             </Avatar>
+      //           ),
+      //           status: "pending",
+      //         });
+      //       }
+      //     })
+      //     .finally(() => setLoading(false))
+      //     .catch((ex) => {
+      //       // console.log(ex.message);
+      //       generateNotification("error", "Error", ex.message);
+      //     });
+      // })
+      // .catch((ex) => {
+      //   // console.log(ex.message);
+      //   generateNotification("error", "Error", ex.message);
+      // })
+      // .finally(() => setLoading(false));
+    }
   };
 
   const renderInviteForm = () => {
@@ -288,7 +370,7 @@ export default function MemberSelection({
           label="Share link with anyone"
           initialValue={
             // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
-            `http://localhost:3000/signup/${inviteId}`
+            `${new URL(window.location).origin}/signup/${inviteId}`
           }
         >
           <FormInput
@@ -301,7 +383,7 @@ export default function MemberSelection({
                 onClick={() => {
                   navigator.clipboard.writeText(
                     // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
-                    `http://localhost:3000/signup/${inviteId}`
+                    `${new URL(window.location).origin}/signup/${inviteId}`
                   );
                 }}
               />
@@ -339,8 +421,10 @@ export default function MemberSelection({
     // console.log(key);
 
     if (key == "2" && itemSelected == null) {
-      console.log("formMode", formMode);
-      setInviteId(v4());
+      console.log("send invite by link", formMode);
+      let invId = v4();
+      // console.log(invId);
+      setInviteId(invId);
       if (itemSelected?.name === "Waiting for member to join") return;
       let payload = {
         receiverId: "temp",
@@ -349,13 +433,13 @@ export default function MemberSelection({
         inviteBy: isLogin.uid,
         batonId: batonId,
         name: "Waiting for member to join",
-        inviteId: inviteId,
+        inviteId: invId,
       };
       handleSendInviteToMember(payload)
         .then(() => {
           setCurrentItem({
             name: payload.name,
-            id: inviteId,
+            id: payload.inviteId,
             image: (
               <Avatar style={{ backgroundColor: colors.tealLight20 }}>
                 {payload.name.substring(0, 2).toUpperCase()}
@@ -377,7 +461,7 @@ export default function MemberSelection({
           }
         })
         .catch((ex) => {
-          // generateNotification("error", "Error", ex.message);
+          generateNotification("error", "Error", ex.message);
         });
     } else {
       console.log("formMode Not", itemSelected);
@@ -448,7 +532,7 @@ export default function MemberSelection({
       <div className="px-0">
         {formMode
           ? members.map((e, index) => (
-              <Row className="d-flex align-items-center">
+              <Row className="d-flex align-items-center" key={index}>
                 <Col
                   xl={{ span: 20 }}
                   lg={{ span: 18 }}
