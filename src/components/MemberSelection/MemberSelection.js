@@ -61,6 +61,7 @@ export default function MemberSelection({
   const [inviteSentTo, setInviteSentTo] = useState("");
   const [inviteId, setInviteId] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
+  const [showLink, setShowLink] = useState(false);
   const [form] = Form.useForm();
   const { isLogin, teamMembers } = useUser();
 
@@ -157,6 +158,7 @@ export default function MemberSelection({
         "User already a member of the team"
       );
     } else {
+      setLoading(true);
       let invId = v4();
       setInviteId(invId);
       let payload = {
@@ -175,34 +177,22 @@ export default function MemberSelection({
         url: `${new URL(window.location).origin}/signup/${invId}`,
       };
       emailjs.init("l-LW9FV7je0GRpUsN");
-      emailjs.send("service_sqizzqr", "template_7rhfybc", templateParams).then(
-        function (response) {
-          console.log("SUCCESS!", response.status, response.text);
-
-          setInviteSentTo("");
-          setIsInviteSent(false);
-          setLoading(true);
-
-          // sent email to the user and then add to database
-          handleSendInviteToMember(payload)
-            .then(() => {
-              console.log("Invite sent");
-              setIsInviteSent(true);
-              setInviteSentTo(values.email);
-              setCurrentItem({
-                name: payload.name,
-                id: inviteId,
-                image: (
-                  <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                    {payload.name.substring(0, 2).toUpperCase()}
-                  </Avatar>
-                ),
-                status: "pending",
-              });
-              if (formMode) {
-                setItemSelected({
+      emailjs
+        .send("service_sqizzqr", "template_7rhfybc", templateParams)
+        .then(
+          function (response) {
+            console.log("SUCCESS!", response.status, response.text);
+            setInviteSentTo("");
+            setIsInviteSent(false);
+            // sent email to the user and then add to database
+            handleSendInviteToMember(payload)
+              .then(() => {
+                console.log("Invite sent");
+                setIsInviteSent(true);
+                setInviteSentTo(values.email);
+                setCurrentItem({
                   name: payload.name,
-                  id: payload.inviteId,
+                  id: inviteId,
                   image: (
                     <Avatar style={{ backgroundColor: colors.tealLight20 }}>
                       {payload.name.substring(0, 2).toUpperCase()}
@@ -210,18 +200,33 @@ export default function MemberSelection({
                   ),
                   status: "pending",
                 });
-              }
-            })
-            .finally(() => setLoading(false))
-            .catch((ex) => {
-              // console.log(ex.message);
-              generateNotification("error", "Error", ex.message);
-            });
-        },
-        function (ex) {
+                if (formMode) {
+                  setItemSelected({
+                    name: payload.name,
+                    id: payload.inviteId,
+                    image: (
+                      <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                        {payload.name.substring(0, 2).toUpperCase()}
+                      </Avatar>
+                    ),
+                    status: "pending",
+                  });
+                }
+              })
+              .finally(() => setLoading(false))
+              .catch((ex) => {
+                // console.log(ex.message);
+                generateNotification("error", "Error", ex.message);
+              });
+          },
+          function (ex) {
+            generateNotification("error", "Error", ex.message);
+          }
+        )
+        .catch((ex) => {
           generateNotification("error", "Error", ex.message);
-        }
-      );
+          setLoading(false);
+        });
     }
   };
 
@@ -309,8 +314,18 @@ export default function MemberSelection({
             },
             {
               required: true,
-              message: "Please input your E-mail!",
+              message: "Please input your Confirm-Email!",
             },
+            ({ getFieldValue }) => ({
+              validator(rule, value) {
+                if (!value || getFieldValue("email") === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  "The confirm email and email that you entered do not match!"
+                );
+              },
+            }),
           ]}
         >
           <FormInput
@@ -354,46 +369,60 @@ export default function MemberSelection({
 
   const renderShareLink = () => {
     return (
-      <Form
-        name="normal_share"
-        className="share-form d-flex col-12 flex-column align-items-center"
-        layout="vertical"
-        aria-readonly="true"
-        form={form}
-      >
-        <Form.Item
-          className="col-12"
-          name="shareLink"
-          label="Share link with anyone"
-          initialValue={
-            // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
-            `${new URL(window.location).origin}/signup/${inviteId}`
-          }
-        >
-          <FormInput
-            type="text"
-            prefix={<LinkOutlined className="site-form-item-icon" />}
-            suffix={
-              <Button
-                icon={!linkCopied && <CopyOutlined size={15} />}
+      <>
+        {showLink ? (
+          <Form
+            name="normal_share"
+            className="share-form d-flex col-12 flex-column align-items-center"
+            layout="vertical"
+            aria-readonly="true"
+            form={form}
+          >
+            <Form.Item
+              className="col-12"
+              name="shareLink"
+              label="Share link with anyone"
+              initialValue={
+                // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
+                `${new URL(window.location).origin}/signup/${inviteId}`
+              }
+            >
+              <FormInput
                 type="text"
-                style={{ margin: 0 }}
-                size="small"
-                onClick={() => {
-                  setLinkCopied(true);
-                  navigator.clipboard.writeText(
-                    // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
-                    `${new URL(window.location).origin}/signup/${inviteId}`
-                  );
-                }}
-              >
-                {linkCopied && "Copied"}
-              </Button>
-            }
-            // disabled={true}
-          />
-        </Form.Item>
-      </Form>
+                prefix={<LinkOutlined className="site-form-item-icon" />}
+                suffix={
+                  <Button
+                    icon={!linkCopied && <CopyOutlined size={15} />}
+                    type="text"
+                    style={{ margin: 0 }}
+                    size="small"
+                    onClick={() => {
+                      setLinkCopied(true);
+                      navigator.clipboard.writeText(
+                        // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
+                        `${new URL(window.location).origin}/signup/${inviteId}`
+                      );
+                    }}
+                  >
+                    {linkCopied && "Copied"}
+                  </Button>
+                }
+                // disabled={true}
+              />
+            </Form.Item>
+          </Form>
+        ) : (
+          <TealButton
+            className="col-12"
+            onClick={() => {
+              handleCreateShareableLink();
+              setShowLink(true);
+            }}
+          >
+            Create Shareble Link
+          </TealButton>
+        )}
+      </>
     );
   };
 
@@ -423,27 +452,35 @@ export default function MemberSelection({
       );
   };
 
-  const onTabItemClick = (key) => {
-    // console.log(key);
-
-    if (key == "2" && itemSelected == null) {
-      console.log("send invite by link", formMode);
-      let invId = v4();
-      // console.log(invId);
-      setInviteId(invId);
-      if (itemSelected?.name === "Waiting for member to join") return;
-      let payload = {
-        receiverId: "temp",
-        receiverEmail: "temp@temp.com",
-        status: "pending",
-        inviteBy: isLogin.uid,
-        batonId: batonId,
-        name: "Waiting for member to join",
-        inviteId: invId,
-      };
-      handleSendInviteToMember(payload)
-        .then(() => {
-          setCurrentItem({
+  const handleCreateShareableLink = () => {
+    console.log("send invite by link", formMode);
+    let invId = v4();
+    // console.log(invId);
+    setInviteId(invId);
+    if (itemSelected?.name === "Waiting for member to join") return;
+    let payload = {
+      receiverId: "temp",
+      receiverEmail: "temp@temp.com",
+      status: "pending",
+      inviteBy: isLogin.uid,
+      batonId: batonId,
+      name: "Waiting for member to join",
+      inviteId: invId,
+    };
+    handleSendInviteToMember(payload)
+      .then(() => {
+        setCurrentItem({
+          name: payload.name,
+          id: payload.inviteId,
+          image: (
+            <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+              {payload.name.substring(0, 2).toUpperCase()}
+            </Avatar>
+          ),
+          status: "pending",
+        });
+        if (formMode) {
+          setItemSelected({
             name: payload.name,
             id: payload.inviteId,
             image: (
@@ -453,25 +490,21 @@ export default function MemberSelection({
             ),
             status: "pending",
           });
-          if (formMode) {
-            setItemSelected({
-              name: payload.name,
-              id: payload.inviteId,
-              image: (
-                <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                  {payload.name.substring(0, 2).toUpperCase()}
-                </Avatar>
-              ),
-              status: "pending",
-            });
-          }
-        })
-        .catch((ex) => {
-          generateNotification("error", "Error", ex.message);
-        });
+        }
+      })
+      .catch((ex) => {
+        generateNotification("error", "Error", ex.message);
+      });
+  };
+
+  const onTabItemClick = (key) => {
+    // console.log(key);
+
+    if (key == "2" && itemSelected == null) {
     } else {
       console.log("formMode Not", itemSelected);
       setInviteId(itemSelected?.id);
+      setShowLink(true);
       console.log(inviteId);
     }
   };

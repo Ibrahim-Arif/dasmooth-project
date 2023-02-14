@@ -19,11 +19,19 @@ export default function DashboardView(props) {
   const [DeclinedBatons, setDeclinedBatons] = useState([]);
   const [AcceptedBatons, setAcceptedBatons] = useState([]);
   const [CompleteBatons, setCompleteBatons] = useState([]);
+  const [DraftBatons, setDraftBatons] = useState([]);
   const [activeBatons, setActiveBatons] = useState(Object.values(batons));
 
   const navigate = useNavigate();
 
-  const statuses = ["pending", "passed", "received", "declined", "complete"];
+  const statuses = [
+    "pending",
+    "passed",
+    "received",
+    "declined",
+    "complete",
+    "draft",
+  ];
 
   const filterBatons = (batonData, batonName) => {
     // console.log(batonsList)
@@ -68,6 +76,10 @@ export default function DashboardView(props) {
     filterBatons(declined, "declined");
     setDeclinedBatons(declined);
 
+    let draft = filterBatonsData(batonsData, "draft", isLogin.uid);
+    filterBatons(draft, "draft");
+    setDraftBatons(draft);
+
     let complete = filterBatonsData(batonsData, "complete");
     // console.log("coomp", complete);
     filterBatons(complete, "complete");
@@ -83,6 +95,7 @@ export default function DashboardView(props) {
     DeclinedBatons,
     AcceptedBatons,
     CompleteBatons,
+    DraftBatons,
   };
 
   const onDragEnd = (fromIndex, toIndex) => {

@@ -79,6 +79,7 @@ export default function BatonsForm() {
 
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
+  const [dataFetchLoading, setDataFetchLoading] = useState(false);
   const [fetchedDataObject, setFetchedDataObject] = useState({
     status: "pending",
     deletedOn: 0,
@@ -86,6 +87,7 @@ export default function BatonsForm() {
   const [isEditable, setIsEditable] = useState(true);
   const [isDeleted, setIsDeleted] = useState(false);
   const [isNewPost, setIsNewPost] = useState(true);
+  const [isDraft, setIsDraft] = useState(false);
 
   const { batonsData, isLogin } = useUser();
 
@@ -100,12 +102,14 @@ export default function BatonsForm() {
 
   const isTitleInputFieldDisabled =
     fetchedDataObject.authorPostStatus != "pending" &&
+    fetchedDataObject.authorPostStatus != "draft" &&
     fetchedDataObject.authorPostStatus != undefined
       ? true
       : false;
 
   const isAddDescriptionInputFieldDisabled =
     fetchedDataObject.authorPostStatus != "pending" &&
+    fetchedDataObject.authorPostStatus != "draft" &&
     fetchedDataObject.authorPostStatus != undefined
       ? true
       : false;
@@ -219,19 +223,19 @@ export default function BatonsForm() {
 
   const handleAddToDrafts = () => {
     let post = {
-      deadline: dateData,
-      budget: budgetData,
-      title,
+      deadline: dateData ? dateData : null,
+      budget: budgetData ? budgetData : null,
+      title: title ? title : "",
       authorId: isLogin.uid,
-      memberId: teamMemberData.id,
+      memberId: teamMemberData?.id ? teamMemberData.id : null,
       authorName:
         isLogin.displayName != null ? isLogin.displayName : isLogin.email,
-      memberName: teamMemberData.name,
-      authorPostStatus: "pending",
-      memberPostStatus: "received",
+      memberName: teamMemberData?.name ? teamMemberData.name : null,
+      authorPostStatus: "draft",
+      memberPostStatus: "draft",
       createdOn: Date.now(),
       deletedOn: 0,
-      description: description,
+      description: description ? description : "",
     };
     // console.log("new Post");
     // console.log(post);
@@ -321,7 +325,7 @@ export default function BatonsForm() {
   };
 
   const editableFields = useMemo(() => {
-    if (isNewPost) {
+    if (isNewPost || isDraft) {
       return {
         title: true,
         description: true,
@@ -375,6 +379,7 @@ export default function BatonsForm() {
   useEffect(() => {
     // console.log("params:", params);
     if (params.id) {
+      setDataFetchLoading(true);
       handleGetBatonFilesSnapshot(params.id, setFilesList);
       handleGetBatonPostUpdates(params.id, setPostUpdateData);
       setIsNewPost(false);
@@ -384,7 +389,42 @@ export default function BatonsForm() {
       filter = filter[0];
       // console.log(filter);
 
-      if (filter == undefined) return;
+      if (filter == undefined) {
+        setDataFetchLoading(false);
+        return;
+      }
+
+      if (
+        filter.authorPostStatus == "draft" &&
+        filter.authorId == isLogin.uid
+      ) {
+        setIsEditable(true);
+        setIsDraft(true);
+        setFetchedDataObject(filter);
+        setTitle(filter.title);
+        setDescription(filter.description);
+
+        if (filter.budget) setBudgetData(filter.budget);
+        else setBudgetData(null);
+
+        if (filter.deadline) setDateData(filter.deadline);
+        else setDateData(null);
+
+        if (filter.post) setPostUpdateData(filter.post);
+        else setPostUpdateData(null);
+
+        if (filter.memberName != null) {
+          setTeamMemberData({
+            name: filter.memberName,
+            id: filter.memberId,
+          });
+        } else setTeamMemberData(null);
+
+        setID(params.id);
+        setDataFetchLoading(false);
+        //  if baton is type draft then we do need to check below code
+        return;
+      }
 
       if (
         filter.authorPostStatus == "passed" ||
@@ -397,6 +437,7 @@ export default function BatonsForm() {
         filter.authorPostStatus == "received"
       )
         setIsDeleted(true);
+
       // "editable:", isEditable;
 
       setFetchedDataObject(filter);
@@ -412,6 +453,7 @@ export default function BatonsForm() {
         id: filter.memberId,
       });
       setID(params.id);
+      setDataFetchLoading(false);
       // console.log("filter", filter);
       // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
     } else {
@@ -468,7 +510,11 @@ export default function BatonsForm() {
               <TealButton
                 htmlType="button"
                 className="col-12"
-                onClick={handleAddToDrafts}
+                onClick={() => {
+                  if (title === "")
+                    return generateNotification("error", "Title is required");
+                  handleAddToDrafts();
+                }}
               >
                 SAVE BATON
               </TealButton>
@@ -494,208 +540,220 @@ export default function BatonsForm() {
         )}
       </Modal>
 
-      <Container fluid className="col">
-        {/* Left Side Items List Container */}
-        <Container className="col">
-          {/* ArrowBack, DropDown menu div */}
-          <div className="col d-flex flex-row justify-content-between ">
-            <ArrowLeftOutlined
-              style={{ fontSize: 20 }}
-              onClick={() => {
-                const isAnyFieldNotEmpty =
-                  teamMemberData != null &&
-                  dateData != null &&
-                  budgetData != null &&
-                  title != "" &&
-                  description != "";
-
-                if (isAnyFieldNotEmpty && isNewPost) {
-                  setIsDraftModalVisible(true);
-                } else {
-                  setIsDraftModalVisible(false);
-                  if (isDeleted) navigate("/deleteBaton");
-                  else navigate("/main");
-                }
-              }}
-            />
-
-            {doShowDropDownMenuOnPage && (
-              <Dropdown
-                overlay={
-                  <Menu
-                    items={[
-                      {
-                        key: "1",
-                        label: (
-                          <div
-                            className="d-flex flex-row align-items-center"
-                            onClick={handleDeleteClick}
-                          >
-                            <DeleteFilled />
-                            Delete
-                          </div>
-                        ),
-                      },
-                      {
-                        key: "2",
-                        label: (
-                          <div
-                            className="d-flex flex-row align-items-center"
-                            onClick={handleDuplicateClick}
-                          >
-                            <CopyOutlined />
-                            Duplicate
-                          </div>
-                        ),
-                      },
-                    ]}
-                  />
-                }
-                placement="bottomRight"
-                arrow={{ pointAtCenter: true }}
-              >
-                <EllipsisOutlined
+      {dataFetchLoading ? (
+        <Loading />
+      ) : (
+        <>
+          {/* Left Side Container */}
+          <Container fluid className="col">
+            {/* Left Side Items List Container */}
+            <Container className="col">
+              {/* ArrowBack, DropDown menu div */}
+              <div className="col d-flex flex-row justify-content-between ">
+                <ArrowLeftOutlined
                   style={{ fontSize: 20 }}
                   onClick={() => {
-                    // navigate("/main");
+                    const isAnyFieldNotEmpty =
+                      teamMemberData != null ||
+                      dateData != null ||
+                      budgetData != null ||
+                      description != "" ||
+                      postUpdateData != null ||
+                      filesList != null ||
+                      title != "";
+
+                    if (isAnyFieldNotEmpty && (isNewPost || isDraft)) {
+                      setIsDraftModalVisible(true);
+                    } else {
+                      setIsDraftModalVisible(false);
+                      if (isDeleted) navigate("/deleteBaton");
+                      else navigate("/main");
+                    }
                   }}
-                  rotate={90}
                 />
-              </Dropdown>
-            )}
-          </div>
 
-          {/* --------If Baton is deleted show this box------ */}
-          {isDeleted && (
-            <NotificationBox
-              text={`You deleted this on ${moment(
-                fetchedDataObject.deletedOn
-              ).format("MMMM DD ,YYYY")}`}
-            />
-          )}
+                {doShowDropDownMenuOnPage && (
+                  <Dropdown
+                    overlay={
+                      <Menu
+                        items={[
+                          {
+                            key: "1",
+                            label: (
+                              <div
+                                className="d-flex flex-row align-items-center"
+                                onClick={handleDeleteClick}
+                              >
+                                <DeleteFilled />
+                                Delete
+                              </div>
+                            ),
+                          },
+                          {
+                            key: "2",
+                            label: (
+                              <div
+                                className="d-flex flex-row align-items-center"
+                                onClick={handleDuplicateClick}
+                              >
+                                <CopyOutlined />
+                                Duplicate
+                              </div>
+                            ),
+                          },
+                        ]}
+                      />
+                    }
+                    placement="bottomRight"
+                    arrow={{ pointAtCenter: true }}
+                  >
+                    <EllipsisOutlined
+                      style={{ fontSize: 20 }}
+                      onClick={() => {
+                        // navigate("/main");
+                      }}
+                      rotate={90}
+                    />
+                  </Dropdown>
+                )}
+              </div>
 
-          <Input
-            size="large"
-            placeholder="Add Title"
-            className={`me-3 ${!isDeleted && "mt-4"} input-placeholder`}
-            onChange={(e) => setTitle(e.currentTarget.value)}
-            style={{ border: "none", backgroundColor: "transparent" }}
-            value={title}
-            // required={true}
-            // status={title == "" && "error"}
-            disabled={isTitleInputFieldDisabled}
-            // prefix="Please input baton title!"
-          />
+              {/* --------If Baton is deleted show this box------ */}
+              {isDeleted && (
+                <NotificationBox
+                  text={`You deleted this on ${moment(
+                    fetchedDataObject.deletedOn
+                  ).format("MMMM DD ,YYYY")}`}
+                />
+              )}
 
-          {/* FormItems */}
-          <div className="col-12">
-            <Form.Item
-              // validateStatus={title == "" && "error"}
-              // help={title != "" ? null : "This field is required"}
-              className="mt-3"
-            >
-              {/* {console.log(fetchedDataObject.authorPostStatus)} */}
               <Input
                 size="large"
-                placeholder="Add Description"
-                className="me-3 input-placeholder"
-                onChange={(e) => setDescription(e.currentTarget.value)}
-                value={description}
-                disabled={isAddDescriptionInputFieldDisabled}
+                placeholder="Add Title"
+                className={`me-3 ${!isDeleted && "mt-4"} input-placeholder`}
+                onChange={(e) => setTitle(e.currentTarget.value)}
+                style={{ border: "none", backgroundColor: "transparent" }}
+                value={title}
+                // required={true}
+                // status={title == "" && "error"}
+                disabled={isTitleInputFieldDisabled}
+                // prefix="Please input baton title!"
               />
-            </Form.Item>
-          </div>
 
-          <Container fluid className="px-0">
-            <Selectable
-              icon={
-                teamMemberData != null ? (
-                  <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                    {teamMemberData?.name?.substring(0, 2).toUpperCase()}
-                  </Avatar>
-                ) : (
-                  <UserOutlined />
+              {/* FormItems */}
+              <div className="col-12">
+                <Form.Item
+                  // validateStatus={title == "" && "error"}
+                  // help={title != "" ? null : "This field is required"}
+                  className="mt-3"
+                >
+                  {/* {console.log(fetchedDataObject.authorPostStatus)} */}
+                  <Input
+                    size="large"
+                    placeholder="Add Description"
+                    className="me-3 input-placeholder"
+                    onChange={(e) => setDescription(e.currentTarget.value)}
+                    value={description}
+                    disabled={isAddDescriptionInputFieldDisabled}
+                  />
+                </Form.Item>
+              </div>
+
+              <Container fluid className="px-0">
+                {console.log(teamMemberData)}
+                <Selectable
+                  icon={
+                    teamMemberData != null ? (
+                      <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                        {teamMemberData?.name?.substring(0, 2).toUpperCase()}
+                      </Avatar>
+                    ) : (
+                      <UserOutlined />
+                    )
+                  }
+                  text={
+                    teamMemberData
+                      ? teamMemberData?.name
+                      : "Select a team member"
+                  }
+                  isEditable={editableFields?.teamMember}
+                  onItemPress={() =>
+                    isSelectableItemPressable && handleFormItemRender(1)
+                  }
+                  isItemActive={activeItemIndex == 1 || teamMemberData}
+                />
+
+                <Selectable
+                  icon={<CalendarOutlined />}
+                  text={dateData ? dateData : "Set a deadline"}
+                  isEditable={editableFields?.date}
+                  isItemActive={activeItemIndex == 2 || dateData}
+                  onItemPress={() =>
+                    isSelectableItemPressable && handleFormItemRender(2)
+                  }
+                />
+                <Selectable
+                  icon={<DollarOutlined />}
+                  text={
+                    budgetData
+                      ? `${budgetData != "N/A" ? "$" : ""}${budgetData}`
+                      : "Set a budget"
+                  }
+                  isEditable={editableFields?.budget}
+                  isItemActive={activeItemIndex == 3 || budgetData}
+                  onItemPress={() =>
+                    isSelectableItemPressable && handleFormItemRender(3)
+                  }
+                />
+                <Selectable
+                  icon={<FileAddOutlined />}
+                  isEditable={editableFields?.files}
+                  text={
+                    filesList
+                      ? filesList.length + " files attached"
+                      : "Attach a file"
+                  }
+                  isItemActive={activeItemIndex == 4 || filesList || params.id}
+                  onItemPress={() => !isDeleted && handleFormItemRender(4)}
+                />
+                <Selectable
+                  icon={<FileTextOutlined />}
+                  isEditable={editableFields?.postUpdate}
+                  text="Post an Update"
+                  isItemActive={activeItemIndex == 5 || postUpdateData}
+                  onItemPress={() => !isDeleted && handleFormItemRender(5)}
+                />
+              </Container>
+
+              {loading ? (
+                <div className="d-flex mt-3 justify-content-center">
+                  <Loading size="large" color={colors.teal100} />
+                </div>
+              ) : (
+                isEditable &&
+                !isDeleted && (
+                  <TealButton
+                    className="col-12"
+                    onClick={handlePass}
+                    // disabled={disabled}
+                    disabled={
+                      !(
+                        dateData != null &&
+                        budgetData != null &&
+                        teamMemberData != null &&
+                        title != "" &&
+                        description != ""
+                      )
+                    }
+                  >
+                    PASS
+                  </TealButton>
                 )
-              }
-              text={
-                teamMemberData ? teamMemberData?.name : "Select a team member"
-              }
-              isEditable={editableFields?.teamMember}
-              onItemPress={() =>
-                isSelectableItemPressable && handleFormItemRender(1)
-              }
-              isItemActive={activeItemIndex == 1 || teamMemberData}
-            />
-
-            <Selectable
-              icon={<CalendarOutlined />}
-              text={dateData ? dateData : "Set a deadline"}
-              isEditable={editableFields?.date}
-              isItemActive={activeItemIndex == 2 || dateData}
-              onItemPress={() =>
-                isSelectableItemPressable && handleFormItemRender(2)
-              }
-            />
-            <Selectable
-              icon={<DollarOutlined />}
-              text={
-                budgetData
-                  ? `${budgetData != "N/A" ? "$" : ""}${budgetData}`
-                  : "Set a budget"
-              }
-              isEditable={editableFields?.budget}
-              isItemActive={activeItemIndex == 3 || budgetData}
-              onItemPress={() =>
-                isSelectableItemPressable && handleFormItemRender(3)
-              }
-            />
-            <Selectable
-              icon={<FileAddOutlined />}
-              isEditable={editableFields?.files}
-              text={
-                filesList
-                  ? filesList.length + " files attached"
-                  : "Attach a file"
-              }
-              isItemActive={activeItemIndex == 4 || filesList || params.id}
-              onItemPress={() => !isDeleted && handleFormItemRender(4)}
-            />
-            <Selectable
-              icon={<FileTextOutlined />}
-              isEditable={editableFields?.postUpdate}
-              text="Post an Update"
-              isItemActive={activeItemIndex == 5 || postUpdateData}
-              onItemPress={() => !isDeleted && handleFormItemRender(5)}
-            />
+              )}
+            </Container>
           </Container>
-
-          {loading ? (
-            <div className="d-flex mt-3 justify-content-center">
-              <Loading size="large" color={colors.teal100} />
-            </div>
-          ) : (
-            isEditable &&
-            !isDeleted && (
-              <TealButton
-                className="col-12"
-                onClick={handlePass}
-                // disabled={disabled}
-                disabled={
-                  !(
-                    dateData != null &&
-                    budgetData != null &&
-                    teamMemberData != null &&
-                    title != "" &&
-                    description != ""
-                  )
-                }
-              >
-                PASS
-              </TealButton>
-            )
-          )}
-        </Container>
-      </Container>
+        </>
+      )}
 
       {/* Rigth Side Container */}
       <Container

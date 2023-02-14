@@ -1,4 +1,10 @@
 export const batonsList = {
+  draft: {
+    title: "Draft Batons",
+    borderColor: "#5E94D4",
+    bgColor: "#fff",
+    status: "draft",
+  },
   pending: {
     title: "Pending Batons",
     borderColor: "#5f6b72",
