@@ -28,8 +28,11 @@ import { handleUploadFile } from "./handleUploadFile";
 import { handleUploadImages } from "./handleUploadImages";
 import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
 import { handleUpdateInviteStatus } from "./handleUpdateInviteStatus";
-
+import { handleAddNotification } from "./handleAddNotification";
+import { handleUpdateTeamMember } from "./handleUpdateTeamMember";
 export {
+  handleUpdateTeamMember,
+  handleAddNotification,
   handleUpdateInviteStatus,
   handleSendEmailToMember,
   handleGetInvite,

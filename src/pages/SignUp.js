@@ -13,6 +13,8 @@ import {
   handleSignUp,
   handleGetInvite,
   handleUpdateInviteStatus,
+  handleUpdateTeamMemberStatus,
+  handleUpdateTeamMember,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -40,7 +42,8 @@ export default function SignUp() {
         .then((data) => {
           if (data) {
             // console.log(data);
-            form.setFieldValue("email", data?.receiverEmail);
+            if (data?.receiverEmail != null)
+              form.setFieldValue("email", data?.receiverEmail);
 
             setInviteData(data);
             setInviteDataLoading(false);
@@ -64,7 +67,10 @@ export default function SignUp() {
     // if there is an id, then it means the user is signing up from an invite
     if (inviteId) {
       // first create the user
-      if (values.email != inviteData?.receiverEmail) {
+      if (
+        inviteData?.receiverEmail != null &&
+        values.email != inviteData?.receiverEmail
+      ) {
         setLoading(false);
         return generateNotification(
           "error",
@@ -84,38 +90,81 @@ export default function SignUp() {
             name: user.email?.split("@")[0],
           };
 
-          // then add the user to the team
-          handleAddTeamMember(inviteId, payload)
-            .then((res) => {
-              console.log("Added Team Member", res);
-              handleUpdateInviteStatus(inviteId, "accepted").then(() => {
-                // then update the baton
-                handleUpdateBaton(inviteData?.batonId, {
-                  memberName: payload.receiverEmail,
-                  memberId: payload.receiverId,
-                  memberPostStatus: "received",
-                  authorPostStatus: "passed",
-                })
-                  .then((res) => {
-                    console.log("Updated Baton", res);
+          // after signing up, check if the invite is an email invite
+          if (inviteData?.inviteType === "email") {
+            // if invite type is email then update the user status to accepted
+            handleUpdateTeamMember(inviteId, {
+              status: "accepted",
+              receiverId: user.uid,
+            }).then(() => {
+              //after updating the user status, update the invite status
+              handleUpdateInviteStatus(inviteId, "accepted")
+                .then(() => {
+                  // now check if there is a batonID
+                  if (inviteData?.batonId) {
+                    // if there is a batonID then update the baton
+                    handleUpdateBaton(inviteData?.batonId, {
+                      memberName: payload.receiverEmail?.split("@")[0],
+                      memberId: payload.receiverId,
+                      memberPostStatus: "received",
+                      authorPostStatus: "passed",
+                    })
+                      .then((res) => {
+                        console.log("Updated Baton", res);
+                        setLoading(false);
+                        navigate("/verifyEmail");
+                      })
+                      .catch((ex) => {
+                        generateNotification("error", "Error", ex.message);
+                        setLoading(false);
+                      });
+                  } else {
+                    // if there is no batonID then just navigate to verifyEmail
                     setLoading(false);
                     navigate("/verifyEmail");
-                  })
-                  .catch((ex) => {
-                    generateNotification("error", "Error", ex.message);
-                    setLoading(false);
-                  });
-              });
-            })
-            .catch((ex) => {
-              generateNotification("error", "Error", ex.message);
-              setLoading(false);
+                  }
+                })
+                .catch((ex) => {
+                  generateNotification("error", "Error", ex.message);
+                  setLoading(false);
+                });
             });
-          // generateNotification(
-          //   "success",
-          //   "Registered",
-          //   `An email has been sent to ${values.email}. Kindly check your email! If you do not see any email, check your spam section`
-          // );
+          } else {
+            // if invite type is link then add the user to the team
+            handleAddTeamMember(inviteId, payload)
+              .then((res) => {
+                console.log("Added Team Member", res);
+                // after adding the user to the team, update the invite status
+                handleUpdateInviteStatus(inviteId, "accepted").then(() => {
+                  // now check if there is a batonID and update the baton
+                  if (inviteData?.batonId) {
+                    handleUpdateBaton(inviteData?.batonId, {
+                      memberName: payload.receiverEmail?.split("@")[0],
+                      memberId: payload.receiverId,
+                      memberPostStatus: "received",
+                      authorPostStatus: "passed",
+                    })
+                      .then((res) => {
+                        console.log("Updated Baton", res);
+                        setLoading(false);
+                        navigate("/verifyEmail");
+                      })
+                      .catch((ex) => {
+                        generateNotification("error", "Error", ex.message);
+                        setLoading(false);
+                      });
+                  } else {
+                    // if there is no batonID then just navigate to verifyEmail
+                    setLoading(false);
+                    navigate("/verifyEmail");
+                  }
+                });
+              })
+              .catch((ex) => {
+                generateNotification("error", "Error", ex.message);
+                setLoading(false);
+              });
+          }
         })
         .catch((ex) => {
           generateNotification("error", "Error", ex.message);
@@ -189,7 +238,7 @@ export default function SignUp() {
                 }}
                 onFocus={() => setFocusedEmail(true)}
                 onBlur={() => setFocusedEmail(false)}
-                disabled={inviteData ? true : false}
+                disabled={inviteData?.receiverEmail ? true : false}
               />
             </Form.Item>
 

@@ -34,7 +34,9 @@ import {
   handleSendInviteToMember,
   handleSignUp,
   handleUpdateTeamMemberStatus,
+  handleAddTeamMember,
 } from "../../services";
+
 import { useUser } from "../../hooks/useContext";
 import { generateNotification } from "../../utilities/generateNotification";
 import { handleAddTeamMemberByInvite } from "../../services/handleAddTeamMemberByInvite";
@@ -63,6 +65,7 @@ export default function MemberSelection({
   const [linkCopied, setLinkCopied] = useState(false);
   const [showLink, setShowLink] = useState(false);
   const [form] = Form.useForm();
+
   const { isLogin, teamMembers } = useUser();
 
   const handleOk = () => {
@@ -147,10 +150,13 @@ export default function MemberSelection({
     //         });
     //     }
     //   })
-
-    if (values.email === isLogin.email) return;
+    console.log("handleAddMemberByEmailSubmit");
+    if (values.email?.toLowerCase() === isLogin.email?.toLowerCase()) return;
     if (
-      members?.filter((item) => item.receiverEmail == values.email).length > 0
+      members?.filter(
+        (item) =>
+          item.receiverEmail?.toLowerCase() == values.email?.toLowerCase()
+      ).length > 0
     ) {
       generateNotification(
         "error",
@@ -163,17 +169,21 @@ export default function MemberSelection({
       setInviteId(invId);
       let payload = {
         receiverId: "temp",
-        receiverEmail: values.email,
+        receiverEmail: values.email?.toLowerCase(),
         status: "pending",
         inviteBy: isLogin.uid,
         batonId: batonId,
         name: values.firstName + " " + values.lastName,
         inviteId: invId,
+        inviteType: "email",
+        timeStamp: new Date().getTime(),
       };
+
+      console.log("email invite payload", payload);
 
       var templateParams = {
         to_name: payload.name,
-        to_email: payload.receiverEmail,
+        to_email: payload.receiverEmail?.toLowerCase(),
         url: `${new URL(window.location).origin}/signup/${invId}`,
       };
       emailjs.init("l-LW9FV7je0GRpUsN");
@@ -188,32 +198,46 @@ export default function MemberSelection({
             handleSendInviteToMember(payload)
               .then(() => {
                 console.log("Invite sent");
-                setIsInviteSent(true);
-                setInviteSentTo(values.email);
-                setCurrentItem({
-                  name: payload.name,
-                  id: inviteId,
-                  image: (
-                    <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                      {payload.name.substring(0, 2).toUpperCase()}
-                    </Avatar>
-                  ),
+                payload = {
+                  receiverId: invId,
+                  receiverEmail: values.email,
                   status: "pending",
-                });
-                if (formMode) {
-                  setItemSelected({
-                    name: payload.name,
-                    id: payload.inviteId,
-                    image: (
-                      <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-                        {payload.name.substring(0, 2).toUpperCase()}
-                      </Avatar>
-                    ),
-                    status: "pending",
-                  });
-                }
+                  inviteBy: isLogin.uid,
+                  name: values.firstName + " " + values.lastName,
+                };
+                handleAddTeamMember(invId, payload)
+                  .then(() => {
+                    console.log("Added as member");
+                    setIsInviteSent(true);
+                    setInviteSentTo(values.email?.toLowerCase());
+                    setCurrentItem({
+                      name: payload.name,
+                      id: invId,
+                      image: (
+                        <Avatar style={{ backgroundColor: colors.tealLight20 }}>
+                          {payload.name.substring(0, 2).toUpperCase()}
+                        </Avatar>
+                      ),
+                      status: "pending",
+                    });
+                    if (formMode) {
+                      setItemSelected({
+                        name: payload.name,
+                        id: invId,
+                        image: (
+                          <Avatar
+                            style={{ backgroundColor: colors.tealLight20 }}
+                          >
+                            {payload.name.substring(0, 2).toUpperCase()}
+                          </Avatar>
+                        ),
+                        status: "pending",
+                      });
+                    }
+                  })
+                  .finally(() => setLoading(false));
               })
-              .finally(() => setLoading(false))
+
               .catch((ex) => {
                 // console.log(ex.message);
                 generateNotification("error", "Error", ex.message);
@@ -237,7 +261,7 @@ export default function MemberSelection({
         className="login-form d-flex col-12 flex-column align-items-center"
         layout="vertical"
         onFinish={handleAddMemberByEmailSubmit}
-        form={form}
+        // form={form}
         requiredMark={false}
       >
         {isInviteSent == true && (
@@ -318,12 +342,13 @@ export default function MemberSelection({
             },
             ({ getFieldValue }) => ({
               validator(rule, value) {
-                if (!value || getFieldValue("email") === value) {
+                if (
+                  !value ||
+                  getFieldValue("email")?.toLowerCase() === value?.toLowerCase()
+                ) {
                   return Promise.resolve();
                 }
-                return Promise.reject(
-                  "The confirm email and email that you entered do not match!"
-                );
+                return Promise.reject("Emails does not match!");
               },
             }),
           ]}
@@ -346,7 +371,8 @@ export default function MemberSelection({
               <TealButton
                 htmlType="submit"
                 className="col-12 "
-                disabled={isInviteSent}
+                // disabled={isInviteSent}
+                onClick={() => console.log("clicked")}
               >
                 SEND INVITE
               </TealButton>
@@ -459,13 +485,15 @@ export default function MemberSelection({
     setInviteId(invId);
     if (itemSelected?.name === "Waiting for member to join") return;
     let payload = {
-      receiverId: "temp",
-      receiverEmail: "temp@temp.com",
+      receiverId: null,
+      receiverEmail: null,
       status: "pending",
       inviteBy: isLogin.uid,
       batonId: batonId,
       name: "Waiting for member to join",
       inviteId: invId,
+      inviteType: "link",
+      timeStamp: new Date().getTime(),
     };
     handleSendInviteToMember(payload)
       .then(() => {
@@ -499,13 +527,21 @@ export default function MemberSelection({
 
   const onTabItemClick = (key) => {
     // console.log(key);
-
+    if (
+      key == "1" &&
+      formMode &&
+      itemSelected?.name === "Waiting for member to join"
+    ) {
+      console.log("switching to email invite");
+      setItemSelected(null);
+    }
     if (key == "2" && itemSelected == null) {
-    } else {
+      setShowLink(false);
+    } else if (key == "2" && itemSelected != null) {
       console.log("formMode Not", itemSelected);
       setInviteId(itemSelected?.id);
       setShowLink(true);
-      console.log(inviteId);
+      // console.log(inviteId);
     }
   };
 
@@ -588,7 +624,7 @@ export default function MemberSelection({
                     text={e.name}
                     isItemActive={currentItem?.name === e.name ? true : false}
                     onItemPress={() => {
-                      // console.log("selected Item", e);
+                      console.log("selected Item", e);
                       setCurrentItem({
                         name: e.name,
                         id: e.receiverId,
@@ -614,6 +650,7 @@ export default function MemberSelection({
                       handleDeleteTeamMember(e.docId)
                         .then(() => {
                           setItemSelected(null);
+                          handleCancel();
                           generateNotification(
                             "success",
                             "Success",
@@ -684,7 +721,7 @@ export default function MemberSelection({
       {formMode && (
         <TealButton
           onClick={() => {
-            // console.log("currentItem", currentItem);
+            console.log("currentItem", currentItem);
             if (currentItem)
               setItemSelected({
                 name: currentItem.name,

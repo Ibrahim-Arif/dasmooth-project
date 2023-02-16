@@ -3,7 +3,7 @@ import { Form, Input, Button, Typography } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
-
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import styledComponents from "styled-components";
 import { colors } from "../utilities/colors";
 import { logo } from "../assets";
@@ -12,6 +12,7 @@ import {
   handleAddTeamMember,
   handleUpdateBaton,
   handleUpdateInviteStatus,
+  handleUpdateTeamMember,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -26,6 +27,7 @@ export default function SignIn() {
   const [inviteData, setInviteData] = useState(null);
   const [inviteId, setInviteId] = useState(null);
   const { setIsLogin, isLogin } = useUser();
+  const auth = getAuth();
 
   // useCheckSignIn();
   const navigate = useNavigate();
@@ -39,7 +41,8 @@ export default function SignIn() {
         .then((data) => {
           if (data) {
             setInviteData(data);
-            form.setFieldValue("email", data?.receiverEmail);
+            if (data?.receiverEmail != null)
+              form.setFieldValue("email", data?.receiverEmail);
             console.log(data);
           } else {
             generateNotification("error", "Error", "Invalid Invitation");
@@ -62,7 +65,10 @@ export default function SignIn() {
     // if there is an id, then it means the user is signing ip from an invite
     if (inviteId) {
       // first signIn the user
-      if (values.email != inviteData?.receiverEmail) {
+      if (
+        inviteData?.receiverEmail != null &&
+        values.email != inviteData?.receiverEmail
+      ) {
         setLoading(false);
         return generateNotification(
           "error",
@@ -81,19 +87,129 @@ export default function SignIn() {
             name: user.email?.split("@")[0],
           };
 
-          // then add the user to the team
-          handleAddTeamMember(inviteId, payload)
-            .then((res) => {
-              console.log("Added Team Member", res);
+          // after signing in, check if the invite is an email invite
+          if (inviteData?.inviteType === "email") {
+            // if invite type is email then update the user status to accepted
+            handleUpdateTeamMember(inviteId, {
+              status: "accepted",
+              receiverId: user.uid,
+            }).then(() => {
+              handleUpdateInviteStatus(inviteId, "accepted")
+                .then((res) => {
+                  // now check if there is a batonID
+                  if (inviteData?.batonId) {
+                    // if there is a batonID then update the baton
 
-              handleUpdateInviteStatus(inviteId, "accepted").then((res) => {
-                handleUpdateBaton(inviteData?.batonId, {
-                  memberName: payload.receiverEmail,
-                  memberId: payload.receiverId,
-                  memberPostStatus: "received",
-                  authorPostStatus: "passed",
+                    handleUpdateBaton(inviteData?.batonId, {
+                      memberName: payload.receiverEmail?.split("@")[0],
+                      memberId: payload.receiverId,
+                      memberPostStatus: "received",
+                      authorPostStatus: "passed",
+                    })
+                      .then((res) => {
+                        setLoading(false);
+                        if (!user.emailVerified) {
+                          generateNotification(
+                            "error",
+                            "Verify Email",
+                            "Kindly verify your email to continue"
+                          );
+                          return;
+                        } else {
+                          // if there is no batonID then just navigate to home
+                          setIsLogin(user);
+                          navigate("/");
+                        }
+                      })
+                      .catch((ex) => {
+                        console.log(ex.message);
+                        generateNotification(
+                          "error",
+                          "Error",
+                          "The Baton you are invited to is no created yet."
+                        );
+                        setIsLogin(user);
+                        navigate("/");
+                        setLoading(false);
+                      });
+                  } else {
+                    // if there is no batonID then check if user is verified
+                    setLoading(false);
+                    if (!user.emailVerified) {
+                      // if user is not verified then show error
+                      generateNotification(
+                        "error",
+                        "Verify Email",
+                        "Kindly verify your email to continue"
+                      );
+                      return;
+                    } else {
+                      // if user is verified then navigate to home
+                      setIsLogin(user);
+                      navigate("/");
+                    }
+                  }
                 })
-                  .then((res) => {
+                .catch((ex) => {
+                  generateNotification(
+                    "error",
+                    "Error",
+                    "You are not added as the member of the team yet."
+                  );
+                  setIsLogin(user);
+                  navigate("/");
+                  setLoading(false);
+                })
+                .catch((ex) => {
+                  generateNotification(
+                    "error",
+                    "Error",
+                    "Failed to add you as the member."
+                  );
+                  setIsLogin(user);
+                  navigate("/");
+                  setLoading(false);
+                });
+            });
+          } else {
+            // then add the user to the team
+            handleAddTeamMember(inviteId, payload)
+              .then((res) => {
+                console.log("Added Team Member", res);
+
+                handleUpdateInviteStatus(inviteId, "accepted").then((res) => {
+                  if (inviteData?.batonId) {
+                    handleUpdateBaton(inviteData?.batonId, {
+                      memberName: payload.receiverEmail?.split("@")[0],
+                      memberId: payload.receiverId,
+                      memberPostStatus: "received",
+                      authorPostStatus: "passed",
+                    })
+                      .then((res) => {
+                        setLoading(false);
+                        if (!user.emailVerified) {
+                          generateNotification(
+                            "error",
+                            "Verify Email",
+                            "Kindly verify your email to continue"
+                          );
+                          return;
+                        } else {
+                          setIsLogin(user);
+                          navigate("/");
+                        }
+                      })
+                      .catch((ex) => {
+                        generateNotification(
+                          "error",
+                          "Error",
+                          "The Baton you are invited to is no created yet."
+                        );
+                        setIsLogin(user);
+                        navigate("/");
+                        setLoading(false);
+                      });
+                  } else {
                     setLoading(false);
                     if (!user.emailVerified) {
                       generateNotification(
@@ -106,25 +222,16 @@ export default function SignIn() {
                       setIsLogin(user);
                       navigate("/");
                     }
-                  })
-                  .catch((ex) => {
-                    generateNotification(
-                      "error",
-                      "Error",
-                      "The Baton you are invited to is no created yet."
-                    );
-                    setIsLogin(user);
-                    navigate("/");
-                    setLoading(false);
-                  });
-              });
+                  }
+                });
 
-              // then update the baton
-            })
-            .catch((ex) => {
-              generateNotification("error", "Error", ex.message);
-              setLoading(false);
-            });
+                // then update the baton
+              })
+              .catch((ex) => {
+                generateNotification("error", "Error", ex.message);
+                setLoading(false);
+              });
+          }
         })
         .catch((ex) => {
           generateNotification("error", "Error", ex.message);
@@ -206,7 +313,7 @@ export default function SignIn() {
               }}
               onFocus={() => setFocusedEmail(true)}
               onBlur={() => setFocusedEmail(false)}
-              disabled={inviteId ? true : false}
+              disabled={inviteData?.receiverEmail ? true : false}
             />
           </Form.Item>
 

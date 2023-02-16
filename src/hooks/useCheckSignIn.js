@@ -9,7 +9,7 @@ export const useCheckSignIn = () => {
   useEffect(() => {
     // console.log(isLogin);
 
-    if (isLogin.uid == null || isLogin.uid == undefined) {
+    if (isLogin?.uid == null || isLogin?.uid == undefined) {
       setIsLogin(false);
       navigate("/signin");
     }

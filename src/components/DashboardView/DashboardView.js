@@ -88,15 +88,25 @@ export default function DashboardView(props) {
     // console.log(batons);
   }, [JSON.stringify(batonsData)]);
 
-  const getBaton = {
-    PendingBatons,
-    PassedBatons,
-    ReceivedBatons,
-    DeclinedBatons,
-    AcceptedBatons,
-    CompleteBatons,
-    DraftBatons,
-  };
+  const getBaton = useMemo(() => {
+    return {
+      PendingBatons,
+      PassedBatons,
+      ReceivedBatons,
+      DeclinedBatons,
+      AcceptedBatons,
+      CompleteBatons,
+      DraftBatons,
+    };
+  }, [
+    JSON.stringify(PendingBatons),
+    JSON.stringify(PassedBatons),
+    JSON.stringify(ReceivedBatons),
+    JSON.stringify(DeclinedBatons),
+    JSON.stringify(AcceptedBatons),
+    JSON.stringify(CompleteBatons),
+    JSON.stringify(DraftBatons),
+  ]);
 
   const onDragEnd = (fromIndex, toIndex) => {
     if (toIndex < 0) return; // Ignores if outside designated area

@@ -88,7 +88,7 @@ export default function Selectable({
         {status && (
           <Container>
             <StatusText id="status-text" color={statusColor}>
-              {`${status.charAt(0).toUpperCase() + status.slice(1)}`}
+              {`${status?.charAt(0)?.toUpperCase() + status?.slice(1)}`}
             </StatusText>
           </Container>
         )}

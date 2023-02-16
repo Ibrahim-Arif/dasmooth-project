@@ -75,7 +75,7 @@ export default function BatonsForm() {
   //   text: "Attach a file",
   //   filesList: [],
   // }
-  const [id, setID] = useState();
+  const [batonId, setbatonId] = useState();
 
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
@@ -141,7 +141,7 @@ export default function BatonsForm() {
     //   title
     // );
 
-    if (isNewPost) {
+    if (isNewPost || isDraft) {
       // console.log("New");
 
       let post = {
@@ -161,12 +161,12 @@ export default function BatonsForm() {
         description: description,
       };
       // console.log("new Post");
-      // console.log(post);
+      console.log(post);
       // return;
 
       setLoading(true);
       // console.log("Adding new post");
-      handleAddBaton(post, id)
+      handleAddBaton(post, batonId)
         .then((docId) => {
           handleAddNotification({
             seen: false,
@@ -207,7 +207,7 @@ export default function BatonsForm() {
       // console.log(editedPost);
       // return;
       setLoading(true);
-      handleUpdateBaton(id, editedPost)
+      handleUpdateBaton(batonId, editedPost)
         .then(() => {
           setLoading(false);
           navigate("/main");
@@ -243,7 +243,7 @@ export default function BatonsForm() {
 
     setModalLoading(true);
     // console.log("Adding new post");
-    handleAddBaton(post, id)
+    handleAddBaton(post, batonId)
       .then((docId) => {
         generateNotification("success", "Baton Saved", "You baton is saved");
         setModalLoading(false);
@@ -374,7 +374,7 @@ export default function BatonsForm() {
             };
         }
     }
-  }, [id]);
+  }, [batonId]);
 
   useEffect(() => {
     // console.log("params:", params);
@@ -420,7 +420,7 @@ export default function BatonsForm() {
           });
         } else setTeamMemberData(null);
 
-        setID(params.id);
+        setbatonId(params.id);
         setDataFetchLoading(false);
         //  if baton is type draft then we do need to check below code
         return;
@@ -452,13 +452,13 @@ export default function BatonsForm() {
         name: filter.memberName,
         id: filter.memberId,
       });
-      setID(params.id);
+      setbatonId(params.id);
       setDataFetchLoading(false);
       // console.log("filter", filter);
       // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
     } else {
       let tempId = v4();
-      setID(tempId);
+      setbatonId(tempId);
       setIsNewPost(true);
       if (!loading) {
         flushData();
@@ -768,7 +768,7 @@ export default function BatonsForm() {
               setItemSelected={setTeamMemberData}
               clickOk={handleResetPageView}
               formMode={true}
-              batonId={id}
+              batonId={batonId}
             />
           </>
         )}
@@ -803,7 +803,7 @@ export default function BatonsForm() {
               itemSelected={filesList}
               setItemSelected={setFilesList}
               // setFilesListB64={setFilesListB64}
-              batonId={id}
+              batonId={batonId}
               clickOk={() => {
                 handleResetPageView();
               }}
@@ -818,7 +818,7 @@ export default function BatonsForm() {
               itemSelected={postUpdateData}
               setItemSelected={setPostUpdateData}
               clickOk={handleResetPageView}
-              batonId={id}
+              batonId={batonId}
               username={isLogin.email}
             />
           </>
@@ -841,7 +841,7 @@ export default function BatonsForm() {
               setItemSelected={setTeamMemberData}
               clickOk={handleResetPageView}
               formMode={true}
-              batonId={id}
+              batonId={batonId}
             />
           </>
         )}
@@ -876,7 +876,7 @@ export default function BatonsForm() {
               itemSelected={filesList}
               setItemSelected={setFilesList}
               // setFilesListB64={setFilesListB64}
-              batonId={id}
+              batonId={batonId}
               clickOk={() => {
                 handleResetPageView();
                 resetFormView();
@@ -892,7 +892,7 @@ export default function BatonsForm() {
               itemSelected={postUpdateData}
               setItemSelected={setPostUpdateData}
               clickOk={handleResetPageView}
-              batonId={id}
+              batonId={batonId}
               username={isLogin.email}
             />
           </>

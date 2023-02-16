@@ -62,8 +62,8 @@ export default function DashboardMenu() {
       let temp = [...permanentData];
       temp = temp.filter(
         (e) =>
-          e.title.toLowerCase().includes(search.toLowerCase()) ||
-          e.memberName.toLowerCase().includes(search.toLowerCase())
+          e.title?.toLowerCase().includes(search.toLowerCase()) ||
+          e.memberName?.toLowerCase().includes(search.toLowerCase())
       );
       setBatonsData(temp);
     }
@@ -282,9 +282,9 @@ export default function DashboardMenu() {
             {photoURL == null || photoURL == "" ? (
               <div style={{ position: "relative" }}>
                 <Avatar style={{ backgroundColor: colors.teal100 }} size={64}>
-                  {isLogin.displayName != null
-                    ? isLogin.displayName.substring(0, 2).toUpperCase()
-                    : isLogin.email.substring(0, 2).toUpperCase()}
+                  {isLogin?.displayName != null
+                    ? isLogin?.displayName.substring(0, 2).toUpperCase()
+                    : isLogin?.email.substring(0, 2).toUpperCase()}
                 </Avatar>
                 <Button
                   type="default"
@@ -338,9 +338,9 @@ export default function DashboardMenu() {
               }}
               className="mt-3"
             >
-              {isLogin.displayName != null
-                ? isLogin.displayName
-                : isLogin.email?.split("@")[0]}
+              {isLogin?.displayName != null
+                ? isLogin?.displayName
+                : isLogin?.email?.split("@")[0]}
             </label>
           </Container>
 

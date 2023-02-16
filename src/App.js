@@ -107,7 +107,7 @@ const App = () => {
     }, []);
     setPermanentData(filteredArr);
     // console.log("Permanent:", permanentData);
-  }, [JSON.stringify(myBatons), JSON.stringify(otherBatons.length)]);
+  }, [JSON.stringify(myBatons), JSON.stringify(otherBatons)]);
 
   useEffect(() => {
     setBatonsData([...permanentData]);
