@@ -64,6 +64,10 @@ export default function MemberSelection({
   const [inviteId, setInviteId] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
   const [showLink, setShowLink] = useState(false);
+  const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
+  const [removeMemberId, setRemoveMemberId] = useState("");
+  const [removeLoading, setRemoveLoading] = useState(false);
+
   const [form] = Form.useForm();
 
   const { isLogin, teamMembers } = useUser();
@@ -82,6 +86,11 @@ export default function MemberSelection({
     setIsModalVisible(false);
     setIsInviteSent(false);
     form.resetFields();
+  };
+
+  const handleRemoveOk = () => {
+    console.log("handleRemoveOk");
+    setIsRemoveModalVisible(false);
   };
 
   const onChange = (key) => {
@@ -278,7 +287,11 @@ export default function MemberSelection({
             <Form.Item
               className="col-12"
               name="firstName"
-              label="First name (required)"
+              label={
+                <label style={{ fontWeight: "bold" }}>
+                  First name (required)
+                </label>
+              }
               rules={[
                 {
                   required: true,
@@ -293,7 +306,11 @@ export default function MemberSelection({
             <Form.Item
               className="col-12"
               name="lastName"
-              label="Last name (required)"
+              label={
+                <label style={{ fontWeight: "bold" }}>
+                  Last name (required)
+                </label>
+              }
               rules={[
                 {
                   required: true,
@@ -308,7 +325,11 @@ export default function MemberSelection({
         <Form.Item
           className="col-12"
           name="email"
-          label="Email address (required)"
+          label={
+            <label style={{ fontWeight: "bold" }}>
+              Email address (required)
+            </label>
+          }
           rules={[
             {
               type: "email",
@@ -330,7 +351,11 @@ export default function MemberSelection({
         <Form.Item
           className="col-12"
           name="confirmemail"
-          label="Confirm email (required)"
+          label={
+            <label style={{ fontWeight: "bold" }}>
+              Confirm email (required)
+            </label>
+          }
           rules={[
             {
               type: "email",
@@ -416,26 +441,23 @@ export default function MemberSelection({
               <FormInput
                 type="text"
                 prefix={<LinkOutlined className="site-form-item-icon" />}
-                suffix={
-                  <Button
-                    icon={!linkCopied && <CopyOutlined size={15} />}
-                    type="text"
-                    style={{ margin: 0 }}
-                    size="small"
-                    onClick={() => {
-                      setLinkCopied(true);
-                      navigator.clipboard.writeText(
-                        // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
-                        `${new URL(window.location).origin}/signup/${inviteId}`
-                      );
-                    }}
-                  >
-                    {linkCopied && "Copied"}
-                  </Button>
-                }
                 // disabled={true}
               />
             </Form.Item>
+
+            <TealButton
+              type="button"
+              className="col-12"
+              onClick={() => {
+                setLinkCopied(true);
+                navigator.clipboard.writeText(
+                  // `http://localhost:3000/invite?inviteBy=${isLogin.uid}&baton=${batonId}`
+                  `${new URL(window.location).origin}/signup/${inviteId}`
+                );
+              }}
+            >
+              {linkCopied ? "Copied" : "Copy"}
+            </TealButton>
           </Form>
         ) : (
           <TealButton
@@ -465,18 +487,18 @@ export default function MemberSelection({
     },
   ];
 
-  const onClick = ({ key, label }) => {
-    // alert(`Click on item ${key} ${label}`);
-    const response = window.confirm(
-      "Are you sure you want to delete this member?"
-    );
-    if (!response) return;
-    handleUpdateTeamMemberStatus(key, "deleted")
-      .then(() => generateNotification("success", "Success", "Member deleted"))
-      .catch((ex) =>
-        generateNotification("error", "Error", "Error deleting member")
-      );
-  };
+  // const onClick = ({ key, label }) => {
+  //   // alert(`Click on item ${key} ${label}`);
+  //   const response = window.confirm(
+  //     "Are you sure you want to delete this member?"
+  //   );
+  //   if (!response) return;
+  //   handleUpdateTeamMemberStatus(key, "deleted")
+  //     .then(() => generateNotification("success", "Success", "Member deleted"))
+  //     .catch((ex) =>
+  //       generateNotification("error", "Error", "Error deleting member")
+  //     );
+  // };
 
   const handleCreateShareableLink = () => {
     console.log("send invite by link", formMode);
@@ -566,14 +588,14 @@ export default function MemberSelection({
   return (
     <>
       {/* Invite Member Modal Section */}
-      <Modal
+      <PopUpModal
         title="Invite a new team member"
         visible={isModalVisible}
         onCancel={handleCancel}
         footer={null}
         mask={false}
       >
-        <Text strong>
+        <Text strong style={{ fontSize: 16 }}>
           Start collabrating with your team member by sending an invite to your
           Baton.
         </Text>
@@ -586,7 +608,69 @@ export default function MemberSelection({
           className="mt-2"
           onTabClick={onTabItemClick}
         />
-      </Modal>
+      </PopUpModal>
+
+      {/* Remove Modal */}
+
+      <PopUpModal
+        title="Confirm"
+        visible={isRemoveModalVisible}
+        onCancel={handleRemoveOk}
+        footer={null}
+        mask={false}
+      >
+        <Text strong style={{ fontSize: 16 }}>
+          Are you sure you want to delete this team member from your list of
+          team members. This process cannot be undone
+        </Text>
+
+        {removeLoading ? (
+          <div className="col-12 d-flex align-items-center justify-content-center">
+            <Loading />
+          </div>
+        ) : (
+          <div className="col-12">
+            <TealButton
+              htmlType="button"
+              className="col-12"
+              onClick={() => {
+                setRemoveLoading(true);
+                handleDeleteTeamMember(removeMemberId)
+                  .then(() => {
+                    setItemSelected(null);
+                    setRemoveMemberId("");
+                    setRemoveLoading(false);
+                    handleRemoveOk();
+                    generateNotification(
+                      "success",
+                      "Success",
+                      "Member deleted"
+                    );
+                  })
+                  .catch((ex) => {
+                    generateNotification(
+                      "error",
+                      "Error",
+                      "Error deleting member"
+                    );
+                    setRemoveLoading(false);
+                  });
+              }}
+            >
+              REMOVE TEAM MEMBER
+            </TealButton>
+
+            <TealButton
+              htmlType="button"
+              className="col-12"
+              mode="outlined"
+              onClick={handleRemoveOk}
+            >
+              CANCEL
+            </TealButton>
+          </div>
+        )}
+      </PopUpModal>
 
       {/* -----------------Memebers View and Search Section----------------------- */}
       <Selectable
@@ -605,117 +689,105 @@ export default function MemberSelection({
         className="normal-input mt-3"
       />
       <div className="px-0">
-        {formMode
-          ? members.map((e, index) => (
-              <Row className="d-flex align-items-center" key={index}>
-                <Col
-                  xl={{ span: 20 }}
-                  lg={{ span: 18 }}
-                  md={{ span: 19 }}
-                  xs={{ span: 21 }}
+        {console.log(members)}
+        {
+          // formMode?
+          members.map((e, index) => (
+            <Row className="d-flex align-items-center" key={index}>
+              <Col
+                xl={{ span: 20 }}
+                lg={{ span: 18 }}
+                md={{ span: 19 }}
+                xs={{ span: 21 }}
+              >
+                <Selectable
+                  key={index}
+                  image={
+                    <Avatar style={{ backgroundColor: colors.teal100 }}>
+                      {e.name.substring(0, 2).toUpperCase()}
+                    </Avatar>
+                  }
+                  text={e.name}
+                  isItemActive={currentItem?.name === e.name ? true : false}
+                  onItemPress={() => {
+                    console.log("selected Item", e);
+                    setCurrentItem({
+                      name: e.name,
+                      id: e.receiverId,
+                      status: e.status,
+                    });
+                    // currentItem;
+                  }}
+                  email={e.receiverEmail}
+                  status={e.status}
+                />
+              </Col>
+              <Col
+                xl={{ span: 4 }}
+                lg={{ span: 6 }}
+                md={{ span: 5 }}
+                xs={{ span: 3 }}
+              >
+                <PressableText
+                  onClick={() => {
+                    setRemoveMemberId(e.docId);
+                    setIsRemoveModalVisible(true);
+                  }}
                 >
-                  <Selectable
-                    key={index}
-                    image={
-                      <Avatar style={{ backgroundColor: colors.teal100 }}>
-                        {e.name.substring(0, 2).toUpperCase()}
-                      </Avatar>
-                    }
-                    text={e.name}
-                    isItemActive={currentItem?.name === e.name ? true : false}
-                    onItemPress={() => {
-                      console.log("selected Item", e);
-                      setCurrentItem({
-                        name: e.name,
-                        id: e.receiverId,
-                        status: e.status,
-                      });
-                      // currentItem;
-                    }}
-                    status={e.status}
-                  />
-                </Col>
-                <Col
-                  xl={{ span: 4 }}
-                  lg={{ span: 6 }}
-                  md={{ span: 5 }}
-                  xs={{ span: 3 }}
-                >
-                  <PressableText
-                    onClick={() => {
-                      const response = window.confirm(
-                        "Are you sure you want to delete this member?"
-                      );
-                      if (!response) return;
-                      handleDeleteTeamMember(e.docId)
-                        .then(() => {
-                          setItemSelected(null);
-                          handleCancel();
-                          generateNotification(
-                            "success",
-                            "Success",
-                            "Member deleted"
-                          );
-                        })
-                        .catch((ex) => {
-                          generateNotification(
-                            "error",
-                            "Error",
-                            "Error deleting member"
-                          );
-                        });
+                  <CloseCircleFilled style={{ color: colors.mosque }} />
+                  <Text
+                    className="ms-1 d-none d-md-block"
+                    style={{
+                      color: colors.mosque,
+                      textDecoration: "underline",
                     }}
                   >
-                    <CloseCircleFilled style={{ color: colors.mosque }} />
-                    <Text
-                      className="ms-1 d-none d-md-block"
-                      style={{
-                        color: colors.mosque,
-                        textDecoration: "underline",
-                      }}
-                    >
-                      Remove
-                    </Text>
-                  </PressableText>
-                </Col>
-              </Row>
-            ))
-          : members.map((e, index) => (
-              <Dropdown
-                key={index}
-                overlay={() => (
-                  <Menu
-                    items={[
-                      {
-                        label: "Delete",
-                        key: e.docId,
-                        icon: <DeleteFilled />,
-                      },
-                    ]}
-                    onClick={onClick}
-                  />
-                )}
-                trigger={["click"]}
-              >
-                <div>
-                  <Selectable
-                    key={e.docId}
-                    icon={
-                      <Avatar style={{ backgroundColor: colors.teal100 }}>
-                        {e.name.substring(0, 2).toUpperCase()}
-                      </Avatar>
-                    }
-                    text={e.name}
-                    isItemActive={false}
-                    status={e.status}
-                    onItemPress={() => {}}
-                    statusColor={
-                      e.status == "pending" ? "#F29339" : colors.teal100
-                    }
-                  />
-                </div>
-              </Dropdown>
-            ))}
+                    Remove
+                  </Text>
+                </PressableText>
+              </Col>
+            </Row>
+          ))
+          // : members.map((e, index) => (
+          //     <Dropdown
+          //       key={index}
+          //       overlay={() => (
+          //         <Menu
+          //           items={[
+          //             {
+          //               label: "Delete",
+          //               key: e.docId,
+          //               icon: <DeleteFilled />,
+          //             },
+          //           ]}
+          //           onClick={() => {
+          //             setRemoveMemberId(e.docId);
+          //             setIsRemoveModalVisible(true);
+          //           }}
+          //         />
+          //       )}
+          //       trigger={["click"]}
+          //     >
+          //       <div>
+          //         <Selectable
+          //           key={e.docId}
+          //           icon={
+          //             <Avatar style={{ backgroundColor: colors.teal100 }}>
+          //               {e.name.substring(0, 2).toUpperCase()}
+          //             </Avatar>
+          //           }
+          //           text={e.name}
+          //           isItemActive={false}
+          //           status={e.status}
+          //           onItemPress={() => {}}
+          //           statusColor={
+          //             e.status == "pending" ? "#F29339" : colors.teal100
+          //           }
+          //         />
+          //       </div>
+          //     </Dropdown>
+          //   ))
+        }
       </div>
 
       {formMode && (
@@ -743,7 +815,6 @@ export default function MemberSelection({
 }
 
 const TabNav = styled(Tabs)`
-  font-weight: 500;
   .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
     color: ${colors.mosque} !important;
   }
@@ -753,11 +824,17 @@ const TabNav = styled(Tabs)`
   .ant-tabs-ink-bar {
     background: ${colors.mosque} !important;
   }
+  .ant-tabs-tab-btn {
+    font-weight: 500 !important;
+  }
 `;
 
 const FormInput = styled(Input)`
   height: 40px;
   border-color: #c0c0c0 !important;
+  &.ant-form-item-required {
+    font-weight: bold !important;
+  }
   &.ant-input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
     -webkit-text-fill-color: black !important;
@@ -770,10 +847,6 @@ const FormInput = styled(Input)`
   &.ant-input:focus {
     border-color: ${colors.mosque} !important;
     box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
-  }
-
-  &.ant-form-item-label {
-    font-weight: bold !important;
   }
 `;
 
@@ -795,5 +868,14 @@ const PressableText = styled.div`
   &:hover {
     color: ${colors.cyprus};
     user-select: none;
+  }
+`;
+
+const PopUpModal = styled(Modal)`
+  .ant-modal-close {
+    color: black !important;
+  }
+  .ant-modal-title {
+    font-weight: bold !important;
   }
 `;

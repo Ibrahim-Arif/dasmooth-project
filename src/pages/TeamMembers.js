@@ -56,6 +56,10 @@ export default function TeamMembers() {
   const [inviteId, setInviteId] = useState("");
   const [linkCopied, setLinkCopied] = useState(false);
   const [showLink, setShowLink] = useState(false);
+  const [isRemoveModalVisible, setIsRemoveModalVisible] = useState(false);
+  const [removeMemberId, setRemoveMemberId] = useState("");
+  const [removeLoading, setRemoveLoading] = useState(false);
+
   const [form] = Form.useForm();
 
   const { isLogin, teamMembers } = useUser();
@@ -65,6 +69,11 @@ export default function TeamMembers() {
     console.log("handleOk");
     setIsModalVisible(false);
     setIsInviteSent(false);
+  };
+
+  const handleRemoveOk = () => {
+    console.log("handleRemoveOk");
+    setIsRemoveModalVisible(false);
   };
 
   const showModal = () => {
@@ -445,92 +454,157 @@ export default function TeamMembers() {
   }, [teamMembers, searchText]);
 
   return (
-    <Container className="p-3 justify-content-start ms-0 d-flex flex-column">
-      <h5>Team Members</h5>
-      <Container className="col-12 col-lg-6  ms-0 align-self-start">
-        <>
-          {/* Invite Member Modal Section */}
-          <Modal
-            title="Invite a new team member"
-            visible={isModalVisible}
-            onCancel={handleCancel}
-            footer={null}
-            mask={false}
-          >
-            <Text strong>
-              Start collabrating with your team member by sending an invite to
-              your Baton.
-            </Text>
+    <>
+      {/* Remove Modal */}
+      <PopUpModal
+        title="Confirm"
+        visible={isRemoveModalVisible}
+        onCancel={handleRemoveOk}
+        footer={null}
+        mask={false}
+      >
+        <Text strong style={{ fontSize: 16 }}>
+          Are you sure you want to delete this team member from your list of
+          team members. This process cannot be undone
+        </Text>
 
-            <TabNav
-              defaultActiveKey="1"
-              items={items}
-              onChange={onChange}
-              tabBarGutter={15}
-              className="mt-2"
-              onTabClick={onTabItemClick}
-            />
-          </Modal>
-
-          {/* -----------------Memebers View and Search Section----------------------- */}
-          <Selectable
-            icon={<PlusOutlined />}
-            text="Invite team member by email or text message"
-            isItemActive={false}
-            customColor={{ color: colors.teal100, bgColor: colors.cgLight95 }}
-            onItemPress={showModal}
-          />
-
-          <Input
-            placeholder="Search by name or email"
-            size="large"
-            style={{ borderRadius: 5, width: "100%", height: 50 }}
-            onChange={(e) => setSearchText(e.currentTarget.value)}
-            className="normal-input mt-3"
-          />
-          <div className="px-0">
-            {members.map((e, index) => (
-              <Dropdown
-                key={index}
-                overlay={() => (
-                  <Menu
-                    items={[
-                      {
-                        label: "Delete",
-                        key: e.docId,
-                        icon: <DeleteFilled />,
-                      },
-                    ]}
-                    onClick={onClick}
-                  />
-                )}
-                trigger={["click"]}
-              >
-                <div>
-                  <Selectable
-                    key={e.docId}
-                    icon={
-                      <Avatar style={{ backgroundColor: colors.teal100 }}>
-                        {e.name.substring(0, 2).toUpperCase()}
-                      </Avatar>
-                    }
-                    text={e.name}
-                    isItemActive={false}
-                    status={e.status}
-                    onItemPress={() => {}}
-                    statusColor={
-                      e.status == "pending" ? "#F29339" : colors.teal100
-                    }
-                  />
-                </div>
-              </Dropdown>
-            ))}
+        {removeLoading ? (
+          <div className="col-12 d-flex align-items-center justify-content-center">
+            <Loading />
           </div>
+        ) : (
+          <div className="col-12">
+            <TealButton
+              htmlType="button"
+              className="col-12"
+              onClick={() => {
+                setRemoveLoading(true);
+                handleDeleteTeamMember(removeMemberId)
+                  .then(() => {
+                    setRemoveMemberId("");
+                    setRemoveLoading(false);
+                    handleRemoveOk();
+                    generateNotification(
+                      "success",
+                      "Success",
+                      "Member deleted"
+                    );
+                  })
+                  .catch((ex) => {
+                    generateNotification(
+                      "error",
+                      "Error",
+                      "Error deleting member"
+                    );
+                    setRemoveLoading(false);
+                  });
+              }}
+            >
+              REMOVE TEAM MEMBER
+            </TealButton>
 
-          <div style={{ height: "50px" }} />
-        </>
+            <TealButton
+              htmlType="button"
+              className="col-12"
+              mode="outlined"
+              onClick={handleRemoveOk}
+            >
+              CANCEL
+            </TealButton>
+          </div>
+        )}
+      </PopUpModal>
+      <Container className="p-3 justify-content-start ms-0 d-flex flex-column">
+        <h5>Team Members</h5>
+        <Container className="col-12 col-lg-6  ms-0 align-self-start">
+          <>
+            {/* Invite Member Modal Section */}
+            <Modal
+              title="Invite a new team member"
+              visible={isModalVisible}
+              onCancel={handleCancel}
+              footer={null}
+              mask={false}
+            >
+              <Text strong>
+                Start collabrating with your team member by sending an invite to
+                your Baton.
+              </Text>
+
+              <TabNav
+                defaultActiveKey="1"
+                items={items}
+                onChange={onChange}
+                tabBarGutter={15}
+                className="mt-2"
+                onTabClick={onTabItemClick}
+              />
+            </Modal>
+
+            {/* -----------------Memebers View and Search Section----------------------- */}
+            <Selectable
+              icon={<PlusOutlined />}
+              text="Invite team member by email or text message"
+              isItemActive={false}
+              customColor={{ color: colors.teal100, bgColor: colors.cgLight95 }}
+              onItemPress={showModal}
+            />
+
+            <Input
+              placeholder="Search by name or email"
+              size="large"
+              style={{ borderRadius: 5, width: "100%", height: 50 }}
+              onChange={(e) => setSearchText(e.currentTarget.value)}
+              className="normal-input mt-3"
+            />
+            <div className="px-0">
+              {members.map((e, index) => (
+                <Dropdown
+                  key={index}
+                  overlay={() => (
+                    <Menu
+                      items={[
+                        {
+                          label: "Delete",
+                          key: e.docId,
+                          icon: <DeleteFilled />,
+                        },
+                      ]}
+                      onClick={() => {
+                        setRemoveMemberId(e.docId);
+                        setIsRemoveModalVisible(true);
+                      }}
+                    />
+                  )}
+                  trigger={["click"]}
+                >
+                  <div>
+                    <Selectable
+                      key={e.docId}
+                      icon={
+                        <Avatar style={{ backgroundColor: colors.teal100 }}>
+                          {e.name.substring(0, 2).toUpperCase()}
+                        </Avatar>
+                      }
+                      text={e.name}
+                      isItemActive={false}
+                      status={e.status}
+                      onItemPress={() => {}}
+                      statusColor={
+                        e.status == "pending" ? "#F29339" : colors.teal100
+                      }
+                      email={e.receiverEmail}
+                    />
+                  </div>
+                </Dropdown>
+              ))}
+            </div>
+
+            <div style={{ height: "50px" }} />
+          </>
+        </Container>
       </Container>
-    </Container>
+    </>
   );
 }
 const TabNav = styled(Tabs)`
@@ -586,5 +660,13 @@ const PressableText = styled.div`
   &:hover {
     color: ${colors.cyprus};
     user-select: none;
+  }
+`;
+const PopUpModal = styled(Modal)`
+  .ant-modal-close {
+    color: black !important;
+  }
+  .ant-modal-title {
+    font-weight: bold !important;
   }
 `;

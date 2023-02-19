@@ -13,6 +13,7 @@ export default function Selectable({
   onItemPress = () => null,
   isItemActive,
   customColor = null,
+  email = null,
   status = null,
   statusColor = colors.teal100,
   isEditable = false,
@@ -76,17 +77,16 @@ export default function Selectable({
           } d-flex flex-row align-items-center px-1 px-md-3 `}
         >
           <AssetContainer>{image ? image : icon}</AssetContainer>
-          {/* <div></div> */}
-          <SelectableLabel
-            className="ms-2"
-            color={isItemActive ? "white" : colors.mosque}
-          >
-            {text}
-          </SelectableLabel>
+          <div className="d-flex flex-column ms-2">
+            <SelectableLabel color={isItemActive ? "white" : colors.mosque}>
+              {text}
+            </SelectableLabel>
+            <label style={{ fontSize: 11 }}>{email}</label>
+          </div>
         </Container>
 
         {status && (
-          <Container>
+          <Container className="my-auto">
             <StatusText id="status-text" color={statusColor}>
               {`${status?.charAt(0)?.toUpperCase() + status?.slice(1)}`}
             </StatusText>

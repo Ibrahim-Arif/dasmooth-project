@@ -48,6 +48,7 @@ import {
 import { generateNotification } from "../utilities/generateNotification";
 import moment from "moment";
 import { handleAddNotification } from "../services/handleAddNotification";
+import styled from "styled-components";
 
 const { Title, Text, Link } = Typography;
 
@@ -143,7 +144,7 @@ export default function BatonsForm() {
 
     if (isNewPost || isDraft) {
       // console.log("New");
-
+      console.log(teamMemberData);
       let post = {
         deadline: dateData,
         budget: budgetData,
@@ -492,7 +493,7 @@ export default function BatonsForm() {
   return (
     <Container className="d-flex flex-row mt-4 mx-0 justify-content-start align-items-start justify-content-lg-start">
       {/* Save in Draft Modal */}
-      <Modal
+      <PopUpModal
         title="Confirm"
         visible={isDraftModalVisible}
         onCancel={() => setIsDraftModalVisible(false)}
@@ -501,7 +502,7 @@ export default function BatonsForm() {
       >
         {!modalLoading ? (
           <>
-            <Text strong>
+            <Text strong style={{ fontSize: 16 }}>
               You have unsaved changes to your Baton. Do you want to save your
               changes?
             </Text>
@@ -538,7 +539,7 @@ export default function BatonsForm() {
             <Loading />
           </div>
         )}
-      </Modal>
+      </PopUpModal>
 
       {dataFetchLoading ? (
         <Loading />
@@ -901,3 +902,9 @@ export default function BatonsForm() {
     </Container>
   );
 }
+
+const PopUpModal = styled(Modal)`
+  .ant-modal-close {
+    color: black !important;
+  }
+`;
