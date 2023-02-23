@@ -144,7 +144,7 @@ export default function BatonsForm() {
 
     if (isNewPost || isDraft) {
       // console.log("New");
-      console.log(teamMemberData);
+      // console.log(teamMemberData);
       let post = {
         deadline: dateData,
         budget: budgetData,
@@ -161,7 +161,7 @@ export default function BatonsForm() {
         deletedOn: 0,
         description: description,
       };
-      // console.log("new Post");
+      console.log("new Post");
       console.log(post);
       // return;
 
@@ -194,7 +194,6 @@ export default function BatonsForm() {
           setLoading(false);
         });
     } else {
-      // console.log("Edit");
       let editedPost = {
         ...fetchedDataObject,
         deadline: dateData,
@@ -202,7 +201,9 @@ export default function BatonsForm() {
         title: title,
         description: description,
         memberName: teamMemberData.name,
+        memberId: teamMemberData.id,
         updateOn: Date.now(),
+        authorPostStatus: "passed",
       };
       console.log("editedPost", editedPost);
       // console.log(editedPost);
@@ -383,6 +384,7 @@ export default function BatonsForm() {
       setDataFetchLoading(true);
       handleGetBatonFilesSnapshot(params.id, setFilesList);
       handleGetBatonPostUpdates(params.id, setPostUpdateData);
+
       setIsNewPost(false);
       if (batonsData.length == 0) return;
 
@@ -466,7 +468,7 @@ export default function BatonsForm() {
         console.log("new post dta flushed");
       }
     }
-  }, [params]);
+  }, []);
 
   // ! this works but resets the page
   // window.onpopstate = () => {
@@ -661,7 +663,6 @@ export default function BatonsForm() {
               </div>
 
               <Container fluid className="px-0">
-                {console.log(teamMemberData)}
                 <Selectable
                   icon={
                     teamMemberData != null ? (

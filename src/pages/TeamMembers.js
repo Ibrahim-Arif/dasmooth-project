@@ -28,13 +28,13 @@ import { TealButton, Selectable, Loading } from "../components";
 import {
   handleAddSystemUserToMember,
   handleCheckUserExsistInSystem,
-  handleDeleteTeamMember,
   handleGetTeamMember,
   handleSendEmailToMember,
   handleSendInviteToMember,
-  handleSignUp,
   handleAddTeamMember,
+  handleDeleteTeamMember,
   handleUpdateTeamMemberStatus,
+  handleSignUp,
   handleAddNotification,
 } from "../services";
 import { useUser } from "../hooks/useContext";

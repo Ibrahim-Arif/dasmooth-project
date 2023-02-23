@@ -85,11 +85,13 @@ export default function DashboardMenu() {
     switch (key) {
       case "logout":
         // setSelectedKey("logout");
-        setBatonsData([]);
-        getAuth().signOut();
-        window.localStorage.clear();
-        setIsLogin(false);
-        navigate("/");
+        getAuth()
+          .signOut()
+          .then(() => {
+            setBatonsData([]);
+            setIsLogin(false);
+            navigate("/signIn");
+          });
         break;
       case "delete":
         // setSelectedKey("delete");

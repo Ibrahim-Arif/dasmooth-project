@@ -13,6 +13,7 @@ import {
   handleUpdateBaton,
   handleUpdateInviteStatus,
   handleUpdateTeamMember,
+  handleGetBaton,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -26,7 +27,7 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [inviteData, setInviteData] = useState(null);
   const [inviteId, setInviteId] = useState(null);
-  const { setIsLogin, isLogin } = useUser();
+  const { setIsLogin, isLogin, setIsInviteLink } = useUser();
   const auth = getAuth();
 
   // useCheckSignIn();
@@ -99,27 +100,46 @@ export default function SignIn() {
                   // now check if there is a batonID
                   if (inviteData?.batonId) {
                     // if there is a batonID then update the baton
-
-                    handleUpdateBaton(inviteData?.batonId, {
-                      memberName: payload.receiverEmail?.split("@")[0],
-                      memberId: payload.receiverId,
-                      memberPostStatus: "received",
-                      authorPostStatus: "passed",
-                    })
-                      .then((res) => {
-                        setLoading(false);
-                        if (!user.emailVerified) {
-                          generateNotification(
-                            "error",
-                            "Verify Email",
-                            "Kindly verify your email to continue"
-                          );
-                          return;
-                        } else {
-                          // if there is no batonID then just navigate to home
-                          setIsLogin(user);
-                          navigate("/");
+                    handleGetBaton(inviteData?.batonId)
+                      .then((baton) => {
+                        let updateauthorPostStatus = null;
+                        if (baton?.authorPostStatus == "draft") {
+                          updateauthorPostStatus = "pending";
+                        } else if (baton?.authorPostStatus == "pending") {
+                          updateauthorPostStatus = "passed";
                         }
+                        handleUpdateBaton(inviteData?.batonId, {
+                          memberName: payload.receiverEmail?.split("@")[0],
+                          memberId: payload.receiverId,
+                          memberPostStatus: "received",
+                          authorPostStatus: updateauthorPostStatus,
+                        })
+                          .then((res) => {
+                            setLoading(false);
+                            if (!user.emailVerified) {
+                              generateNotification(
+                                "error",
+                                "Verify Email",
+                                "Kindly verify your email to continue"
+                              );
+                              return;
+                            } else {
+                              // if there is no batonID then just navigate to home
+                              setIsLogin(user);
+                              navigate("/");
+                            }
+                          })
+                          .catch((ex) => {
+                            console.log(ex.message);
+                            generateNotification(
+                              "error",
+                              "Error",
+                              "The Baton you are invited to is no created yet."
+                            );
+                            setIsLogin(user);
+                            navigate("/");
+                            setLoading(false);
+                          });
                       })
                       .catch((ex) => {
                         console.log(ex.message);

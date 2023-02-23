@@ -30,7 +30,9 @@ import { handleUserInformationUpdate } from "./handleUserInformationUpdate";
 import { handleUpdateInviteStatus } from "./handleUpdateInviteStatus";
 import { handleAddNotification } from "./handleAddNotification";
 import { handleUpdateTeamMember } from "./handleUpdateTeamMember";
+import { handleGetBaton } from "./handleGetBaton";
 export {
+  handleGetBaton,
   handleUpdateTeamMember,
   handleAddNotification,
   handleUpdateInviteStatus,

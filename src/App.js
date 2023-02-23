@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import { StateProvider } from "./hooks/useContext";
 import {
   DashboardMenu,
@@ -25,6 +32,7 @@ import {
   handleGetTeamMembers,
 } from "./services";
 import { batonsList } from "./utilities/batonsList";
+import SplashScreen from "./pages/SplashScreen";
 
 const app = initializeApp(firebaseConfig);
 const db = initializeFirestore(app, {
@@ -42,6 +50,8 @@ const App = () => {
   const [myBatons, setMyBatons] = useState([]);
   const [otherBatons, setOtherBatons] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [showSplashScreen, setShowSplshScreen] = useState(true);
+  const [isInviteLink, setIsInviteLink] = useState(false);
 
   const flushStates = () => {
     setPermanentData([]);
@@ -72,13 +82,9 @@ const App = () => {
     setNotifications,
     photoURL,
     setPhotoURL,
+    isInviteLink,
+    setIsInviteLink,
   };
-
-  onAuthStateChanged(auth, (user) => {
-    if (user && user.emailVerified) {
-      setIsLogin(user);
-    }
-  });
 
   useEffect(() => {
     if (isLogin) {
@@ -113,32 +119,47 @@ const App = () => {
     setBatonsData([...permanentData]);
   }, [JSON.stringify(permanentData)]);
 
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user && user.emailVerified) {
+        if (!window.location.pathname.includes("/signup/")) {
+          setIsLogin(user);
+        } else {
+          auth.signOut().then(() => {
+            flushStates();
+          });
+        }
+        setShowSplshScreen(false);
+      } else {
+        setShowSplshScreen(false);
+      }
+    });
+  }, []);
+
   return (
     <StateProvider values={userContextValues}>
       <BrowserRouter>
-        {isLoading === false ? (
-          <>
-            <Routes>
-              {isLogin == false ? (
-                <>
-                  <Route path="" element={<Welcome />} />
-                  {/* <Route path="invite/:inviteId" element={<Invite />} /> */}
-                  <Route path="signIn/:id" element={<SignIn />} />
-                  <Route path="signUp/:id" element={<SignUp />} />
-                  <Route path="signIn" element={<SignIn />} />
-                  <Route path="signUp" element={<SignUp />} />
-                  <Route path="verifyEmail" element={<VerifyEmail />} />
-                  <Route path="forgotpassword" element={<ForgotPassword />} />
-                  <Route path="*" element={<SignIn />} />
-                </>
-              ) : (
-                <Route path="*" element={<DashboardMenu />} />
-              )}
-              {/*  <Route path="*" element={<NotFound />} /> */}
-            </Routes>
-          </>
-        ) : // <Loading />
-        null}
+        <>
+          <Routes>
+            {showSplashScreen ? (
+              <Route path="*" element={<SplashScreen />} />
+            ) : isLogin == false ? (
+              <>
+                <Route path="" element={<Welcome />} />
+                {/* <Route path="invite/:inviteId" element={<Invite />} /> */}
+                <Route path="signIn/:id" element={<SignIn />} />
+                <Route path="signUp/:id" element={<SignUp />} />
+                <Route path="signIn" element={<SignIn />} />
+                <Route path="signUp" element={<SignUp />} />
+                <Route path="verifyEmail" element={<VerifyEmail />} />
+                <Route path="forgotpassword" element={<ForgotPassword />} />
+                <Route path="*" element={<SignIn />} />
+              </>
+            ) : (
+              <Route path="*" element={<DashboardMenu />} />
+            )}
+          </Routes>
+        </>
       </BrowserRouter>
     </StateProvider>
   );

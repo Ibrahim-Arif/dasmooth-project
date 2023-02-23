@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, Typography } from "antd";
+import { Form, Input, Button, Typography, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { Container } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router";
@@ -15,6 +15,7 @@ import {
   handleUpdateInviteStatus,
   handleUpdateTeamMemberStatus,
   handleUpdateTeamMember,
+  handleGetBaton,
 } from "../services";
 import { generateNotification } from "../utilities/generateNotification";
 import { Loading } from "../components";
@@ -102,22 +103,32 @@ export default function SignUp() {
                 .then(() => {
                   // now check if there is a batonID
                   if (inviteData?.batonId) {
-                    // if there is a batonID then update the baton
-                    handleUpdateBaton(inviteData?.batonId, {
-                      memberName: payload.receiverEmail?.split("@")[0],
-                      memberId: payload.receiverId,
-                      memberPostStatus: "received",
-                      authorPostStatus: "passed",
-                    })
-                      .then((res) => {
-                        console.log("Updated Baton", res);
-                        setLoading(false);
-                        navigate("/verifyEmail");
+                    // check current baton status
+
+                    handleGetBaton(inviteData?.batonId).then((baton) => {
+                      let updateauthorPostStatus =
+                        baton?.authorPostStatus == "draft"
+                          ? "pending"
+                          : "passed";
+
+                      // if there is a batonID then update the baton
+                      handleUpdateBaton(inviteData?.batonId, {
+                        memberName: payload.receiverEmail?.split("@")[0],
+                        memberId: payload.receiverId,
+                        memberPostStatus: "received",
+                        authorPostStatus: updateauthorPostStatus,
                       })
-                      .catch((ex) => {
-                        generateNotification("error", "Error", ex.message);
-                        setLoading(false);
-                      });
+                        .then((res) => {
+                          console.log("Updated Baton", res);
+                          setLoading(false);
+                          navigate("/verifyEmail");
+                        })
+                        .catch((ex) => {
+                          console.log(ex.message);
+                          generateNotification("error", "Error", ex.message);
+                          setLoading(false);
+                        });
+                    });
                   } else {
                     // if there is no batonID then just navigate to verifyEmail
                     setLoading(false);

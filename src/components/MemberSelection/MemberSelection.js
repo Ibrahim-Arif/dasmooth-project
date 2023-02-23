@@ -101,65 +101,7 @@ export default function MemberSelection({
     // 1. Check if user is already a member of the team, then show error
     // 2. if user is not a member of the team, then send mail
 
-    // console.log(members);
-    // handleCheckUserExsistInSystem(values.email)
-    //   .then((uid) => {
-    //     let payload = {};
-    //     if (uid) {
-    //       console.log("User exsist in system, Adding member to team");
-    //       payload = {
-    //         receiverId: uid,
-    //         receiverEmail: values.email,
-    //         status: "pending",
-    //         inviteBy: isLogin.uid,
-    //         name: values.firstName + " " + values.lastName,
-    //       };
-
-    //       // sent email to the user and then add to database
-    //     } else {
-    //       console.log("User don't exsist in system, Adding member to team");
-    //       payload = {
-    //         receiverId: "",
-    //         receiverEmail: values.email,
-    //         status: "pending",
-    //         inviteBy: isLogin.uid,
-    //         name: values.firstName + " " + values.lastName,
-    //       };
-    //       handleAddTeamMemberByInvite(payload)
-    //         .then(() => {
-    //           console.log("Invite sent");
-    //           setIsInviteSent(true);
-    //           setInviteSentTo(values.email);
-    //           setCurrentItem({
-    //             name: payload.name,
-    //             inviteBy: isLogin.uid,
-    //             name: payload.name,
-    //             image: (
-    //               <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-    //                 {payload.name.substring(0, 2).toUpperCase()}
-    //               </Avatar>
-    //             ),
-    //           });
-    //           if (formMode) {
-    //             setItemSelected({
-    //               name: payload.name,
-    //               inviteBy: isLogin.uid,
-    //               name: payload.name,
-    //               image: (
-    //                 <Avatar style={{ backgroundColor: colors.tealLight20 }}>
-    //                   {payload.name.substring(0, 2).toUpperCase()}
-    //                 </Avatar>
-    //               ),
-    //             });
-    //           }
-    //         })
-    //         .finally(() => setLoading(false))
-    //         .catch((ex) => {
-    //           generateNotification("error", "Error", ex.message);
-    //         });
-    //     }
-    //   })
-    console.log("handleAddMemberByEmailSubmit");
+    console.log("handleAddMemberByEmailSubmit ", batonId);
     if (values.email?.toLowerCase() === isLogin.email?.toLowerCase()) return;
     if (
       members?.filter(
