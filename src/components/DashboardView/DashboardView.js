@@ -25,12 +25,12 @@ export default function DashboardView(props) {
   const navigate = useNavigate();
 
   const statuses = [
+    "draft",
     "pending",
     "passed",
     "received",
     "declined",
     "complete",
-    "draft",
   ];
 
   const filterBatons = (batonData, batonName) => {
@@ -40,7 +40,7 @@ export default function DashboardView(props) {
       let temp = batons;
       delete temp[batonName];
       setBatons(temp);
-      setActiveBatons(Object.values(temp));
+      setActiveBatons(Object.values(temp).sort((a, b) => a.id - b.id));
     } else if (batonData.length > 0) {
       // console.log(`adding the ${batonName} btaon back in array`);
       let temp = batons;
@@ -48,7 +48,7 @@ export default function DashboardView(props) {
       // console.log(batonsList)
       setBatons(temp);
       temp = Object.values(temp);
-      setActiveBatons(Object.values(temp));
+      setActiveBatons(Object.values(temp).sort((a, b) => a.id - b.id));
     }
   };
 
@@ -56,6 +56,11 @@ export default function DashboardView(props) {
     // console.log("DashBoardView");
     // batonsData.forEach((e) => console.log(e.title, "|", e.docId));
     // console.log(batonsData);
+
+    let draft = filterBatonsData(batonsData, "draft", isLogin.uid);
+    filterBatons(draft, "draft");
+    setDraftBatons(draft);
+
     let pending = filterBatonsData(batonsData, "pending", isLogin.uid);
     filterBatons(pending, "pending");
     setPendingBatons(pending);
@@ -76,10 +81,6 @@ export default function DashboardView(props) {
     filterBatons(declined, "declined");
     setDeclinedBatons(declined);
 
-    let draft = filterBatonsData(batonsData, "draft", isLogin.uid);
-    filterBatons(draft, "draft");
-    setDraftBatons(draft);
-
     let complete = filterBatonsData(batonsData, "complete");
     // console.log("coomp", complete);
     filterBatons(complete, "complete");
@@ -90,22 +91,22 @@ export default function DashboardView(props) {
 
   const getBaton = useMemo(() => {
     return {
+      DraftBatons,
       PendingBatons,
       PassedBatons,
       ReceivedBatons,
       DeclinedBatons,
       AcceptedBatons,
       CompleteBatons,
-      DraftBatons,
     };
   }, [
+    JSON.stringify(DraftBatons),
     JSON.stringify(PendingBatons),
     JSON.stringify(PassedBatons),
     JSON.stringify(ReceivedBatons),
     JSON.stringify(DeclinedBatons),
     JSON.stringify(AcceptedBatons),
     JSON.stringify(CompleteBatons),
-    JSON.stringify(DraftBatons),
   ]);
 
   const onDragEnd = (fromIndex, toIndex) => {
@@ -136,6 +137,7 @@ export default function DashboardView(props) {
           CREATE A NEW BATON
         </Button>
       </Container>
+
       {/* Batons Container */}
       {batonsData.length > 0 && (
         <Container>

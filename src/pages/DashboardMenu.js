@@ -43,6 +43,7 @@ export default function DashboardMenu() {
     photoURL,
     permanentData,
     notifications,
+    setIsDraftModalVisible,
   } = useUser();
 
   const [siderW, setSiderW] = useState("200px");
@@ -82,6 +83,10 @@ export default function DashboardMenu() {
   const handleItemClick = ({ key }) => {
     // console.log(key);
     setSelectedKey(key);
+    if (location.pathname == "/batonsForm") {
+      setIsDraftModalVisible(true);
+      return;
+    }
     switch (key) {
       case "logout":
         // setSelectedKey("logout");

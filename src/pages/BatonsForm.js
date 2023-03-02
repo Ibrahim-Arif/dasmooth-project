@@ -54,7 +54,6 @@ const { Title, Text, Link } = Typography;
 
 export default function BatonsForm() {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isDraftModalVisible, setIsDraftModalVisible] = useState(false);
 
   const [activeTitle, setActiveTitle] = useState("");
 
@@ -90,7 +89,8 @@ export default function BatonsForm() {
   const [isNewPost, setIsNewPost] = useState(true);
   const [isDraft, setIsDraft] = useState(false);
 
-  const { batonsData, isLogin } = useUser();
+  const { batonsData, isLogin, isDraftModalVisible, setIsDraftModalVisible } =
+    useUser();
 
   const params = useParams();
   const navigate = useNavigate();

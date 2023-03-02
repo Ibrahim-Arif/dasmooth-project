@@ -52,6 +52,7 @@ const App = () => {
   const [notifications, setNotifications] = useState([]);
   const [showSplashScreen, setShowSplshScreen] = useState(true);
   const [isInviteLink, setIsInviteLink] = useState(false);
+  const [isDraftModalVisible, setIsDraftModalVisible] = useState(false);
 
   const flushStates = () => {
     setPermanentData([]);
@@ -84,6 +85,8 @@ const App = () => {
     setPhotoURL,
     isInviteLink,
     setIsInviteLink,
+    isDraftModalVisible,
+    setIsDraftModalVisible,
   };
 
   useEffect(() => {

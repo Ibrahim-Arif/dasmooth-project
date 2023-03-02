@@ -18,6 +18,8 @@ export const useUser = () => {
     setNotifications,
     photoURL,
     setPhotoURL,
+    isDraftModalVisible,
+    setIsDraftModalVisible,
   } = useContext(UserContext);
 
   return {
@@ -35,6 +37,8 @@ export const useUser = () => {
     setNotifications,
     photoURL,
     setPhotoURL,
+    isDraftModalVisible,
+    setIsDraftModalVisible,
   };
 };
 
@@ -54,6 +58,8 @@ export const StateProvider = ({ values, children }) => {
     setNotifications,
     photoURL,
     setPhotoURL,
+    isDraftModalVisible,
+    setIsDraftModalVisible,
   } = values;
 
   return (
@@ -73,6 +79,8 @@ export const StateProvider = ({ values, children }) => {
         setNotifications,
         photoURL,
         setPhotoURL,
+        isDraftModalVisible,
+        setIsDraftModalVisible,
       }}
     >
       {children}
