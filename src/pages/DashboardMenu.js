@@ -33,7 +33,6 @@ export default function DashboardMenu() {
   const sideBarBgColor = "#f2f9f8";
 
   const [collapsed, setCollapsed] = useState(true);
-
   const [renderSearchBar, setRenderSearchBar] = useState(false);
   const [search, setSearch] = useState("");
   const {
@@ -44,6 +43,9 @@ export default function DashboardMenu() {
     permanentData,
     notifications,
     setIsDraftModalVisible,
+    isDraftModalVisible,
+    drawerClickedItem,
+    setDrawerClickedItem,
   } = useUser();
 
   const [siderW, setSiderW] = useState("200px");
@@ -81,15 +83,27 @@ export default function DashboardMenu() {
   };
 
   const handleItemClick = ({ key }) => {
-    // console.log(key);
+    // console.log(location);
     setSelectedKey(key);
-    if (location.pathname == "/batonsForm") {
+    if (
+      location.pathname == "/batonsForm" &&
+      location.state.from != "/batonsForm"
+    ) {
       setIsDraftModalVisible(true);
+      if (key == "delete") setDrawerClickedItem("deleteBaton");
+      if (key == "dashboard") setDrawerClickedItem("main");
+      if (key == "notifications") setDrawerClickedItem("notifications");
+      if (key == "profile") setDrawerClickedItem("profileSettings");
+      if (key == "team") setDrawerClickedItem("teamMembers");
       return;
+    } else {
+      setIsDraftModalVisible(false);
     }
+
     switch (key) {
       case "logout":
         // setSelectedKey("logout");
+
         getAuth()
           .signOut()
           .then(() => {
@@ -100,23 +114,28 @@ export default function DashboardMenu() {
         break;
       case "delete":
         // setSelectedKey("delete");
-        navigate("deleteBaton");
+
+        navigate("deleteBaton", { state: { from: location } });
         break;
       case "dashboard":
         // setSelectedKey("dasboard");
-        navigate("main");
+
+        navigate("main", { state: { from: location } });
         break;
       case "notifications":
         // setSelectedKey("notifications");
-        navigate("notifications");
+
+        navigate("notifications", { state: { from: location } });
         break;
       case "profile":
         // setSelectedKey("profile");
-        navigate("profileSettings");
+
+        navigate("profileSettings", { state: { from: location } });
         break;
       case "team":
         // setSelectedKey("team");
-        navigate("teamMembers");
+
+        navigate("teamMembers", { state: { from: location } });
         break;
     }
     window.innerWidth < 768 && setCollapsed(true);

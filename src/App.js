@@ -53,6 +53,7 @@ const App = () => {
   const [showSplashScreen, setShowSplshScreen] = useState(true);
   const [isInviteLink, setIsInviteLink] = useState(false);
   const [isDraftModalVisible, setIsDraftModalVisible] = useState(false);
+  const [drawerClickedItem, setDrawerClickedItem] = useState(null);
 
   const flushStates = () => {
     setPermanentData([]);
@@ -87,6 +88,8 @@ const App = () => {
     setIsInviteLink,
     isDraftModalVisible,
     setIsDraftModalVisible,
+    drawerClickedItem,
+    setDrawerClickedItem,
   };
 
   useEffect(() => {

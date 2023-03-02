@@ -20,6 +20,8 @@ export const useUser = () => {
     setPhotoURL,
     isDraftModalVisible,
     setIsDraftModalVisible,
+    drawerClickedItem,
+    setDrawerClickedItem,
   } = useContext(UserContext);
 
   return {
@@ -39,6 +41,8 @@ export const useUser = () => {
     setPhotoURL,
     isDraftModalVisible,
     setIsDraftModalVisible,
+    drawerClickedItem,
+    setDrawerClickedItem,
   };
 };
 
@@ -60,6 +64,8 @@ export const StateProvider = ({ values, children }) => {
     setPhotoURL,
     isDraftModalVisible,
     setIsDraftModalVisible,
+    drawerClickedItem,
+    setDrawerClickedItem,
   } = values;
 
   return (
@@ -81,6 +87,8 @@ export const StateProvider = ({ values, children }) => {
         setPhotoURL,
         isDraftModalVisible,
         setIsDraftModalVisible,
+        drawerClickedItem,
+        setDrawerClickedItem,
       }}
     >
       {children}

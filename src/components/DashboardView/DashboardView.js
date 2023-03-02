@@ -5,7 +5,7 @@ import { Container } from "react-bootstrap";
 import { colors } from "../../utilities/colors";
 import Collapseable from "../Collapseable/Collapseable";
 import { useUser } from "../../hooks/useContext";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import ReactDragListView from "react-drag-listview";
 import { batonsList } from "../../utilities/batonsList";
@@ -23,6 +23,7 @@ export default function DashboardView(props) {
   const [activeBatons, setActiveBatons] = useState(Object.values(batons));
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const statuses = [
     "draft",
@@ -132,7 +133,7 @@ export default function DashboardView(props) {
           size="large"
           icon={<PlusOutlined />}
           className="d-flex flex-row align-items-center"
-          onClick={() => navigate("/batonsForm")}
+          onClick={() => navigate("/batonsForm", { state: { from: location } })}
         >
           CREATE A NEW BATON
         </Button>

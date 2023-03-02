@@ -4,7 +4,7 @@ import { Container } from "react-bootstrap";
 import { useUser } from "../hooks/useContext";
 import { handleUpdateNotificationStatus } from "../services";
 import moment from "moment";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useCheckSignIn } from "../hooks/useCheckSignIn";
 import styledComponents from "styled-components";
 import Alert from "../components/Alert/Alert";
@@ -86,6 +86,7 @@ export default function Notification() {
   ];
   console.log(notifications);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const sectionSortedNotifications = useMemo(() => {
     if (notifications.length == 0) return [];
@@ -146,7 +147,9 @@ export default function Notification() {
                   handleUpdateNotificationStatus(notification.docId, true)
                 }
                 onViewDetails={() =>
-                  navigate(`/batonsForm/${notification.batonId}`)
+                  navigate(`/batonsForm/${notification.batonId}`, {
+                    state: { from: location },
+                  })
                 }
               />
             ))}

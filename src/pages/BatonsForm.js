@@ -89,8 +89,13 @@ export default function BatonsForm() {
   const [isNewPost, setIsNewPost] = useState(true);
   const [isDraft, setIsDraft] = useState(false);
 
-  const { batonsData, isLogin, isDraftModalVisible, setIsDraftModalVisible } =
-    useUser();
+  const {
+    batonsData,
+    isLogin,
+    isDraftModalVisible,
+    setIsDraftModalVisible,
+    drawerClickedItem,
+  } = useUser();
 
   const params = useParams();
   const navigate = useNavigate();
@@ -528,7 +533,7 @@ export default function BatonsForm() {
                 mode="outlined"
                 onClick={() => {
                   setIsDraftModalVisible(false);
-                  navigate("/main");
+                  navigate("/" + drawerClickedItem);
                 }}
               >
                 DISCARD
@@ -570,7 +575,7 @@ export default function BatonsForm() {
                     } else {
                       setIsDraftModalVisible(false);
                       if (isDeleted) navigate("/deleteBaton");
-                      else navigate("/main");
+                      else navigate("/" + drawerClickedItem);
                     }
                   }}
                 />

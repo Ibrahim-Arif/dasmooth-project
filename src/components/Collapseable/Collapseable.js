@@ -8,7 +8,7 @@ import {
 } from "@ant-design/icons";
 import styledComponents from "styled-components";
 import { colors } from "../../utilities/colors";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 const { Panel } = Collapse;
 
@@ -24,6 +24,7 @@ export default function Collapseable({
   // useEffect(() => console.log("Collapseable", batonsData), [batonsData]);
 
   const navigate = useNavigate();
+  const location = useLocation();
   return (
     <CustomCollapse
       bordered={false}
@@ -72,7 +73,7 @@ export default function Collapseable({
             onClick={() => {
               // console.log(e)
               // console.log(`/batonsForm/${e.docId}`);
-              navigate(`/batonsForm/${e.docId}`);
+              navigate(`/batonsForm/${e.docId}`, { state: { from: location } });
             }}
           >
             <Container
