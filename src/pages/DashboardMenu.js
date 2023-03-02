@@ -84,7 +84,6 @@ export default function DashboardMenu() {
 
   const handleItemClick = ({ key }) => {
     // console.log(location);
-    setSelectedKey(key);
     if (
       location.pathname == "/batonsForm" &&
       location.state.from != "/batonsForm"
@@ -99,6 +98,7 @@ export default function DashboardMenu() {
     } else {
       setIsDraftModalVisible(false);
     }
+    setSelectedKey(key);
 
     switch (key) {
       case "logout":
